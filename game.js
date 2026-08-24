@@ -8,6 +8,7 @@
   const TOTAL_STEPS = 5;
   const TOTAL_QS = GAME_QUESTION_COUNT;
   const FINAL_ROUND_COUNT = Math.min(10, TOTAL_QS, QUESTION_POOL.length);
+  const REGULAR_LEVEL_COUNT = Math.max(0, TOTAL_QS - FINAL_ROUND_COUNT);
   const CAMERA_ANCHOR_SLOT = 3;
   const STEP_SHIFT_X = 60;
   const STEP_SHIFT_Y = 40;
@@ -30,6 +31,7 @@
   let currentCorrectMeta = null;
   let stairPanTimer = null;
   let climberMotionTimer = null;
+  let nextQuestionTimer = null;
 
   const screenStart = document.getElementById("screenStart");
   const screenQuiz = document.getElementById("screenQuiz");
@@ -154,6 +156,50 @@
     const selectedRegular = shuffle([...regularPool]).slice(0, regularCount);
     return [...selectedRegular, ...hardQuestions].slice(0, TOTAL_QS);
   }
+
+  function getQuestionPoolForLevel(levelIndex) {
+    if (levelIndex < REGULAR_LEVEL_COUNT) {
+      return QUESTION_POOL.slice(0, Math.max(QUESTION_POOL.length - FINAL_ROUND_COUNT, 0));
+    }
+    return QUESTION_POOL.slice(-FINAL_ROUND_COUNT);
+  }
+
+  function getLevelRangeForLevel(levelIndex) {
+    if (levelIndex < REGULAR_LEVEL_COUNT) {
+      return [0, Math.max(0, REGULAR_LEVEL_COUNT - 1)];
+    }
+    return [REGULAR_LEVEL_COUNT, Math.max(REGULAR_LEVEL_COUNT, TOTAL_QS - 1)];
+  }
+
+  function refreshQuestionForLevel(levelIndex) {
+    if (levelIndex < 0 || levelIndex >= questionList.length) return;
+
+    const currentQuestion = questionList[levelIndex];
+    const [rangeStart, rangeEnd] = getLevelRangeForLevel(levelIndex);
+    const pool = getQuestionPoolForLevel(levelIndex);
+    const assignedInBand = questionList.slice(rangeStart, rangeEnd + 1);
+    const availableQuestions = pool.filter(
+      (candidate) => candidate !== currentQuestion && !assignedInBand.includes(candidate)
+    );
+
+    if (availableQuestions.length > 0) {
+      questionList[levelIndex] = availableQuestions[Math.floor(Math.random() * availableQuestions.length)];
+      return;
+    }
+
+    const swapCandidates = [];
+    for (let i = rangeStart; i <= rangeEnd; i += 1) {
+      if (i !== levelIndex && questionList[i] !== currentQuestion) {
+        swapCandidates.push(i);
+      }
+    }
+
+    if (swapCandidates.length > 0) {
+      const swapIndex = swapCandidates[Math.floor(Math.random() * swapCandidates.length)];
+      [questionList[levelIndex], questionList[swapIndex]] = [questionList[swapIndex], questionList[levelIndex]];
+    }
+  }
+
   function getWindowStart(level) {
     const maxWindowStart = Math.max(1, TOTAL_QS - TOTAL_STEPS + 1);
     return clamp(level - (CAMERA_ANCHOR_SLOT - 1), 1, maxWindowStart);
@@ -167,6 +213,21 @@
   function clearNotification() {
     notifOverlay.classList.remove("visible");
     notifOverlay.innerHTML = "";
+  }
+
+  function clearNextQuestionTimer() {
+    if (nextQuestionTimer) {
+      clearTimeout(nextQuestionTimer);
+      nextQuestionTimer = null;
+    }
+  }
+
+  function queueNextQuestion(step = 1, refreshCurrentLevel = false, delay = 0) {
+    clearNextQuestionTimer();
+    nextQuestionTimer = setTimeout(() => {
+      nextQuestionTimer = null;
+      nextQuestion(step, refreshCurrentLevel);
+    }, delay);
   }
 
   function updateSpeechBubble() {
@@ -319,6 +380,7 @@
   }
 
   function startGame() {
+    clearNextQuestionTimer();
     questionList = buildQuestionList();
     currentIndex = 0;
     score = 0;
@@ -339,6 +401,7 @@
       return;
     }
 
+    clearNextQuestionTimer();
     answered = false;
     currentCorrectMeta = null;
     btnNext.classList.add("hidden");
@@ -457,10 +520,7 @@
       disableChoices(false);
       showSuccess(`${currentCorrectMeta.label}. ${correctAnswer}`, points);
       triggerClimb();
-      setTimeout(() => {
-        btnNext.classList.remove("hidden");
-        btnNext.classList.add("btn-enter");
-      }, 1200);
+      queueNextQuestion(1, false, 1700);
       return;
     }
 
@@ -478,18 +538,25 @@
     card.classList.add("shake");
     setTimeout(() => card.classList.remove("shake"), 500);
 
+    const targetIndex = Math.max(0, currentIndex - 1);
+
     triggerFall();
     showWrongReveal(currentCorrectMeta);
-    setTimeout(() => nextQuestion(-1), 1800);
+    queueNextQuestion(targetIndex - currentIndex, true, 1800);
   }
 
-  function nextQuestion(step = 1) {
+  function nextQuestion(step = 1, refreshCurrentLevel = false) {
+    clearNextQuestionTimer();
+    const numericStep = typeof step === "number" && Number.isFinite(step) ? step : 1;
     btnNext.classList.add("hidden");
     btnNext.classList.remove("btn-enter");
-    currentIndex = clamp(currentIndex + step, 0, questionList.length);
+    currentIndex = clamp(currentIndex + numericStep, 0, questionList.length);
     if (currentIndex >= questionList.length) {
       endGame();
     } else {
+      if (refreshCurrentLevel) {
+        refreshQuestionForLevel(currentIndex);
+      }
       loadQuestion();
     }
   }
@@ -598,7 +665,7 @@
   }
 
   btnStart.addEventListener("click", startGame);
-  btnNext.addEventListener("click", nextQuestion);
+  btnNext.addEventListener("click", () => nextQuestion());
   btnPlayAgain.addEventListener("click", startGame);
   btnCloseDance.addEventListener("click", () => {
     danceOverlay.classList.add("hidden");
@@ -611,5 +678,8 @@
 
   initBackground();
 })();
+
+
+
 
 
