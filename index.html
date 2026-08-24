@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MaoThink - General Knowledge Quiz</title>
+  <meta
+    name="description"
+    content="MaoThink is a fun and interactive general knowledge quiz game. Test your brain with MaoThink!"
+  />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Fredoka:wght@500;600;700&display=swap"
+    rel="stylesheet"
+  />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="bg-layer" aria-hidden="true">
+    <canvas id="bgCanvas"></canvas>
+    <div class="bg-grid"></div>
+    <div class="floating-shapes" id="floatingShapes"></div>
+    <div class="spotlight spotlight-1"></div>
+    <div class="spotlight spotlight-2"></div>
+  </div>
+
+  <div id="app">
+    <div class="screen active" id="screenStart">
+      <div class="start-card glass-card">
+        <div class="mascot-container bounce-anim">
+          <img src="mascot.png" alt="MaoThink Mascot" id="mascotImg" draggable="false" />
+          <div class="mascot-shadow"></div>
+        </div>
+        <div class="brand">
+          <span class="brand-mao">Mao</span><span class="brand-think">Think</span>
+        </div>
+        <p class="tagline">How smart are you today?</p>
+        <div class="start-stats">
+          <div class="stat-pill"><span class="stat-icon">?</span><span id="statQuestions">50 Levels</span></div>
+          <div class="stat-pill"><span class="stat-icon">T</span><span>Multiple Choice</span></div>
+          <div class="stat-pill"><span class="stat-icon">!</span><span>One Chance</span></div>
+        </div>
+        <button class="btn btn-primary btn-glow" id="btnStart">
+          <span class="btn-icon">&#9658;</span> Let's Play!
+        </button>
+      </div>
+    </div>
+
+    <div class="screen" id="screenQuiz">
+      <div class="quiz-brand-panel" aria-hidden="true">
+        <img src="mascot.png" alt="MaoThink logo" class="quiz-brand-mascot" draggable="false" />
+        <div class="quiz-brand-copy">
+          <span class="quiz-brand-name"><span class="brand-mao">Mao</span><span class="brand-think">Think</span></span>
+        </div>
+      </div>
+
+      <div class="question-area">
+        <div class="category-ribbon" id="categoryRibbon">
+          <span id="categoryIcon">&#127758;</span>
+          <span id="categoryName">General Knowledge</span>
+        </div>
+        <div class="question-card glass-card" id="questionCard">
+          <div class="question-number" id="questionNumber">Level 1 / 50</div>
+          <p class="question-text" id="questionText">Loading question...</p>
+          <div class="attempts-row one-shot-row" id="attemptsRow">
+            <span class="attempts-label">One chance only</span>
+          </div>
+        </div>
+
+        <div class="choices-grid" id="choicesGrid"></div>
+
+        <button class="btn btn-next hidden" id="btnNext">
+          Next Question <span>&#8594;</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="screen" id="screenResult">
+      <div class="result-card glass-card">
+        <div class="mascot-container bounce-anim">
+          <img src="mascot.png" alt="MaoThink Mascot" draggable="false" />
+          <div class="mascot-shadow"></div>
+        </div>
+        <div class="result-title" id="resultTitle">Amazing!</div>
+        <div class="result-score-ring">
+          <svg viewBox="0 0 120 120" class="ring-svg">
+            <circle cx="60" cy="60" r="50" class="ring-bg" />
+            <circle cx="60" cy="60" r="50" class="ring-progress" id="ringProgress" />
+          </svg>
+          <div class="ring-inner">
+            <span class="ring-score" id="ringScore">0</span>
+            <span class="ring-max" id="ringMax">/ 500</span>
+          </div>
+        </div>
+        <p class="result-message" id="resultMessage">Great job, trivia champion!</p>
+        <div class="result-breakdown" id="resultBreakdown"></div>
+        <div class="result-buttons">
+          <button class="btn btn-primary btn-glow" id="btnPlayAgain">Play Again</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="climb-scene" id="climbScene" aria-hidden="true">
+    <div class="stair-track" id="stairTrack">
+      <div class="staircase">
+        <div class="step step-5" data-slot="5"><span class="step-level">5</span></div>
+        <div class="step step-4" data-slot="4"><span class="step-level">4</span></div>
+        <div class="step step-3" data-slot="3"><span class="step-level">3</span></div>
+        <div class="step step-2" data-slot="2"><span class="step-level">2</span></div>
+        <div class="step step-1" data-slot="1"><span class="step-level">1</span></div>
+      </div>
+    </div>
+
+    <div class="climber" id="climber">
+      <div class="speech-bubble" id="speechBubble">Answer correctly to climb.</div>
+      <div class="climber-sprite-wrap" aria-hidden="true">
+        <img
+          src="mascot.png"
+          alt="Climber head"
+          class="climber-head-image"
+          id="climberHeadImage"
+          draggable="false"
+        />
+        <div class="climber-shadow"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="dance-overlay hidden" id="danceOverlay">
+    <div class="dance-content">
+      <div class="dance-mascot bounce-anim">
+        <img src="mascot.png" alt="MaoThink celebrating" draggable="false" />
+      </div>
+      <div class="dance-title">DANCE TIME!</div>
+      <div class="dance-subtitle">You cleared all 50 levels!</div>
+      <div class="dance-message">The teacher will now dance live for you!</div>
+      <div class="dance-confetti-text">* * * * *</div>
+      <button class="btn btn-primary btn-glow" id="btnCloseDance">See Results &#8594;</button>
+    </div>
+  </div>
+
+  <div class="notif-overlay" id="notifOverlay" aria-live="polite"></div>
+  <canvas id="confettiCanvas" aria-hidden="true"></canvas>
+
+  <script src="questions.js"></script>
+  <script src="game.js"></script>
+</body>
+</html>
+
+
+

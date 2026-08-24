@@ -1,0 +1,609 @@
+/* ============================================================
+   MaoThink - Game Logic
+   ============================================================ */
+
+(function () {
+  "use strict";
+
+  const TOTAL_STEPS = 5;
+  const TOTAL_QS = GAME_QUESTION_COUNT;
+  const FINAL_ROUND_COUNT = Math.min(10, TOTAL_QS, QUESTION_POOL.length);
+  const CAMERA_ANCHOR_SLOT = 3;
+  const STEP_SHIFT_X = 60;
+  const STEP_SHIFT_Y = 40;
+  const STEP_COORDS = [
+    [10, 4],
+    [42, 48],
+    [102, 88],
+    [162, 128],
+    [222, 168],
+    [282, 208]
+  ];
+
+  let questionList = [];
+  let currentIndex = 0;
+  let score = 0;
+  let answered = false;
+  let results = [];
+  let playerLevel = 0;
+  let stairWindowStart = 1;
+  let currentCorrectMeta = null;
+  let stairPanTimer = null;
+  let climberMotionTimer = null;
+
+  const screenStart = document.getElementById("screenStart");
+  const screenQuiz = document.getElementById("screenQuiz");
+  const screenResult = document.getElementById("screenResult");
+  const btnStart = document.getElementById("btnStart");
+  const btnNext = document.getElementById("btnNext");
+  const btnPlayAgain = document.getElementById("btnPlayAgain");
+  const categoryIcon = document.getElementById("categoryIcon");
+  const categoryName = document.getElementById("categoryName");
+  const questionNumber = document.getElementById("questionNumber");
+  const questionText = document.getElementById("questionText");
+  const choicesGrid = document.getElementById("choicesGrid");
+  const heartRow = document.getElementById("heartRow");
+  const notifOverlay = document.getElementById("notifOverlay");
+  const ringProgress = document.getElementById("ringProgress");
+  const ringScore = document.getElementById("ringScore");
+  const ringMax = document.getElementById("ringMax");
+  const resultTitle = document.getElementById("resultTitle");
+  const resultMessage = document.getElementById("resultMessage");
+  const resultBreakdown = document.getElementById("resultBreakdown");
+  const confettiCanvas = document.getElementById("confettiCanvas");
+  const statQuestions = document.getElementById("statQuestions");
+  const bgCanvas = document.getElementById("bgCanvas");
+  const floatingShapes = document.getElementById("floatingShapes");
+  const climbScene = document.getElementById("climbScene");
+  const stairTrack = document.getElementById("stairTrack");
+  const climber = document.getElementById("climber");
+  const speechBubble = document.getElementById("speechBubble");
+  const danceOverlay = document.getElementById("danceOverlay");
+  const btnCloseDance = document.getElementById("btnCloseDance");
+  const stepEls = Array.from(climbScene.querySelectorAll(".step")).sort(
+    (a, b) => Number(a.dataset.slot) - Number(b.dataset.slot)
+  );
+
+  function initBackground() {
+    const symbols = ["?", "!", "*", "#", "$", "%", "&", "+", "=", "~"];
+    floatingShapes.innerHTML = "";
+    for (let i = 0; i < 20; i++) {
+      const el = document.createElement("div");
+      el.className = "f-shape";
+      el.textContent = symbols[Math.floor(Math.random() * symbols.length)];
+      el.style.cssText = [
+        `left: ${Math.random() * 100}%`,
+        `top: ${Math.random() * 100}%`,
+        `font-size: ${14 + Math.random() * 24}px`,
+        `animation-delay: ${Math.random() * 8}s`,
+        `animation-duration: ${6 + Math.random() * 10}s`,
+        `opacity: ${0.08 + Math.random() * 0.18}`
+      ].join(";");
+      floatingShapes.appendChild(el);
+    }
+
+    const ctx = bgCanvas.getContext("2d");
+    let width;
+    let height;
+    const particles = [];
+
+    function resize() {
+      width = bgCanvas.width = window.innerWidth;
+      height = bgCanvas.height = window.innerHeight;
+    }
+
+    resize();
+    window.addEventListener("resize", resize);
+
+    for (let i = 0; i < 60; i++) {
+      particles.push({
+        x: Math.random() * window.innerWidth,
+        y: Math.random() * window.innerHeight,
+        r: 1 + Math.random() * 3,
+        dx: (Math.random() - 0.5) * 0.4,
+        dy: (Math.random() - 0.5) * 0.4,
+        alpha: 0.1 + Math.random() * 0.4
+      });
+    }
+
+    function drawParticles() {
+      ctx.clearRect(0, 0, width, height);
+      particles.forEach((particle) => {
+        ctx.beginPath();
+        ctx.arc(particle.x, particle.y, particle.r, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(255,255,255,${particle.alpha})`;
+        ctx.fill();
+        particle.x += particle.dx;
+        particle.y += particle.dy;
+        if (particle.x < 0 || particle.x > width) particle.dx *= -1;
+        if (particle.y < 0 || particle.y > height) particle.dy *= -1;
+      });
+      requestAnimationFrame(drawParticles);
+    }
+
+    drawParticles();
+  }
+
+  function showScreen(screen) {
+    [screenStart, screenQuiz, screenResult].forEach((section) => {
+      section.classList.remove("active");
+      section.classList.add("exiting");
+    });
+    setTimeout(() => {
+      [screenStart, screenQuiz, screenResult].forEach((section) => section.classList.remove("exiting"));
+      screen.classList.add("active");
+    }, 350);
+  }
+
+  function shuffle(items) {
+    for (let i = items.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [items[i], items[j]] = [items[j], items[i]];
+    }
+    return items;
+  }
+
+  function clamp(value, min, max) {
+    return Math.min(max, Math.max(min, value));
+  }
+
+  function buildQuestionList() {
+    const hardQuestions = QUESTION_POOL.slice(-FINAL_ROUND_COUNT);
+    const regularPool = QUESTION_POOL.slice(0, Math.max(QUESTION_POOL.length - FINAL_ROUND_COUNT, 0));
+    const regularCount = Math.max(0, TOTAL_QS - hardQuestions.length);
+    const selectedRegular = shuffle([...regularPool]).slice(0, regularCount);
+    return [...selectedRegular, ...hardQuestions].slice(0, TOTAL_QS);
+  }
+  function getWindowStart(level) {
+    const maxWindowStart = Math.max(1, TOTAL_QS - TOTAL_STEPS + 1);
+    return clamp(level - (CAMERA_ANCHOR_SLOT - 1), 1, maxWindowStart);
+  }
+
+  function getVisibleSlot(level) {
+    if (level <= 0) return 0;
+    return clamp(level - getWindowStart(level) + 1, 1, TOTAL_STEPS);
+  }
+
+  function clearNotification() {
+    notifOverlay.classList.remove("visible");
+    notifOverlay.innerHTML = "";
+  }
+
+  function updateSpeechBubble() {
+    if (playerLevel <= 0) {
+      speechBubble.textContent = "Answer correctly to climb.";
+    } else if (playerLevel < 10) {
+      speechBubble.textContent = "Good start. Keep climbing.";
+    } else if (playerLevel < 25) {
+      speechBubble.textContent = "You are building momentum.";
+    } else if (playerLevel < 40) {
+      speechBubble.textContent = "You are in the higher levels now.";
+    } else if (playerLevel < 50) {
+      speechBubble.textContent = "Final stretch. Stay sharp.";
+    } else {
+      speechBubble.textContent = "You made it to the top.";
+    }
+  }
+
+  function updateStairLabels() {
+    const focusLevel = currentIndex + 1;
+    stepEls.forEach((stepEl) => {
+      const slot = Number(stepEl.dataset.slot);
+      const level = stairWindowStart + slot - 1;
+      const label = stepEl.querySelector(".step-level");
+      label.textContent = String(level);
+      stepEl.classList.toggle("step-cleared", level < playerLevel);
+      stepEl.classList.toggle("step-active", playerLevel > 0 && level === playerLevel);
+      stepEl.classList.toggle("step-focus", level === focusLevel);
+    });
+  }
+
+  function clearStairPan() {
+    if (stairPanTimer) {
+      clearTimeout(stairPanTimer);
+      stairPanTimer = null;
+    }
+    stairTrack.classList.remove("stair-pan");
+    stairTrack.style.setProperty("--stair-pan-x", "0px");
+    stairTrack.style.setProperty("--stair-pan-y", "0px");
+  }
+
+  function animateStairPan(deltaX, deltaY, nextWindowStart) {
+    clearStairPan();
+    stairTrack.style.setProperty("--stair-pan-x", `${deltaX}px`);
+    stairTrack.style.setProperty("--stair-pan-y", `${deltaY}px`);
+    stairTrack.classList.add("stair-pan");
+    stairPanTimer = setTimeout(() => {
+      stairTrack.classList.remove("stair-pan");
+      stairTrack.style.setProperty("--stair-pan-x", "0px");
+      stairTrack.style.setProperty("--stair-pan-y", "0px");
+      stairWindowStart = nextWindowStart;
+      updateStairLabels();
+      stairPanTimer = null;
+    }, 680);
+  }
+
+  function setClimberPosition(slot, motion) {
+    const [leftPx, bottomPx] = STEP_COORDS[slot];
+    climber.style.left = `${leftPx}px`;
+    climber.style.bottom = `${bottomPx}px`;
+    climber.style.right = "auto";
+
+    climber.classList.remove("climber-step-up", "climber-fall");
+    void climber.offsetWidth;
+
+    if (climberMotionTimer) {
+      clearTimeout(climberMotionTimer);
+      climberMotionTimer = null;
+    }
+
+    if (motion === "up") {
+      climber.classList.add("climber-step-up");
+      climberMotionTimer = setTimeout(() => climber.classList.remove("climber-step-up"), 680);
+    } else if (motion === "fall") {
+      climber.classList.add("climber-fall");
+      climberMotionTimer = setTimeout(() => climber.classList.remove("climber-fall"), 700);
+    }
+  }
+
+  function initClimber() {
+    playerLevel = 0;
+    stairWindowStart = 1;
+    clearStairPan();
+    setClimberPosition(0);
+    climber.style.transition = "none";
+    const [leftPx, bottomPx] = STEP_COORDS[0];
+    climber.style.left = `${leftPx}px`;
+    climber.style.bottom = `${bottomPx}px`;
+    void climber.offsetWidth;
+    climber.style.transition = "";
+    updateStairLabels();
+    updateSpeechBubble();
+    climbScene.style.display = "block";
+  }
+
+  function triggerClimb() {
+    const previousLevel = playerLevel;
+    const nextLevel = Math.min(TOTAL_QS, playerLevel + 1);
+    if (nextLevel === previousLevel) return;
+
+    const previousWindow = getWindowStart(previousLevel || 1);
+    const nextWindow = getWindowStart(nextLevel);
+    const previousSlot = getVisibleSlot(previousLevel);
+    const nextSlot = getVisibleSlot(nextLevel);
+
+    playerLevel = nextLevel;
+
+    if (nextWindow !== previousWindow && previousSlot > 0 && nextSlot === previousSlot) {
+      animateStairPan(-STEP_SHIFT_X, STEP_SHIFT_Y, nextWindow);
+      setClimberPosition(previousSlot, "up");
+    } else {
+      stairWindowStart = nextWindow;
+      updateStairLabels();
+      setClimberPosition(nextSlot, "up");
+    }
+
+    updateSpeechBubble();
+  }
+
+  function triggerFall() {
+    const previousLevel = playerLevel;
+    const nextLevel = Math.max(0, playerLevel - 1);
+    if (nextLevel === previousLevel && previousLevel === 0) return;
+
+    const previousWindow = getWindowStart(previousLevel || 1);
+    const nextWindow = getWindowStart(nextLevel || 1);
+    const previousSlot = getVisibleSlot(previousLevel);
+    const nextSlot = getVisibleSlot(nextLevel);
+
+    playerLevel = nextLevel;
+
+    if (previousSlot > 0 && nextWindow !== previousWindow && nextSlot === previousSlot) {
+      animateStairPan(STEP_SHIFT_X, -STEP_SHIFT_Y, nextWindow);
+      setClimberPosition(previousSlot, "fall");
+    } else {
+      stairWindowStart = nextWindow;
+      updateStairLabels();
+      setClimberPosition(nextSlot, "fall");
+    }
+
+    updateSpeechBubble();
+  }
+
+  function showDanceOverlay() {
+    danceOverlay.classList.remove("hidden");
+    danceOverlay.classList.add("dance-visible");
+    launchConfetti(true);
+    speechBubble.textContent = "Showtime.";
+  }
+
+  function startGame() {
+    questionList = buildQuestionList();
+    currentIndex = 0;
+    score = 0;
+    answered = false;
+    results = [];
+    currentCorrectMeta = null;
+    clearNotification();
+    statQuestions.textContent = `${TOTAL_QS} Levels`;
+    danceOverlay.classList.add("hidden");
+    danceOverlay.classList.remove("dance-visible");
+    initClimber();
+    showScreen(screenQuiz);
+    setTimeout(loadQuestion, 400);
+  }
+  function loadQuestion() {
+    if (currentIndex >= questionList.length) {
+      endGame();
+      return;
+    }
+
+    answered = false;
+    currentCorrectMeta = null;
+    btnNext.classList.add("hidden");
+    btnNext.classList.remove("btn-enter");
+    clearNotification();
+
+    const question = questionList[currentIndex];
+    const categoryParts = question.category.split(" ");
+    categoryIcon.textContent = categoryParts[0] || "?";
+    categoryName.textContent = categoryParts.slice(1).join(" ") || question.category;
+    questionNumber.textContent = `Level ${currentIndex + 1} / ${TOTAL_QS}`;
+    questionText.textContent = question.question;
+
+    renderHearts();
+    updateStairLabels();
+
+    const labels = ["A", "B", "C", "D"];
+    const shuffledChoices = shuffle([...question.choices]);
+    choicesGrid.innerHTML = "";
+
+    shuffledChoices.forEach((choice, index) => {
+      const button = document.createElement("button");
+      button.className = "choice-btn";
+      button.id = `choice-${index}`;
+      button.setAttribute("data-choice", choice);
+      button.innerHTML = `<span class="choice-label">${labels[index]}</span><span class="choice-text">${choice}</span>`;
+      button.addEventListener("click", () => handleAnswer(button, choice, question.answer, question.points));
+      button.style.animationDelay = `${index * 80}ms`;
+      button.classList.add("choice-enter");
+      choicesGrid.appendChild(button);
+
+      if (choice === question.answer) {
+        currentCorrectMeta = {
+          label: labels[index],
+          answer: question.answer
+        };
+      }
+    });
+
+    const card = document.getElementById("questionCard");
+    card.classList.remove("card-enter");
+    void card.offsetWidth;
+    card.classList.add("card-enter");
+  }
+
+  function renderHearts() {
+    if (!heartRow) return;
+    heartRow.innerHTML = "";
+  }
+
+  function disableChoices(showCorrectAnswer) {
+    choicesGrid.querySelectorAll(".choice-btn").forEach((button) => {
+      button.disabled = true;
+      const isCorrect = currentCorrectMeta && button.dataset.choice === currentCorrectMeta.answer;
+      if (showCorrectAnswer && isCorrect) {
+        button.classList.add("choice-correct");
+      } else if (!button.classList.contains("choice-correct") && !button.classList.contains("choice-wrong")) {
+        button.classList.add("choice-dim");
+      }
+    });
+  }
+
+  function showSuccess(answerText, points) {
+    notifOverlay.innerHTML = `
+      <div class="notif-card notif-success animate-pop">
+        <div class="notif-mascot-wrap">
+          <img src="krishhead.png" alt="Player success" class="notif-mascot jump-anim" />
+        </div>
+        <div class="notif-content">
+          <div class="notif-title">Correct</div>
+          <div class="notif-answer">${answerText}</div>
+          <div class="notif-points">+${points} pts</div>
+        </div>
+      </div>`;
+    notifOverlay.classList.add("visible");
+    launchConfetti();
+    setTimeout(clearNotification, 2200);
+  }
+
+  function showWrongReveal(correctMeta) {
+    const answerLine = correctMeta
+      ? `Correct answer: ${correctMeta.label}. ${correctMeta.answer}`
+      : "Correct answer revealed.";
+
+    notifOverlay.innerHTML = `
+      <div class="notif-card notif-error animate-pop">
+        <div class="notif-content">
+          <div class="notif-title">Wrong answer</div>
+          <div class="notif-answer">${answerLine}</div>
+        </div>
+      </div>`;
+    notifOverlay.classList.add("visible");
+    setTimeout(clearNotification, 1500);
+  }
+
+  function showWrongFlash(button) {
+    button.classList.add("wrong-flash");
+    setTimeout(() => button.classList.remove("wrong-flash"), 600);
+  }
+
+  function handleAnswer(button, choice, correctAnswer, points) {
+    if (answered) return;
+    answered = true;
+
+    if (choice === correctAnswer) {
+      button.classList.add("choice-correct");
+      score += points;
+      results.push({
+        question: questionList[currentIndex].question,
+        correct: true,
+        attempts: 1
+      });
+      disableChoices(false);
+      showSuccess(`${currentCorrectMeta.label}. ${correctAnswer}`, points);
+      triggerClimb();
+      setTimeout(() => {
+        btnNext.classList.remove("hidden");
+        btnNext.classList.add("btn-enter");
+      }, 1200);
+      return;
+    }
+
+    button.classList.add("choice-wrong");
+    showWrongFlash(button);
+    disableChoices(true);
+    results.push({
+      question: questionList[currentIndex].question,
+      correct: false,
+      attempts: 1
+    });
+
+    const card = document.getElementById("questionCard");
+    card.classList.add("shake");
+    setTimeout(() => card.classList.remove("shake"), 500);
+
+    triggerFall();
+    showWrongReveal(currentCorrectMeta);
+    setTimeout(nextQuestion, 1800);
+  }
+
+  function nextQuestion() {
+    btnNext.classList.add("hidden");
+    btnNext.classList.remove("btn-enter");
+    currentIndex += 1;
+    if (currentIndex >= questionList.length) {
+      endGame();
+    } else {
+      loadQuestion();
+    }
+  }
+  function endGame() {
+    const maxScore = questionList.reduce((sum, question) => sum + question.points, 0);
+    const pct = maxScore ? score / maxScore : 0;
+
+    let title = "Keep Going";
+    let message = "You can always climb higher on the next run.";
+
+    if (pct === 1) {
+      title = "Perfect Score";
+      message = "You cleared every level flawlessly.";
+    } else if (pct >= 0.8) {
+      title = "Excellent";
+      message = "That was a strong run.";
+    } else if (pct >= 0.6) {
+      title = "Well Done";
+      message = "You handled the harder levels nicely.";
+    } else if (pct >= 0.4) {
+      title = "Not Bad";
+      message = "You are getting there.";
+    }
+
+    resultTitle.textContent = title;
+    resultMessage.textContent = message;
+    ringScore.textContent = score;
+    ringMax.textContent = `/ ${maxScore}`;
+
+    const circumference = 2 * Math.PI * 50;
+    ringProgress.style.strokeDasharray = circumference;
+    ringProgress.style.strokeDashoffset = circumference;
+    setTimeout(() => {
+      ringProgress.style.strokeDashoffset = circumference * (1 - pct);
+    }, 100);
+
+    resultBreakdown.innerHTML = "";
+    results.forEach((result, index) => {
+      const row = document.createElement("div");
+      row.className = "breakdown-row";
+      row.innerHTML = `
+        <span class="bd-icon">${result.correct ? "OK" : "X"}</span>
+        <span class="bd-q">L${index + 1}: ${questionList[index].question.substring(0, 40)}...</span>
+        <span class="bd-att">${result.correct ? "cleared" : "missed"}</span>`;
+      resultBreakdown.appendChild(row);
+    });
+
+    showDanceOverlay();
+  }
+
+  function launchConfetti(big = false) {
+    const canvas = confettiCanvas;
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    canvas.style.display = "block";
+    const ctx = canvas.getContext("2d");
+    const colors = ["#FFD700", "#FF6B6B", "#4ECDC4", "#A855F7", "#3B82F6", "#F59E0B", "#10B981", "#EC4899"];
+    const count = big ? 220 : 80;
+    const pieces = [];
+
+    for (let i = 0; i < count; i++) {
+      pieces.push({
+        x: Math.random() * canvas.width,
+        y: -20,
+        w: 6 + Math.random() * 10,
+        h: 6 + Math.random() * 10,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        rot: Math.random() * 360,
+        drot: (Math.random() - 0.5) * 8,
+        dx: (Math.random() - 0.5) * 4,
+        dy: 3 + Math.random() * 5,
+        alpha: 1
+      });
+    }
+
+    let frame;
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      let alive = false;
+      pieces.forEach((piece) => {
+        if (piece.y < canvas.height + 30) {
+          alive = true;
+          ctx.save();
+          ctx.translate(piece.x, piece.y);
+          ctx.rotate((piece.rot * Math.PI) / 180);
+          ctx.globalAlpha = piece.alpha;
+          ctx.fillStyle = piece.color;
+          ctx.fillRect(-piece.w / 2, -piece.h / 2, piece.w, piece.h);
+          ctx.restore();
+          piece.x += piece.dx;
+          piece.y += piece.dy;
+          piece.rot += piece.drot;
+          piece.alpha = Math.max(0, piece.alpha - 0.008);
+        }
+      });
+      if (alive) {
+        frame = requestAnimationFrame(draw);
+      } else {
+        canvas.style.display = "none";
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+      }
+    }
+
+    if (frame) cancelAnimationFrame(frame);
+    draw();
+  }
+
+  btnStart.addEventListener("click", startGame);
+  btnNext.addEventListener("click", nextQuestion);
+  btnPlayAgain.addEventListener("click", startGame);
+  btnCloseDance.addEventListener("click", () => {
+    danceOverlay.classList.add("hidden");
+    danceOverlay.classList.remove("dance-visible");
+    showScreen(screenResult);
+    const maxScore = questionList.reduce((sum, question) => sum + question.points, 0);
+    const pct = maxScore ? score / maxScore : 0;
+    if (pct >= 0.6) launchConfetti(true);
+  });
+
+  initBackground();
+})();
+
