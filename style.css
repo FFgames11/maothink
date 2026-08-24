@@ -355,7 +355,7 @@ img {
 .question-area {
   display: flex;
   flex-direction: column;
-  width: min(100%, 760px);
+  width: min(100%, 1455px);
 }
 
 .question-card {
@@ -377,7 +377,7 @@ img {
 
 .question-text {
   margin: 16px 0 20px;
-  font-size: clamp(1.55rem, 2.7vw, 2.35rem);
+  font-size: clamp(1.55rem, 3.7vw, 6.35rem);
   line-height: 1.2;
   font-weight: 900;
 }
@@ -463,13 +463,13 @@ img {
   border-radius: 16px;
   background: linear-gradient(135deg, rgba(249, 115, 22, 0.95), rgba(251, 191, 36, 0.92));
   color: #261102;
-  font-size: 1.14rem;
+  font-size: 2.14rem;
   font-weight: 900;
 }
 
 .choice-text {
   padding-top: 5px;
-  font-size: 1.22rem;
+  font-size: 3.22rem;
   font-weight: 800;
   line-height: 1.35;
 }
@@ -623,12 +623,10 @@ img {
   position: absolute;
   bottom: 0;
   width: 60px;
-  background: linear-gradient(
-    180deg,
-    rgba(249, 115, 22, 0.28) 0%,
-    rgba(251, 191, 36, 0.12) 60%,
-    rgba(0, 0, 0, 0.12) 100%
-  );
+  background: linear-gradient(180deg,
+      rgba(249, 115, 22, 0.28) 0%,
+      rgba(251, 191, 36, 0.12) 60%,
+      rgba(0, 0, 0, 0.12) 100%);
   border-left: 2px solid rgba(255, 214, 169, 0.16);
   overflow: visible;
 }
@@ -682,11 +680,30 @@ img {
   box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.12);
 }
 
-.step-1 { left: 40px; height: 40px; }
-.step-2 { left: 100px; height: 80px; }
-.step-3 { left: 160px; height: 120px; }
-.step-4 { left: 220px; height: 160px; }
-.step-5 { left: 280px; height: 200px; }
+.step-1 {
+  left: 40px;
+  height: 40px;
+}
+
+.step-2 {
+  left: 100px;
+  height: 80px;
+}
+
+.step-3 {
+  left: 160px;
+  height: 120px;
+}
+
+.step-4 {
+  left: 220px;
+  height: 160px;
+}
+
+.step-5 {
+  left: 280px;
+  height: 200px;
+}
 
 .climber {
   position: absolute;
@@ -791,12 +808,10 @@ img {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(
-    135deg,
-    rgba(249, 115, 22, 0.97) 0%,
-    rgba(246, 173, 85, 0.96) 50%,
-    rgba(56, 189, 248, 0.94) 100%
-  );
+  background: linear-gradient(135deg,
+      rgba(249, 115, 22, 0.97) 0%,
+      rgba(246, 173, 85, 0.96) 50%,
+      rgba(56, 189, 248, 0.94) 100%);
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.5s ease;
@@ -958,19 +973,23 @@ img {
   0% {
     transform: translateY(0) rotate(0deg);
   }
+
   50% {
     transform: translateY(-18px) rotate(8deg);
   }
+
   100% {
     transform: translateY(-36px) rotate(-8deg);
   }
 }
 
 @keyframes softBounce {
+
   0%,
   100% {
     transform: translateY(0);
   }
+
   50% {
     transform: translateY(-10px);
   }
@@ -981,6 +1000,7 @@ img {
     opacity: 0;
     transform: scale(0.92);
   }
+
   100% {
     opacity: 1;
     transform: scale(1);
@@ -992,6 +1012,7 @@ img {
     opacity: 0;
     transform: translateY(14px);
   }
+
   100% {
     opacity: 1;
     transform: translateY(0);
@@ -1003,6 +1024,7 @@ img {
     opacity: 0;
     transform: translateY(18px) scale(0.96);
   }
+
   100% {
     opacity: 1;
     transform: translateY(0) scale(1);
@@ -1010,32 +1032,40 @@ img {
 }
 
 @keyframes wrongFlash {
+
   0%,
   100% {
     transform: translateX(0);
   }
+
   25% {
     transform: translateX(-6px);
   }
+
   75% {
     transform: translateX(6px);
   }
 }
 
 @keyframes shakeCard {
+
   0%,
   100% {
     transform: translateX(0);
   }
+
   20% {
     transform: translateX(-8px);
   }
+
   40% {
     transform: translateX(6px);
   }
+
   60% {
     transform: translateX(-4px);
   }
+
   80% {
     transform: translateX(4px);
   }
@@ -1045,6 +1075,7 @@ img {
   from {
     transform: translate(0, 0);
   }
+
   to {
     transform: translate(var(--stair-pan-x), var(--stair-pan-y));
   }
@@ -1054,15 +1085,19 @@ img {
   0% {
     transform: translateY(0) scale(1, 1) rotate(0deg);
   }
+
   18% {
     transform: translateY(8px) scale(1.05, 0.93) rotate(-2deg);
   }
+
   48% {
     transform: translateY(-42px) scale(0.93, 1.06) rotate(-8deg);
   }
+
   76% {
     transform: translateY(-10px) scale(1.03, 0.98) rotate(4deg);
   }
+
   100% {
     transform: translateY(0) scale(1, 1) rotate(0deg);
   }
@@ -1072,35 +1107,43 @@ img {
   0% {
     transform: translateY(0) translateX(0) rotate(0deg) scale(1, 1);
   }
+
   24% {
     transform: translateY(-14px) translateX(10px) rotate(7deg) scale(0.96, 1.03);
   }
+
   58% {
     transform: translateY(12px) translateX(2px) rotate(-10deg) scale(1.03, 0.97);
   }
+
   82% {
     transform: translateY(3px) translateX(0) rotate(4deg) scale(0.99, 1.01);
   }
+
   100% {
     transform: translateY(0) translateX(0) rotate(0deg) scale(1, 1);
   }
 }
 
 @keyframes characterIdle {
+
   0%,
   100% {
     transform: translateY(0) rotate(0deg);
   }
+
   50% {
     transform: translateY(-4px) rotate(1deg);
   }
 }
 
 @keyframes bubbleFloat {
+
   0%,
   100% {
     transform: translateX(-50%) translateY(0);
   }
+
   50% {
     transform: translateX(-50%) translateY(-5px);
   }
@@ -1179,6 +1222,7 @@ img {
   html {
     font-size: 16px;
   }
+
   .start-card,
   .result-card {
     padding: 34px 20px;
@@ -1220,12 +1264,3 @@ img {
     transform: translateX(50%) scale(0.82);
   }
 }
-
-
-
-
-
-
-
-
-

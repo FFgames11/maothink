@@ -170,8 +170,8 @@
   }
 
   function updateSpeechBubble() {
-    if (playerLevel <= 0) {
-      speechBubble.textContent = "Answer correctly to climb.";
+    if (results.length === 0 && currentIndex === 0 && playerLevel === 1) {
+      speechBubble.textContent = "Answer correctly to climb higher.";
     } else if (playerLevel < 10) {
       speechBubble.textContent = "Good start. Keep climbing.";
     } else if (playerLevel < 25) {
@@ -247,12 +247,13 @@
   }
 
   function initClimber() {
-    playerLevel = 0;
+    playerLevel = 1;
     stairWindowStart = 1;
     clearStairPan();
-    setClimberPosition(0);
+    const initialSlot = getVisibleSlot(playerLevel);
+    setClimberPosition(initialSlot);
     climber.style.transition = "none";
-    const [leftPx, bottomPx] = STEP_COORDS[0];
+    const [leftPx, bottomPx] = STEP_COORDS[initialSlot];
     climber.style.left = `${leftPx}px`;
     climber.style.bottom = `${bottomPx}px`;
     void climber.offsetWidth;
@@ -288,8 +289,8 @@
 
   function triggerFall() {
     const previousLevel = playerLevel;
-    const nextLevel = Math.max(0, playerLevel - 1);
-    if (nextLevel === previousLevel && previousLevel === 0) return;
+    const nextLevel = Math.max(1, playerLevel - 1);
+    if (nextLevel === previousLevel) return;
 
     const previousWindow = getWindowStart(previousLevel || 1);
     const nextWindow = getWindowStart(nextLevel || 1);
@@ -442,10 +443,13 @@
     if (answered) return;
     answered = true;
 
+    const currentLevel = currentIndex + 1;
+
     if (choice === correctAnswer) {
       button.classList.add("choice-correct");
       score += points;
       results.push({
+        level: currentLevel,
         question: questionList[currentIndex].question,
         correct: true,
         attempts: 1
@@ -464,6 +468,7 @@
     showWrongFlash(button);
     disableChoices(true);
     results.push({
+      level: currentLevel,
       question: questionList[currentIndex].question,
       correct: false,
       attempts: 1
@@ -475,13 +480,13 @@
 
     triggerFall();
     showWrongReveal(currentCorrectMeta);
-    setTimeout(nextQuestion, 1800);
+    setTimeout(() => nextQuestion(-1), 1800);
   }
 
-  function nextQuestion() {
+  function nextQuestion(step = 1) {
     btnNext.classList.add("hidden");
     btnNext.classList.remove("btn-enter");
-    currentIndex += 1;
+    currentIndex = clamp(currentIndex + step, 0, questionList.length);
     if (currentIndex >= questionList.length) {
       endGame();
     } else {
@@ -522,12 +527,12 @@
     }, 100);
 
     resultBreakdown.innerHTML = "";
-    results.forEach((result, index) => {
+    results.forEach((result) => {
       const row = document.createElement("div");
       row.className = "breakdown-row";
       row.innerHTML = `
         <span class="bd-icon">${result.correct ? "OK" : "X"}</span>
-        <span class="bd-q">L${index + 1}: ${questionList[index].question.substring(0, 40)}...</span>
+        <span class="bd-q">L${result.level}: ${result.question.substring(0, 40)}...</span>
         <span class="bd-att">${result.correct ? "cleared" : "missed"}</span>`;
       resultBreakdown.appendChild(row);
     });
@@ -606,4 +611,5 @@
 
   initBackground();
 })();
+
 
