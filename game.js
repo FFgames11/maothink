@@ -32,6 +32,7 @@
   let stairPanTimer = null;
   let climberMotionTimer = null;
   let nextQuestionTimer = null;
+  let answeredQuestions = new Set(); // tracks every question object shown this session
 
   const screenStart = document.getElementById("screenStart");
   const screenQuiz = document.getElementById("screenQuiz");
@@ -39,8 +40,8 @@
   const btnStart = document.getElementById("btnStart");
   const btnNext = document.getElementById("btnNext");
   const btnPlayAgain = document.getElementById("btnPlayAgain");
-  const categoryIcon = document.getElementById("categoryIcon");
-  const categoryName = document.getElementById("categoryName");
+  const categoryIcon = null;  // removed — category ribbon no longer in UI
+  const categoryName = null;   // removed — category ribbon no longer in UI
   const questionNumber = document.getElementById("questionNumber");
   const questionText = document.getElementById("questionText");
   const choicesGrid = document.getElementById("choicesGrid");
@@ -178,8 +179,13 @@
     const [rangeStart, rangeEnd] = getLevelRangeForLevel(levelIndex);
     const pool = getQuestionPoolForLevel(levelIndex);
     const assignedInBand = questionList.slice(rangeStart, rangeEnd + 1);
+
+    // Exclude questions already seen/answered this session to avoid repeats
     const availableQuestions = pool.filter(
-      (candidate) => candidate !== currentQuestion && !assignedInBand.includes(candidate)
+      (candidate) =>
+        candidate !== currentQuestion &&
+        !assignedInBand.includes(candidate) &&
+        !answeredQuestions.has(candidate)
     );
 
     if (availableQuestions.length > 0) {
@@ -187,6 +193,16 @@
       return;
     }
 
+    // Fallback: try any unseen question in the band (ignoring assignedInBand restriction)
+    const unseenFallback = pool.filter(
+      (candidate) => candidate !== currentQuestion && !answeredQuestions.has(candidate)
+    );
+    if (unseenFallback.length > 0) {
+      questionList[levelIndex] = unseenFallback[Math.floor(Math.random() * unseenFallback.length)];
+      return;
+    }
+
+    // Last resort: swap within the band (pool exhausted — all questions seen)
     const swapCandidates = [];
     for (let i = rangeStart; i <= rangeEnd; i += 1) {
       if (i !== levelIndex && questionList[i] !== currentQuestion) {
@@ -387,6 +403,7 @@
     answered = false;
     results = [];
     currentCorrectMeta = null;
+    answeredQuestions = new Set();
     clearNotification();
     statQuestions.textContent = `${TOTAL_QS} Levels`;
     danceOverlay.classList.add("hidden");
@@ -401,6 +418,9 @@
       return;
     }
 
+    // Mark this question as seen so it is never shown again this session
+    answeredQuestions.add(questionList[currentIndex]);
+
     clearNextQuestionTimer();
     answered = false;
     currentCorrectMeta = null;
@@ -409,9 +429,6 @@
     clearNotification();
 
     const question = questionList[currentIndex];
-    const categoryParts = question.category.split(" ");
-    categoryIcon.textContent = categoryParts[0] || "?";
-    categoryName.textContent = categoryParts.slice(1).join(" ") || question.category;
     questionNumber.textContent = `Level ${currentIndex + 1} / ${TOTAL_QS}`;
     questionText.textContent = question.question;
 
@@ -468,7 +485,7 @@
     notifOverlay.innerHTML = `
       <div class="notif-card notif-success animate-pop">
         <div class="notif-mascot-wrap">
-          <img src="krishhead.png" alt="Player success" class="notif-mascot jump-anim" />
+          <img src="chellehead.png" alt="Player success" class="notif-mascot jump-anim" />
         </div>
         <div class="notif-content">
           <div class="notif-title">Correct</div>
@@ -539,6 +556,10 @@
     setTimeout(() => card.classList.remove("shake"), 500);
 
     const targetIndex = Math.max(0, currentIndex - 1);
+
+    // Replace the wrong question at the current level NOW so the player
+    // never sees it again when they advance back up to this level.
+    refreshQuestionForLevel(currentIndex);
 
     triggerFall();
     showWrongReveal(currentCorrectMeta);
