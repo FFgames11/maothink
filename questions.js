@@ -1,6 +1,8 @@
 // ============================================================
-//  MaoThink – Question Bank  (50 questions across 10 categories)
-//  Levels 1-40 draw randomly from the early pool, while levels 41-50 use the last 10 questions.
+//  MaoThink – Question Bank
+//  QUESTION_POOL   – regular questions (points: 10) drawn randomly for levels 1-40
+//  HARD_QUESTION_POOL – 100+ difficult questions (points: 20); 10 are randomly
+//                       selected each game for the final difficult round (levels 41-50)
 // ============================================================
 
 const GAME_QUESTION_COUNT = 50;
@@ -256,16 +258,120 @@ const QUESTION_POOL = [
   { category: "🌍 Geography", question: "In which country would you find the city of Casablanca?", choices: ["Tunisia", "Algeria", "Morocco", "Libya"], answer: "Morocco", points: 10 },
   { category: "🔬 Science", question: "Which part of the human eye controls the amount of light entering it?", choices: ["Cornea", "Retina", "Iris", "Lens"], answer: "Iris", points: 10 },
 
-  // ── 🔥 FINAL DIFFICULT ROUND (Questions 90–100) ──────────
+];
+
+// ── 🔥 HARD QUESTION POOL (100 questions, points: 20 each) ─────────────────
+//    10 are randomly selected each game for the final difficult round.
+const HARD_QUESTION_POOL = [
+  // Science
   { category: "🔬 Science", question: "Which phenomenon occurs when the Moon passes between Earth and the Sun, blocking some or all of the Sun's light?", choices: ["Lunar eclipse", "Solar eclipse", "Solstice", "Equinox"], answer: "Solar eclipse", points: 20 },
   { category: "🔬 Science", question: "Which element has the atomic number 79?", choices: ["Silver", "Platinum", "Gold", "Mercury"], answer: "Gold", points: 20 },
-  { category: "📚 History", question: "Which ancient civilization is credited with developing one of the earliest known alphabetic writing systems?", choices: ["Phoenicians", "Mongols", "Vikings", "Aztecs"], answer: "Phoenicians", points: 20 },
-  { category: "🍎 Nature", question: "What is the term for animals that are active mainly during the night?", choices: ["Aquatic", "Nocturnal", "Diurnal", "Arboreal"], answer: "Nocturnal", points: 20 },
   { category: "🔬 Science", question: "Which fundamental force is responsible for holding atomic nuclei together?", choices: ["Electromagnetic force", "Gravitational force", "Strong nuclear force", "Weak nuclear force"], answer: "Strong nuclear force", points: 20 },
-  { category: "🎨 Art & Culture", question: "Which philosopher wrote The Republic?", choices: ["Aristotle", "Socrates", "Plato", "Epicurus"], answer: "Plato", points: 20 },
   { category: "🔬 Science", question: "Which blood type is often described as the universal red-cell donor type?", choices: ["AB positive", "A positive", "O negative", "B negative"], answer: "O negative", points: 20 },
   { category: "🔬 Science", question: "Which geological process describes the movement of large sections of Earth's lithosphere?", choices: ["Erosion", "Plate tectonics", "Sedimentation", "Weathering"], answer: "Plate tectonics", points: 20 },
-  { category: "🔢 Math", question: "Which of these numbers is irrational?", choices: ["0.5", "3/4", "√2", "2"], answer: "√2", points: 20 },
+  { category: "🔬 Science", question: "Which scientific principle states that energy cannot be created or destroyed, only transformed from one form to another?", choices: ["Principle of relativity", "Law of conservation of energy", "Heisenberg uncertainty principle", "Archimedes' principle"], answer: "Law of conservation of energy", points: 20 },
+  { category: "🔬 Science", question: "Which element has the chemical symbol Fe?", choices: ["Fluorine", "Iron", "Francium", "Fermium"], answer: "Iron", points: 20 },
+  { category: "🔬 Science", question: "Which layer of Earth's atmosphere contains most of the ozone layer?", choices: ["Troposphere", "Stratosphere", "Mesosphere", "Thermosphere"], answer: "Stratosphere", points: 20 },
+  { category: "🔬 Science", question: "Which scientist formulated the three laws of planetary motion?", choices: ["Johannes Kepler", "Galileo Galilei", "Isaac Newton", "Nicolaus Copernicus"], answer: "Johannes Kepler", points: 20 },
+  { category: "🔬 Science", question: "Which blood vessels generally carry blood away from the heart?", choices: ["Veins", "Arteries", "Capillaries", "Venules"], answer: "Arteries", points: 20 },
+  { category: "🔬 Science", question: "What is the SI unit of electric resistance?", choices: ["Volt", "Watt", "Ampere", "Ohm"], answer: "Ohm", points: 20 },
+  { category: "🔬 Science", question: "Which part of the brain is primarily associated with balance and coordination?", choices: ["Cerebellum", "Hypothalamus", "Medulla oblongata", "Amygdala"], answer: "Cerebellum", points: 20 },
+  { category: "🔬 Science", question: "What is the name of the DNA structure described as a double helix?", choices: ["RNA", "ATP", "DNA double helix", "Ribosome"], answer: "DNA double helix", points: 20 },
+  { category: "🔬 Science", question: "Which particle has no electric charge and is found in the nucleus of an atom?", choices: ["Proton", "Electron", "Neutron", "Photon"], answer: "Neutron", points: 20 },
+  { category: "🔬 Science", question: "What is the name of the force that causes objects at rest to remain at rest?", choices: ["Gravity", "Inertia", "Friction", "Tension"], answer: "Inertia", points: 20 },
+  { category: "🔬 Science", question: "Which type of electromagnetic radiation has the shortest wavelength?", choices: ["Radio waves", "Visible light", "X-rays", "Gamma rays"], answer: "Gamma rays", points: 20 },
+  { category: "🔬 Science", question: "What is the term for the change of a gas directly into a solid without passing through the liquid state?", choices: ["Evaporation", "Condensation", "Sublimation", "Deposition"], answer: "Deposition", points: 20 },
+  { category: "🔬 Science", question: "Which gas is produced when acids react with metals?", choices: ["Oxygen", "Carbon dioxide", "Hydrogen", "Nitrogen"], answer: "Hydrogen", points: 20 },
+  { category: "🔬 Science", question: "What is the speed of light in a vacuum approximately equal to?", choices: ["100,000 km/s", "200,000 km/s", "300,000 km/s", "400,000 km/s"], answer: "300,000 km/s", points: 20 },
+  { category: "🔬 Science", question: "Which organ in the human body is responsible for producing insulin?", choices: ["Liver", "Kidney", "Pancreas", "Adrenal gland"], answer: "Pancreas", points: 20 },
+  { category: "🔬 Science", question: "What is the name of the unit used to measure the amount of a substance in chemistry?", choices: ["Gram", "Litre", "Mole", "Joule"], answer: "Mole", points: 20 },
+  { category: "🔬 Science", question: "What is the chemical formula for table salt?", choices: ["KCl", "NaOH", "NaCl", "MgCl₂"], answer: "NaCl", points: 20 },
+  { category: "🔬 Science", question: "Which planet has the Great Red Spot, a giant storm system?", choices: ["Saturn", "Mars", "Jupiter", "Neptune"], answer: "Jupiter", points: 20 },
+  { category: "🔬 Science", question: "What is the name for the study of heredity and genetic variation?", choices: ["Ecology", "Genetics", "Microbiology", "Physiology"], answer: "Genetics", points: 20 },
+  { category: "🔬 Science", question: "Which element is a liquid at room temperature and is also a metal?", choices: ["Bromine", "Mercury", "Gallium", "Cesium"], answer: "Mercury", points: 20 },
+  { category: "🔬 Science", question: "What is the term for the bending of light as it passes from one medium to another?", choices: ["Reflection", "Diffraction", "Refraction", "Absorption"], answer: "Refraction", points: 20 },
+  { category: "🔬 Science", question: "What is the name of the theory that describes the origin of the universe from an initial singularity?", choices: ["Steady State Theory", "Big Bang Theory", "String Theory", "Multiverse Theory"], answer: "Big Bang Theory", points: 20 },
+  { category: "🔬 Science", question: "Which bone is commonly known as the collarbone?", choices: ["Sternum", "Clavicle", "Scapula", "Humerus"], answer: "Clavicle", points: 20 },
+  { category: "🔬 Science", question: "What is the process by which bacteria convert atmospheric nitrogen into ammonia?", choices: ["Denitrification", "Nitrification", "Nitrogen fixation", "Ammonification"], answer: "Nitrogen fixation", points: 20 },
+  { category: "🔬 Science", question: "Which part of the neuron receives signals from other neurons?", choices: ["Axon", "Dendrite", "Myelin sheath", "Synapse"], answer: "Dendrite", points: 20 },
+
+  // History
+  { category: "📚 History", question: "Which ancient civilization is credited with developing one of the earliest known alphabetic writing systems?", choices: ["Phoenicians", "Mongols", "Vikings", "Aztecs"], answer: "Phoenicians", points: 20 },
+  { category: "📚 History", question: "Which civilization developed the writing system known as cuneiform?", choices: ["Sumerians", "Romans", "Vikings", "Aztecs"], answer: "Sumerians", points: 20 },
+  { category: "📚 History", question: "Which ancient city was buried by the eruption of Mount Vesuvius in 79 CE?", choices: ["Pompeii", "Athens", "Carthage", "Alexandria"], answer: "Pompeii", points: 20 },
   { category: "📚 History", question: "Which treaty is commonly associated with formally ending the First World War between Germany and the Allied Powers?", choices: ["Treaty of Paris", "Treaty of Versailles", "Treaty of Vienna", "Treaty of Utrecht"], answer: "Treaty of Versailles", points: 20 },
-  { category: "🔬 Science", question: "Which scientific principle states that energy cannot be created or destroyed, only transformed from one form to another?", choices: ["Principle of relativity", "Law of conservation of energy", "Heisenberg uncertainty principle", "Archimedes' principle"], answer: "Law of conservation of energy", points: 20 }
+  { category: "📚 History", question: "Who was the first Emperor of a unified China?", choices: ["Kublai Khan", "Qin Shi Huang", "Liu Bang", "Yongle Emperor"], answer: "Qin Shi Huang", points: 20 },
+  { category: "📚 History", question: "Which country was the first to industrialize during the Industrial Revolution?", choices: ["France", "Germany", "United States", "United Kingdom"], answer: "United Kingdom", points: 20 },
+  { category: "📚 History", question: "Which event in 1789 marked the beginning of the French Revolution?", choices: ["Execution of Louis XVI", "Storming of the Bastille", "Declaration of the Rights of Man", "The Tennis Court Oath"], answer: "Storming of the Bastille", points: 20 },
+  { category: "📚 History", question: "Who was the leader of the Soviet Union during the Cuban Missile Crisis?", choices: ["Joseph Stalin", "Leonid Brezhnev", "Nikita Khrushchev", "Mikhail Gorbachev"], answer: "Nikita Khrushchev", points: 20 },
+  { category: "📚 History", question: "Which Roman general crossed the Rubicon river in 49 BC, triggering a civil war?", choices: ["Pompey", "Julius Caesar", "Mark Antony", "Augustus"], answer: "Julius Caesar", points: 20 },
+  { category: "📚 History", question: "The Meiji Restoration of 1868 was a pivotal event in which country's history?", choices: ["China", "Korea", "Japan", "Vietnam"], answer: "Japan", points: 20 },
+  { category: "📚 History", question: "Who was the first person to circumnavigate the globe?", choices: ["Vasco da Gama", "Christopher Columbus", "James Cook", "Ferdinand Magellan"], answer: "Ferdinand Magellan", points: 20 },
+  { category: "📚 History", question: "Which empire was ruled by Suleiman the Magnificent?", choices: ["Persian Empire", "Ottoman Empire", "Mongol Empire", "Byzantine Empire"], answer: "Ottoman Empire", points: 20 },
+  { category: "📚 History", question: "In which year did the Russian Revolution take place?", choices: ["1905", "1914", "1917", "1921"], answer: "1917", points: 20 },
+  { category: "📚 History", question: "Which battle in 1815 marked Napoleon Bonaparte's final defeat?", choices: ["Battle of Austerlitz", "Battle of Trafalgar", "Battle of Waterloo", "Battle of Leipzig"], answer: "Battle of Waterloo", points: 20 },
+  { category: "📚 History", question: "Which African leader was the first President of an independent Ghana?", choices: ["Nelson Mandela", "Kwame Nkrumah", "Julius Nyerere", "Jomo Kenyatta"], answer: "Kwame Nkrumah", points: 20 },
+
+  // Math
+  { category: "🔢 Math", question: "Which of these numbers is irrational?", choices: ["0.5", "3/4", "√2", "2"], answer: "√2", points: 20 },
+  { category: "🔢 Math", question: "What is the smallest prime number?", choices: ["0", "1", "2", "3"], answer: "2", points: 20 },
+  { category: "🔢 Math", question: "What is the value of log₁₀(1000)?", choices: ["2", "3", "4", "10"], answer: "3", points: 20 },
+  { category: "🔢 Math", question: "How many degrees does the interior of a regular hexagon contain in total?", choices: ["540°", "720°", "900°", "1080°"], answer: "720°", points: 20 },
+  { category: "🔢 Math", question: "What is the derivative of sin(x)?", choices: ["cos(x)", "-cos(x)", "tan(x)", "-sin(x)"], answer: "cos(x)", points: 20 },
+  { category: "🔢 Math", question: "What is the formula for the volume of a sphere?", choices: ["(4/3)πr³", "πr²h", "(2/3)πr³", "4πr²"], answer: "(4/3)πr³", points: 20 },
+  { category: "🔢 Math", question: "If a function f(x) = 3x² + 2x − 5, what is f(2)?", choices: ["9", "11", "13", "15"], answer: "11", points: 20 },
+  { category: "🔢 Math", question: "What is the sum of all interior angles of a pentagon?", choices: ["360°", "450°", "540°", "720°"], answer: "540°", points: 20 },
+  { category: "🔢 Math", question: "Which number is both a perfect square and a perfect cube?", choices: ["8", "27", "64", "16"], answer: "64", points: 20 },
+  { category: "🔢 Math", question: "What is Euler's number (e) approximately equal to?", choices: ["2.14", "2.72", "3.14", "1.62"], answer: "2.72", points: 20 },
+  { category: "🔢 Math", question: "In a right triangle, if one angle is 30° and the hypotenuse is 10, what is the length of the side opposite the 30° angle?", choices: ["3", "5", "7", "8"], answer: "5", points: 20 },
+  { category: "🔢 Math", question: "What is the 10th term of the Fibonacci sequence (starting 1, 1, 2, 3, 5, …)?", choices: ["34", "55", "89", "44"], answer: "55", points: 20 },
+  { category: "🔢 Math", question: "What is the probability of rolling two sixes in a row on a standard die?", choices: ["1/12", "1/36", "1/18", "1/6"], answer: "1/36", points: 20 },
+
+  // Language
+  { category: "📖 Language", question: "What is the term for a word that has the opposite meaning of another word?", choices: ["Synonym", "Homonym", "Antonym", "Acronym"], answer: "Antonym", points: 20 },
+  { category: "📖 Language", question: "Which of these languages belongs to the Romance language family?", choices: ["German", "Portuguese", "Arabic", "Japanese"], answer: "Portuguese", points: 20 },
+  { category: "📖 Language", question: "What is the grammatical term for the subject of a passive sentence?", choices: ["Direct object", "Indirect object", "Agent", "Predicate"], answer: "Agent", points: 20 },
+  { category: "📖 Language", question: "What literary device is used when a writer gives human qualities to non-human things?", choices: ["Metaphor", "Simile", "Personification", "Irony"], answer: "Personification", points: 20 },
+  { category: "📖 Language", question: "Which of these is an example of dramatic irony?", choices: ["A character trips on a banana peel.", "The audience knows the villain is hiding behind the door, but the hero does not.", "A storm reflects a character's anger.", "A character says they are fine when they are not."], answer: "The audience knows the villain is hiding behind the door, but the hero does not.", points: 20 },
+  { category: "📖 Language", question: "What is the term for a narrative technique where the story is told by a character within the story?", choices: ["Third-person omniscient", "First-person narrative", "Stream of consciousness", "Free indirect discourse"], answer: "First-person narrative", points: 20 },
+  { category: "📖 Language", question: "What is the name for the repetition of a word or phrase at the beginning of successive clauses?", choices: ["Epistrophe", "Chiasmus", "Anaphora", "Zeugma"], answer: "Anaphora", points: 20 },
+  { category: "📖 Language", question: "Which grammatical mood is used to express wishes, hypotheticals, or doubts?", choices: ["Indicative", "Imperative", "Subjunctive", "Conditional"], answer: "Subjunctive", points: 20 },
+  { category: "📖 Language", question: "What is a portmanteau word?", choices: ["A word with multiple meanings", "A word blending two other words", "A borrowed word from another language", "A word that has become obsolete"], answer: "A word blending two other words", points: 20 },
+  { category: "📖 Language", question: "What is the term for using a part to represent the whole, such as 'all hands on deck'?", choices: ["Metonymy", "Synecdoche", "Euphemism", "Hyperbole"], answer: "Synecdoche", points: 20 },
+
+  // Art & Culture
+  { category: "🎨 Art & Culture", question: "Which philosopher wrote The Republic?", choices: ["Aristotle", "Socrates", "Plato", "Epicurus"], answer: "Plato", points: 20 },
+  { category: "🎨 Art & Culture", question: "What artistic movement was Salvador Dalí associated with?", choices: ["Cubism", "Surrealism", "Impressionism", "Futurism"], answer: "Surrealism", points: 20 },
+  { category: "🎨 Art & Culture", question: "Which novel by Franz Kafka tells the story of a man who wakes up transformed into a giant insect?", choices: ["The Trial", "Amerika", "The Metamorphosis", "The Castle"], answer: "The Metamorphosis", points: 20 },
+  { category: "🎨 Art & Culture", question: "Who composed the opera 'La Traviata'?", choices: ["Puccini", "Verdi", "Mozart", "Wagner"], answer: "Verdi", points: 20 },
+  { category: "🎨 Art & Culture", question: "Which ancient Greek tragedy was written by Sophocles and features the character Oedipus?", choices: ["Medea", "Antigone", "Oedipus Rex", "The Oresteia"], answer: "Oedipus Rex", points: 20 },
+  { category: "🎨 Art & Culture", question: "In which city is the Uffizi Gallery, home to Botticelli's 'The Birth of Venus', located?", choices: ["Rome", "Venice", "Florence", "Milan"], answer: "Florence", points: 20 },
+  { category: "🎨 Art & Culture", question: "Which author wrote the novel 'One Hundred Years of Solitude'?", choices: ["Mario Vargas Llosa", "Jorge Luis Borges", "Gabriel García Márquez", "Pablo Neruda"], answer: "Gabriel García Márquez", points: 20 },
+  { category: "🎨 Art & Culture", question: "What is the name of the narrative technique used in James Joyce's 'Ulysses' that mimics the flow of thoughts?", choices: ["Free verse", "Stream of consciousness", "Magic realism", "Epistolary"], answer: "Stream of consciousness", points: 20 },
+  { category: "🎨 Art & Culture", question: "Which Renaissance artist painted the ceiling of the Sistine Chapel?", choices: ["Leonardo da Vinci", "Raphael", "Michelangelo", "Donatello"], answer: "Michelangelo", points: 20 },
+  { category: "🎨 Art & Culture", question: "What musical term describes a gradual increase in tempo?", choices: ["Ritardando", "Accelerando", "Crescendo", "Diminuendo"], answer: "Accelerando", points: 20 },
+
+  // Geography
+  { category: "🌍 Geography", question: "What is the name of the tectonic plate boundary where plates move apart from each other?", choices: ["Convergent boundary", "Transform boundary", "Divergent boundary", "Subduction zone"], answer: "Divergent boundary", points: 20 },
+  { category: "🌍 Geography", question: "Which country contains more than 17,000 islands?", choices: ["Philippines", "Japan", "Indonesia", "Malaysia"], answer: "Indonesia", points: 20 },
+  { category: "🌍 Geography", question: "What is the name of the boundary between the troposphere and stratosphere?", choices: ["Mesopause", "Tropopause", "Stratopause", "Thermopause"], answer: "Tropopause", points: 20 },
+  { category: "🌍 Geography", question: "Which country is home to the world's largest salt flat, Salar de Uyuni?", choices: ["Argentina", "Chile", "Bolivia", "Peru"], answer: "Bolivia", points: 20 },
+  { category: "🌍 Geography", question: "In which ocean is the island of Madagascar located?", choices: ["Atlantic Ocean", "Pacific Ocean", "Indian Ocean", "Southern Ocean"], answer: "Indian Ocean", points: 20 },
+  { category: "🌍 Geography", question: "Which mountain range contains the highest peak in North America?", choices: ["Rocky Mountains", "Sierra Nevada", "Appalachians", "Alaska Range"], answer: "Alaska Range", points: 20 },
+  { category: "🌍 Geography", question: "What is the term for a narrow strip of land connecting two larger land masses?", choices: ["Peninsula", "Isthmus", "Cape", "Archipelago"], answer: "Isthmus", points: 20 },
+  { category: "🌍 Geography", question: "Which river is the primary source of water for ancient Egyptian civilization?", choices: ["Tigris", "Euphrates", "Nile", "Congo"], answer: "Nile", points: 20 },
+  { category: "🌍 Geography", question: "Which sea has the highest salinity of any major body of water?", choices: ["Mediterranean Sea", "Red Sea", "Dead Sea", "Caspian Sea"], answer: "Dead Sea", points: 20 },
+  { category: "🌍 Geography", question: "What is the name of the biogeographic region that includes Australia, New Zealand, and nearby islands?", choices: ["Nearctic", "Palearctic", "Australasia", "Afrotropic"], answer: "Australasia", points: 20 },
+
+  // Nature
+  { category: "🍎 Nature", question: "What is the term for animals that are active mainly during the night?", choices: ["Aquatic", "Nocturnal", "Diurnal", "Arboreal"], answer: "Nocturnal", points: 20 },
+  { category: "🍎 Nature", question: "What is the name of the symbiotic relationship where both species benefit?", choices: ["Parasitism", "Commensalism", "Mutualism", "Predation"], answer: "Mutualism", points: 20 },
+  { category: "🍎 Nature", question: "What is the largest organ of the human body?", choices: ["Liver", "Lung", "Skin", "Brain"], answer: "Skin", points: 20 },
+  { category: "🍎 Nature", question: "What is the name of the process by which RNA is used to make a protein?", choices: ["Transcription", "Replication", "Translation", "Mutation"], answer: "Translation", points: 20 },
+  { category: "🍎 Nature", question: "Which animal has the highest blood pressure of any land animal?", choices: ["Elephant", "Giraffe", "Blue whale", "Cheetah"], answer: "Giraffe", points: 20 },
+  { category: "🍎 Nature", question: "What is the name of the ecological concept describing the role of a species in its environment?", choices: ["Habitat", "Niche", "Biome", "Ecosystem"], answer: "Niche", points: 20 },
+  { category: "🍎 Nature", question: "Which type of rock is formed by the alteration of existing rocks due to heat and pressure?", choices: ["Igneous", "Sedimentary", "Metamorphic", "Volcanic"], answer: "Metamorphic", points: 20 },
+  { category: "🍎 Nature", question: "What is the name for the outermost layer of Earth?", choices: ["Mantle", "Core", "Crust", "Lithosphere"], answer: "Crust", points: 20 },
+  { category: "🍎 Nature", question: "Which biome is characterized by the highest biodiversity on Earth?", choices: ["Savanna", "Taiga", "Tropical rainforest", "Temperate forest"], answer: "Tropical rainforest", points: 20 },
+  { category: "🍎 Nature", question: "What is the correct term for a group of lions?", choices: ["Pack", "Herd", "Pride", "Colony"], answer: "Pride", points: 20 }
 ];

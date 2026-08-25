@@ -7,7 +7,7 @@
 
   const TOTAL_STEPS = 5;
   const TOTAL_QS = GAME_QUESTION_COUNT;
-  const FINAL_ROUND_COUNT = Math.min(10, TOTAL_QS, QUESTION_POOL.length);
+  const FINAL_ROUND_COUNT = Math.min(10, TOTAL_QS, HARD_QUESTION_POOL.length);
   const REGULAR_LEVEL_COUNT = Math.max(0, TOTAL_QS - FINAL_ROUND_COUNT);
   const CAMERA_ANCHOR_SLOT = 3;
   const STEP_SHIFT_X = 60;
@@ -151,18 +151,18 @@
   }
 
   function buildQuestionList() {
-    const hardQuestions = QUESTION_POOL.slice(-FINAL_ROUND_COUNT);
-    const regularPool = QUESTION_POOL.slice(0, Math.max(QUESTION_POOL.length - FINAL_ROUND_COUNT, 0));
+    // Pick FINAL_ROUND_COUNT random hard questions (no repeats)
+    const hardQuestions = shuffle([...HARD_QUESTION_POOL]).slice(0, FINAL_ROUND_COUNT);
     const regularCount = Math.max(0, TOTAL_QS - hardQuestions.length);
-    const selectedRegular = shuffle([...regularPool]).slice(0, regularCount);
+    const selectedRegular = shuffle([...QUESTION_POOL]).slice(0, regularCount);
     return [...selectedRegular, ...hardQuestions].slice(0, TOTAL_QS);
   }
 
   function getQuestionPoolForLevel(levelIndex) {
     if (levelIndex < REGULAR_LEVEL_COUNT) {
-      return QUESTION_POOL.slice(0, Math.max(QUESTION_POOL.length - FINAL_ROUND_COUNT, 0));
+      return QUESTION_POOL;
     }
-    return QUESTION_POOL.slice(-FINAL_ROUND_COUNT);
+    return HARD_QUESTION_POOL;
   }
 
   function getLevelRangeForLevel(levelIndex) {
