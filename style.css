@@ -1507,8 +1507,8 @@ img {
 
 .maolingo-badge {
   position: fixed;
-  top: 22px;
-  right: 22px;
+  top: 72px;
+  right: 33px;
   z-index: 50;
   display: inline-flex;
   align-items: center;
@@ -1539,14 +1539,6 @@ img {
   transform: translateY(-2px);
 }
 
-.maolingo-badge-label {
-  font-size: 0.68rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: rgba(255, 244, 231, 0.48);
-  white-space: nowrap;
-}
 
 /* ── Wave text container ── */
 .maolingo-wave-text {
@@ -1554,7 +1546,7 @@ img {
   align-items: baseline;
   gap: 0;
   font-family: var(--font-brand);
-  font-size: 1.08rem;
+  font-size: 2.3rem;
   font-weight: 700;
   letter-spacing: 0.01em;
   line-height: 1;
@@ -1576,9 +1568,13 @@ img {
 }
 
 @keyframes maoWave {
-  0%, 60%, 100% {
+
+  0%,
+  60%,
+  100% {
     transform: translateY(0);
   }
+
   30% {
     transform: translateY(-5px);
   }

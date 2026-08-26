@@ -80,6 +80,7 @@
   const challengeTimerBar = document.getElementById("challengeTimerBar");
   const challengeTimerFill = document.getElementById("challengeTimerFill");
   const challengeTimerText = document.getElementById("challengeTimerText");
+  const maolingoBadge = document.getElementById("maolingoBadge");
   const stepEls = Array.from(climbScene.querySelectorAll(".step")).sort(
     (a, b) => Number(a.dataset.slot) - Number(b.dataset.slot)
   );
@@ -406,6 +407,7 @@
   }
 
   function showDanceOverlay() {
+    maolingoBadge.classList.add("hidden");
     danceOverlay.classList.remove("hidden");
     danceOverlay.classList.add("dance-visible");
     launchConfetti(true);
@@ -427,6 +429,7 @@
     danceOverlay.classList.add("hidden");
     danceOverlay.classList.remove("dance-visible");
     challengeTimerBar.classList.add("hidden");
+    maolingoBadge.classList.remove("hidden");
     initClimber();
     showScreen(screenQuiz);
     setTimeout(loadQuestion, 400);
@@ -458,6 +461,7 @@
     challengeFailOverlay.classList.add("hidden");
     challengeWinOverlay.classList.add("hidden");
     challengeTimerBar.classList.remove("hidden");
+    maolingoBadge.classList.remove("hidden");
     initClimber();
     showScreen(screenQuiz);
     setTimeout(loadQuestion, 400);
@@ -500,6 +504,7 @@
     answered = true;
     stopChallengeTimer();
     clearNextQuestionTimer();
+    maolingoBadge.classList.add("hidden");
     disableChoices(true);
 
     const card = document.getElementById("questionCard");
@@ -518,6 +523,7 @@
   function triggerChallengeWin() {
     stopChallengeTimer();
     clearNextQuestionTimer();
+    maolingoBadge.classList.add("hidden");
     launchConfetti(true);
     setTimeout(() => {
       challengeWinOverlay.classList.remove("hidden");
@@ -532,6 +538,7 @@
     danceOverlay.classList.add("hidden");
     danceOverlay.classList.remove("dance-visible");
     challengeTimerBar.classList.add("hidden");
+    maolingoBadge.classList.add("hidden");
     climbScene.style.display = "none";
     isChallengeMode = false;
     showScreen(screenStart);
