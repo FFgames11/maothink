@@ -974,6 +974,236 @@ img {
   margin-top: 28px;
 }
 
+/* ── Start screen: two-button row ── */
+.start-buttons {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  flex-wrap: nowrap;
+  align-content: center;
+  justify-content: center;
+}
+
+/* ── Challenge Mode button ── */
+.btn-challenge {
+  background: linear-gradient(135deg, #7c3aed, #a855f7, #ec4899);
+  color: #fff;
+  font-size: 1.08rem;
+  min-width: 220px;
+}
+
+.btn-challenge-glow {
+  box-shadow: 0 14px 32px rgba(168, 85, 247, 0.45);
+}
+
+.btn-challenge:hover {
+  box-shadow: 0 18px 40px rgba(168, 85, 247, 0.62);
+}
+
+/* ── Challenge back button (neutral) ── */
+.btn-back {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  color: var(--clr-text);
+  font-size: 1rem;
+  min-width: 180px;
+}
+
+.btn-back:hover {
+  background: rgba(255, 255, 255, 0.16);
+}
+
+/* ── Timer bar inside the question card ── */
+.challenge-timer-bar {
+  position: relative;
+  width: 100%;
+  height: 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.1);
+  overflow: hidden;
+  margin-bottom: 16px;
+}
+
+.challenge-timer-fill {
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #a855f7, #ec4899, #f97316);
+  transform-origin: left;
+  transition: width 1s linear;
+}
+
+.challenge-timer-text {
+  position: absolute;
+  right: 0;
+  top: -22px;
+  font-size: 0.78rem;
+  font-weight: 900;
+  color: #e879f9;
+  letter-spacing: 0.04em;
+}
+
+.challenge-timer-bar.timer-warning .challenge-timer-fill {
+  background: linear-gradient(90deg, #ef4444, #f97316);
+}
+
+.challenge-timer-bar.timer-warning .challenge-timer-text {
+  color: #f87171;
+  animation: timerPulse 0.5s ease-in-out infinite;
+}
+
+@keyframes timerPulse {
+
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 0.7;
+    transform: scale(1.15);
+  }
+}
+
+/* ── Challenge overlays (fail & win) ── */
+.challenge-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 210;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(6, 3, 14, 0.88);
+  backdrop-filter: blur(10px);
+  animation: fadeInOverlay 0.45s ease;
+}
+
+@keyframes fadeInOverlay {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+.challenge-overlay-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+  width: min(100%, 660px);
+  padding: 46px 34px;
+  border-radius: 34px;
+  background: linear-gradient(160deg, rgba(124, 58, 237, 0.28), rgba(18, 7, 38, 0.96));
+  border: 1px solid rgba(168, 85, 247, 0.36);
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.54), 0 0 60px rgba(168, 85, 247, 0.22);
+  text-align: center;
+  animation: popIn 0.48s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.challenge-mascot-wrap img {
+  width: 150px;
+  object-fit: contain;
+  filter: drop-shadow(0 12px 30px rgba(0, 0, 0, 0.4));
+}
+
+/* ── Fail overlay specifics ── */
+.challenge-fail-mascot {
+  filter: drop-shadow(0 12px 30px rgba(239, 68, 68, 0.4)) !important;
+}
+
+.challenge-fail-title {
+  font-family: var(--font-brand);
+  font-size: clamp(2.4rem, 5vw, 3.8rem);
+  color: #f87171;
+  text-shadow: 0 0 40px rgba(248, 113, 113, 0.55);
+  line-height: 0.95;
+}
+
+.challenge-fail-subtitle {
+  font-size: 1.3rem;
+  font-weight: 900;
+  color: var(--clr-text-dim);
+}
+
+.challenge-fail-message {
+  max-width: 420px;
+  font-size: 0.98rem;
+  font-weight: 800;
+  color: rgba(255, 244, 231, 0.55);
+  line-height: 1.45;
+}
+
+.challenge-fail-buttons {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 6px;
+}
+
+/* ── Win overlay specifics ── */
+.challenge-win-content {
+  background: linear-gradient(160deg, rgba(22, 101, 52, 0.3), rgba(14, 6, 30, 0.96));
+  border-color: rgba(34, 197, 94, 0.36);
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.54), 0 0 60px rgba(34, 197, 94, 0.2);
+}
+
+.challenge-win-stars {
+  font-size: 2.2rem;
+  letter-spacing: 0.4rem;
+  animation: softBounce 1.8s ease-in-out infinite;
+}
+
+.challenge-win-title {
+  font-family: var(--font-brand);
+  font-size: clamp(2.4rem, 5vw, 3.8rem);
+  color: #4ade80;
+  text-shadow: 0 0 40px rgba(74, 222, 128, 0.55);
+  line-height: 0.95;
+}
+
+.challenge-win-reward {
+  font-size: 1.18rem;
+  font-weight: 800;
+  color: var(--clr-text);
+  max-width: 400px;
+  line-height: 1.45;
+}
+
+.challenge-win-reward strong {
+  color: #fbbf24;
+}
+
+.challenge-win-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 28px;
+  border-radius: 18px;
+  background: linear-gradient(135deg, #22c55e, #16a34a);
+  color: #fff;
+  font-weight: 900;
+  font-size: 1.06rem;
+  text-decoration: none;
+  box-shadow: 0 12px 28px rgba(34, 197, 94, 0.36);
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+.challenge-win-link:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 18px 36px rgba(34, 197, 94, 0.52);
+}
+
 @keyframes floatShape {
   0% {
     transform: translateY(0) rotate(0deg);
@@ -1269,4 +1499,101 @@ img {
     bottom: 62px;
     transform: translateX(50%) scale(0.9);
   }
+}
+
+/* ══════════════════════════════════════════════
+   Maolingo badge — upper-right wave link
+══════════════════════════════════════════════ */
+
+.maolingo-badge {
+  position: fixed;
+  top: 22px;
+  right: 22px;
+  z-index: 50;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 9px 16px 9px 13px;
+  border-radius: 999px;
+  background: rgba(14, 8, 30, 0.72);
+  border: 1px solid rgba(168, 85, 247, 0.36);
+  backdrop-filter: blur(14px);
+  box-shadow:
+    0 6px 24px rgba(0, 0, 0, 0.32),
+    0 0 0 0 rgba(168, 85, 247, 0);
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    border-color 0.25s ease,
+    box-shadow 0.25s ease,
+    background 0.25s ease,
+    transform 0.2s ease;
+}
+
+.maolingo-badge:hover {
+  background: rgba(124, 58, 237, 0.22);
+  border-color: rgba(168, 85, 247, 0.72);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.36),
+    0 0 28px rgba(168, 85, 247, 0.28);
+  transform: translateY(-2px);
+}
+
+.maolingo-badge-label {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255, 244, 231, 0.48);
+  white-space: nowrap;
+}
+
+/* ── Wave text container ── */
+.maolingo-wave-text {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0;
+  font-family: var(--font-brand);
+  font-size: 1.08rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  line-height: 1;
+}
+
+/* Each letter inherits its stagger index via --i */
+.maolingo-wave-text span {
+  display: inline-block;
+  color: #c084fc;
+  animation: maoWave 2.2s ease-in-out infinite;
+  animation-delay: calc(var(--i) * 0.07s);
+  text-shadow: 0 0 12px rgba(192, 132, 252, 0.55);
+  transition: color 0.2s ease;
+}
+
+.maolingo-badge:hover .maolingo-wave-text span {
+  color: #e879f9;
+  text-shadow: 0 0 18px rgba(232, 121, 249, 0.75);
+}
+
+@keyframes maoWave {
+  0%, 60%, 100% {
+    transform: translateY(0);
+  }
+  30% {
+    transform: translateY(-5px);
+  }
+}
+
+/* ── Arrow indicator ── */
+.maolingo-badge-arrow {
+  font-size: 0.8rem;
+  color: rgba(192, 132, 252, 0.6);
+  margin-left: 2px;
+  transition: transform 0.2s ease, color 0.2s ease;
+  line-height: 1;
+}
+
+.maolingo-badge:hover .maolingo-badge-arrow {
+  transform: translate(2px, -2px);
+  color: #e879f9;
 }

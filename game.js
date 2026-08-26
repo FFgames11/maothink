@@ -34,10 +34,18 @@
   let nextQuestionTimer = null;
   let answeredQuestions = new Set(); // tracks every question object shown this session
 
+  // ── Challenge Mode state ──
+  let isChallengeMode = false;
+  const CHALLENGE_TOTAL = 10;
+  const CHALLENGE_SECONDS = 20;
+  let challengeTimerInterval = null;
+  let challengeSecondsLeft = CHALLENGE_SECONDS;
+
   const screenStart = document.getElementById("screenStart");
   const screenQuiz = document.getElementById("screenQuiz");
   const screenResult = document.getElementById("screenResult");
   const btnStart = document.getElementById("btnStart");
+  const btnChallenge = document.getElementById("btnChallenge");
   const btnNext = document.getElementById("btnNext");
   const btnPlayAgain = document.getElementById("btnPlayAgain");
   const categoryIcon = null;  // removed — category ribbon no longer in UI
@@ -63,6 +71,15 @@
   const speechBubble = document.getElementById("speechBubble");
   const danceOverlay = document.getElementById("danceOverlay");
   const btnCloseDance = document.getElementById("btnCloseDance");
+  const challengeFailOverlay = document.getElementById("challengeFailOverlay");
+  const challengeWinOverlay = document.getElementById("challengeWinOverlay");
+  const challengeFailReason = document.getElementById("challengeFailReason");
+  const btnTryAgain = document.getElementById("btnTryAgain");
+  const btnFailBack = document.getElementById("btnFailBack");
+  const btnWinBack = document.getElementById("btnWinBack");
+  const challengeTimerBar = document.getElementById("challengeTimerBar");
+  const challengeTimerFill = document.getElementById("challengeTimerFill");
+  const challengeTimerText = document.getElementById("challengeTimerText");
   const stepEls = Array.from(climbScene.querySelectorAll(".step")).sort(
     (a, b) => Number(a.dataset.slot) - Number(b.dataset.slot)
   );
@@ -396,6 +413,7 @@
   }
 
   function startGame() {
+    isChallengeMode = false;
     clearNextQuestionTimer();
     questionList = buildQuestionList();
     currentIndex = 0;
@@ -408,13 +426,123 @@
     statQuestions.textContent = `${TOTAL_QS} Levels`;
     danceOverlay.classList.add("hidden");
     danceOverlay.classList.remove("dance-visible");
+    challengeTimerBar.classList.add("hidden");
     initClimber();
     showScreen(screenQuiz);
     setTimeout(loadQuestion, 400);
   }
+
+  // ── Challenge Mode functions ──────────────────────────────────────────────
+
+  function buildChallengeQuestionList() {
+    // Combine both pools, shuffle, pick 10
+    const combined = [...QUESTION_POOL, ...HARD_QUESTION_POOL];
+    return shuffle([...combined]).slice(0, CHALLENGE_TOTAL);
+  }
+
+  function startChallenge() {
+    isChallengeMode = true;
+    clearNextQuestionTimer();
+    stopChallengeTimer();
+    questionList = buildChallengeQuestionList();
+    currentIndex = 0;
+    score = 0;
+    answered = false;
+    results = [];
+    currentCorrectMeta = null;
+    answeredQuestions = new Set();
+    clearNotification();
+    statQuestions.textContent = `${CHALLENGE_TOTAL} Levels`;
+    danceOverlay.classList.add("hidden");
+    danceOverlay.classList.remove("dance-visible");
+    challengeFailOverlay.classList.add("hidden");
+    challengeWinOverlay.classList.add("hidden");
+    challengeTimerBar.classList.remove("hidden");
+    initClimber();
+    showScreen(screenQuiz);
+    setTimeout(loadQuestion, 400);
+  }
+
+  function stopChallengeTimer() {
+    if (challengeTimerInterval) {
+      clearInterval(challengeTimerInterval);
+      challengeTimerInterval = null;
+    }
+  }
+
+  function startChallengeTimer() {
+    stopChallengeTimer();
+    challengeSecondsLeft = CHALLENGE_SECONDS;
+    challengeTimerFill.style.width = "100%";
+    challengeTimerText.textContent = CHALLENGE_SECONDS;
+    challengeTimerBar.classList.remove("timer-warning");
+
+    challengeTimerInterval = setInterval(() => {
+      challengeSecondsLeft -= 1;
+      const pct = Math.max(0, challengeSecondsLeft / CHALLENGE_SECONDS) * 100;
+      challengeTimerFill.style.width = pct + "%";
+      challengeTimerText.textContent = challengeSecondsLeft;
+
+      if (challengeSecondsLeft <= 7) {
+        challengeTimerBar.classList.add("timer-warning");
+      }
+
+      if (challengeSecondsLeft <= 0) {
+        stopChallengeTimer();
+        if (!answered) {
+          triggerChallengeFail("Time's up! You ran out of time.");
+        }
+      }
+    }, 1000);
+  }
+
+  function triggerChallengeFail(reason) {
+    answered = true;
+    stopChallengeTimer();
+    clearNextQuestionTimer();
+    disableChoices(true);
+
+    const card = document.getElementById("questionCard");
+    if (card) {
+      card.classList.add("shake");
+      setTimeout(() => card.classList.remove("shake"), 500);
+    }
+
+    challengeFailReason.textContent = reason || "Better luck next time!";
+
+    setTimeout(() => {
+      challengeFailOverlay.classList.remove("hidden");
+    }, 500);
+  }
+
+  function triggerChallengeWin() {
+    stopChallengeTimer();
+    clearNextQuestionTimer();
+    launchConfetti(true);
+    setTimeout(() => {
+      challengeWinOverlay.classList.remove("hidden");
+    }, 500);
+  }
+
+  function returnToMenu() {
+    stopChallengeTimer();
+    clearNextQuestionTimer();
+    challengeFailOverlay.classList.add("hidden");
+    challengeWinOverlay.classList.add("hidden");
+    danceOverlay.classList.add("hidden");
+    danceOverlay.classList.remove("dance-visible");
+    challengeTimerBar.classList.add("hidden");
+    climbScene.style.display = "none";
+    isChallengeMode = false;
+    showScreen(screenStart);
+  }
   function loadQuestion() {
     if (currentIndex >= questionList.length) {
-      endGame();
+      if (isChallengeMode) {
+        triggerChallengeWin();
+      } else {
+        endGame();
+      }
       return;
     }
 
@@ -429,7 +557,8 @@
     clearNotification();
 
     const question = questionList[currentIndex];
-    questionNumber.textContent = `Level ${currentIndex + 1} / ${TOTAL_QS}`;
+    const totalLevels = isChallengeMode ? CHALLENGE_TOTAL : TOTAL_QS;
+    questionNumber.textContent = `Level ${currentIndex + 1} / ${totalLevels}`;
     questionText.textContent = question.question;
 
     renderHearts();
@@ -462,6 +591,11 @@
     card.classList.remove("card-enter");
     void card.offsetWidth;
     card.classList.add("card-enter");
+
+    // Start per-question countdown in Challenge Mode
+    if (isChallengeMode) {
+      startChallengeTimer();
+    }
   }
 
   function renderHearts() {
@@ -485,7 +619,7 @@
     notifOverlay.innerHTML = `
       <div class="notif-card notif-success animate-pop">
         <div class="notif-mascot-wrap">
-          <img src="chellehead.png" alt="Player success" class="notif-mascot jump-anim" />
+          <img src="ashhead.png" alt="Player success" class="notif-mascot jump-anim" />
         </div>
         <div class="notif-content">
           <div class="notif-title">Correct</div>
@@ -523,6 +657,11 @@
     if (answered) return;
     answered = true;
 
+    // Stop the challenge timer the moment the player clicks
+    if (isChallengeMode) {
+      stopChallengeTimer();
+    }
+
     const currentLevel = currentIndex + 1;
 
     if (choice === correctAnswer) {
@@ -537,10 +676,17 @@
       disableChoices(false);
       showSuccess(`${currentCorrectMeta.label}. ${correctAnswer}`, points);
       triggerClimb();
-      queueNextQuestion(1, false, 1700);
+
+      if (isChallengeMode) {
+        // Advance straight to next question (no fall-back mechanic in challenge)
+        queueNextQuestion(1, false, 1700);
+      } else {
+        queueNextQuestion(1, false, 1700);
+      }
       return;
     }
 
+    // Wrong answer
     button.classList.add("choice-wrong");
     showWrongFlash(button);
     disableChoices(true);
@@ -554,6 +700,13 @@
     const card = document.getElementById("questionCard");
     card.classList.add("shake");
     setTimeout(() => card.classList.remove("shake"), 500);
+
+    if (isChallengeMode) {
+      // Challenge mode: instant fail on wrong answer
+      showWrongReveal(currentCorrectMeta);
+      setTimeout(() => triggerChallengeFail("Wrong answer! You need to be perfect."), 1000);
+      return;
+    }
 
     const targetIndex = Math.max(0, currentIndex - 1);
 
@@ -573,6 +726,10 @@
     btnNext.classList.remove("btn-enter");
     currentIndex = clamp(currentIndex + numericStep, 0, questionList.length);
     if (currentIndex >= questionList.length) {
+      if (isChallengeMode) {
+        triggerChallengeWin();
+        return;
+      }
       endGame();
     } else {
       if (refreshCurrentLevel) {
@@ -686,8 +843,12 @@
   }
 
   btnStart.addEventListener("click", startGame);
+  btnChallenge.addEventListener("click", startChallenge);
   btnNext.addEventListener("click", () => nextQuestion());
   btnPlayAgain.addEventListener("click", startGame);
+  btnTryAgain.addEventListener("click", startChallenge);
+  btnFailBack.addEventListener("click", returnToMenu);
+  btnWinBack.addEventListener("click", returnToMenu);
   btnCloseDance.addEventListener("click", () => {
     danceOverlay.classList.add("hidden");
     danceOverlay.classList.remove("dance-visible");

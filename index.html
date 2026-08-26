@@ -41,9 +41,14 @@
           <div class="stat-pill"><span class="stat-icon">T</span><span>Multiple Choice</span></div>
           <div class="stat-pill"><span class="stat-icon">!</span><span>One Chance</span></div>
         </div>
-        <button class="btn btn-primary btn-glow" id="btnStart">
-          <span class="btn-icon">&#9658;</span> Let's Play!
-        </button>
+        <div class="start-buttons">
+          <button class="btn btn-primary btn-glow" id="btnStart">
+            <span class="btn-icon">&#9658;</span> Let's Play!
+          </button>
+          <button class="btn btn-challenge btn-challenge-glow" id="btnChallenge">
+            <span class="btn-icon">&#9889;</span> Challenge Mode
+          </button>
+        </div>
       </div>
     </div>
 
@@ -61,6 +66,10 @@
             <img src="mascot.png" alt="MaoThink mascot" class="quiz-peek-img" draggable="false" />
           </div>
           <div class="question-card glass-card" id="questionCard">
+            <div class="challenge-timer-bar hidden" id="challengeTimerBar">
+              <div class="challenge-timer-fill" id="challengeTimerFill"></div>
+              <span class="challenge-timer-text" id="challengeTimerText">20</span>
+            </div>
             <div class="question-number" id="questionNumber">Level 1 / 50</div>
             <p class="question-text" id="questionText">Loading question...</p>
             <div class="attempts-row one-shot-row" id="attemptsRow">
@@ -118,7 +127,7 @@
       <div class="speech-bubble" id="speechBubble">Answer correctly to climb.</div>
       <div class="climber-sprite-wrap" aria-hidden="true">
         <img
-          src="chellehead.png"
+          src="ashhead.png"
           alt="Player head"
           class="climber-head-image"
           id="climberHeadImage"
@@ -141,6 +150,45 @@
       <button class="btn btn-primary btn-glow" id="btnCloseDance">See Results &#8594;</button>
     </div>
   </div>
+
+  <!-- Challenge Mode: Fail Overlay -->
+  <div class="challenge-overlay hidden" id="challengeFailOverlay">
+    <div class="challenge-overlay-content">
+      <div class="challenge-mascot-wrap bounce-anim">
+        <img src="mascot.png" alt="MaoThink" draggable="false" class="challenge-fail-mascot" />
+      </div>
+      <div class="challenge-fail-title">GAME OVER!</div>
+      <div class="challenge-fail-subtitle" id="challengeFailReason">Better luck next time!</div>
+      <div class="challenge-fail-message">The challenge requires perfection — 10 questions, no mistakes, no timeouts!</div>
+      <div class="challenge-fail-buttons">
+        <button class="btn btn-challenge btn-challenge-glow" id="btnTryAgain">&#8635; Try Again</button>
+        <button class="btn btn-back" id="btnFailBack">&#8592; Go Back</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Challenge Mode: Win Overlay -->
+  <div class="challenge-overlay hidden" id="challengeWinOverlay">
+    <div class="challenge-overlay-content challenge-win-content">
+      <div class="challenge-mascot-wrap bounce-anim">
+        <img src="mascot.png" alt="MaoThink celebrating" draggable="false" class="challenge-win-mascot" />
+      </div>
+      <div class="challenge-win-stars">&#11088; &#11088; &#11088;</div>
+      <div class="challenge-win-title">Challenge Cleared!</div>
+      <div class="challenge-win-reward">You got <strong>3 Day Membership</strong> to Maolingo platform!</div>
+      <a href="https://www.maolingo.com/" target="_blank" rel="noopener" class="challenge-win-link" id="maolingoLink">&#127760; Visit Maolingo.com</a>
+      <button class="btn btn-back" id="btnWinBack">&#8592; Back to Menu</button>
+    </div>
+  </div>
+
+  <!-- Maolingo wave link — upper right, above staircase -->
+  <a href="https://www.maolingo.com/" target="_blank" rel="noopener" class="maolingo-badge" id="maolingoBadge" aria-label="Visit Maolingo">
+    <span class="maolingo-badge-label">Powered by</span>
+    <span class="maolingo-wave-text" aria-hidden="true">
+      <span style="--i:0">m</span><span style="--i:1">a</span><span style="--i:2">o</span><span style="--i:3">l</span><span style="--i:4">i</span><span style="--i:5">n</span><span style="--i:6">g</span><span style="--i:7">o</span><span style="--i:8">.</span><span style="--i:9">c</span><span style="--i:10">o</span><span style="--i:11">m</span>
+    </span>
+    <span class="maolingo-badge-arrow">↗</span>
+  </a>
 
   <div class="notif-overlay" id="notifOverlay" aria-live="polite"></div>
   <canvas id="confettiCanvas" aria-hidden="true"></canvas>
