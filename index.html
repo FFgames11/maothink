@@ -23,10 +23,48 @@
     <div class="floating-shapes" id="floatingShapes"></div>
     <div class="spotlight spotlight-1"></div>
     <div class="spotlight spotlight-2"></div>
+    <div class="holo-globe" aria-hidden="true">
+      <span class="holo-orbit holo-orbit-a"></span>
+      <span class="holo-orbit holo-orbit-b"></span>
+      <div class="holo-globe-core">
+        <span class="holo-longitude holo-longitude-a"></span>
+        <span class="holo-longitude holo-longitude-b"></span>
+        <span class="holo-latitude holo-latitude-a"></span>
+        <span class="holo-latitude holo-latitude-b"></span>
+        <span class="holo-continent holo-continent-a"></span>
+        <span class="holo-continent holo-continent-b"></span>
+        <span class="holo-scan"></span>
+      </div>
+      <span class="holo-base"></span>
+    </div>
   </div>
 
   <div id="app">
-    <div class="screen active" id="screenStart">
+    <div class="screen active" id="screenPlayerSelect">
+      <div class="player-select-card glass-card">
+        <div class="select-brand">
+          <img src="mascot.png" alt="MaoThink mascot" draggable="false" />
+          <span><span class="select-brand-mao">Mao</span><span class="select-brand-think">Think</span></span>
+        </div>
+        <p class="select-eyebrow">WELCOME TO MAOTHINK</p>
+        <h1>Who will be playing today?</h1>
+        <p class="select-subtitle">Choose your player to begin the climb.</p>
+        <div class="player-options">
+          <button class="player-option" type="button" data-player="kresh" data-image="krishhead.png">
+            <span class="player-portrait"><img src="krishhead.png" alt="Teacher Kresh" draggable="false" /></span>
+            <span class="player-option-copy"><strong>Teacher Kresh</strong><small>Ready to climb</small></span>
+            <span class="player-select-arrow" aria-hidden="true">&#8594;</span>
+          </button>
+          <button class="player-option" type="button" data-player="ash" data-image="ashhead.png">
+            <span class="player-portrait"><img src="ashhead.png" alt="Teacher Ash" draggable="false" /></span>
+            <span class="player-option-copy"><strong>Teacher Ash</strong><small>Ready to climb</small></span>
+            <span class="player-select-arrow" aria-hidden="true">&#8594;</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="screen" id="screenStart">
       <div class="start-card glass-card">
         <div class="mascot-container bounce-anim">
           <img src="mascot.png" alt="MaoThink Mascot" id="mascotImg" draggable="false" />
@@ -36,6 +74,11 @@
           <span class="brand-mao">Mao</span><span class="brand-think">Think</span>
         </div>
         <p class="tagline">How smart are you today?</p>
+        <button class="selected-player-pill" id="btnChangePlayer" type="button" aria-label="Change selected player">
+          <img src="ashhead.png" alt="" id="selectedPlayerThumb" />
+          <span>Playing as <strong id="selectedPlayerName">Teacher Ash</strong></span>
+          <span aria-hidden="true">Change</span>
+        </button>
         <div class="start-stats">
           <div class="stat-pill"><span class="stat-icon">?</span><span id="statQuestions">50 Levels</span></div>
           <div class="stat-pill"><span class="stat-icon">T</span><span>Multiple Choice</span></div>
@@ -54,9 +97,10 @@
 
     <div class="screen" id="screenQuiz">
       <div class="quiz-brand-panel" aria-hidden="true">
-        <img src="mascot.png" alt="MaoThink logo" class="quiz-brand-mascot" draggable="false" />
+        <span class="quiz-brand-icon"><img src="mascot.png" alt="MaoThink logo" class="quiz-brand-mascot" draggable="false" /></span>
         <div class="quiz-brand-copy">
           <span class="quiz-brand-name"><span class="brand-mao">Mao</span><span class="brand-think">Think</span></span>
+          <span class="quiz-brand-tagline">Think • Learn • Grow</span>
         </div>
       </div>
 
@@ -113,6 +157,11 @@
   </div>
 
   <div class="climb-scene" id="climbScene" aria-hidden="true">
+    <div class="climb-instruction">
+      <span class="mountain-icon"><i></i></span>
+      <span>Answer correctly<br />to <strong>climb higher!</strong></span>
+    </div>
+    <div class="finish-flag"><span></span></div>
     <div class="stair-track" id="stairTrack">
       <div class="staircase">
         <div class="step step-5" data-slot="5"><span class="step-level">5</span></div>
@@ -182,6 +231,7 @@
 
   <!-- Maolingo wave link — upper right, above staircase -->
   <a href="https://www.maolingo.com/" target="_blank" rel="noopener" class="maolingo-badge hidden" id="maolingoBadge" aria-label="Visit Maolingo">
+    <span class="maolingo-globe" aria-hidden="true">◎</span>
     <span class="maolingo-wave-text" aria-hidden="true">
       <span style="--i:0">h</span><span style="--i:1">t</span><span style="--i:2">t</span><span style="--i:3">p</span><span style="--i:4">s</span><span style="--i:5">:</span><span style="--i:6">/</span><span style="--i:7">/</span><span style="--i:8">w</span><span style="--i:9">w</span><span style="--i:10">w</span><span style="--i:11">.</span><span style="--i:12">m</span><span style="--i:13">a</span><span style="--i:14">o</span><span style="--i:15">l</span><span style="--i:16">i</span><span style="--i:17">n</span><span style="--i:18">g</span><span style="--i:19">o</span><span style="--i:20">.</span><span style="--i:21">c</span><span style="--i:22">o</span><span style="--i:23">m</span><span style="--i:24">/</span>
     </span>

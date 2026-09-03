@@ -10,15 +10,15 @@
   const FINAL_ROUND_COUNT = Math.min(10, TOTAL_QS, HARD_QUESTION_POOL.length);
   const REGULAR_LEVEL_COUNT = Math.max(0, TOTAL_QS - FINAL_ROUND_COUNT);
   const CAMERA_ANCHOR_SLOT = 3;
-  const STEP_SHIFT_X = 60;
-  const STEP_SHIFT_Y = 40;
+  const STEP_SHIFT_X = 90;
+  const STEP_SHIFT_Y = 72;
   const STEP_COORDS = [
-    [10, 4],
-    [42, 48],
-    [102, 88],
-    [162, 128],
-    [222, 168],
-    [282, 208]
+    [8, 4],
+    [13, 158],
+    [103, 230],
+    [193, 302],
+    [283, 374],
+    [373, 446]
   ];
 
   let questionList = [];
@@ -41,11 +41,15 @@
   let challengeTimerInterval = null;
   let challengeSecondsLeft = CHALLENGE_SECONDS;
 
+  const screenPlayerSelect = document.getElementById("screenPlayerSelect");
   const screenStart = document.getElementById("screenStart");
   const screenQuiz = document.getElementById("screenQuiz");
   const screenResult = document.getElementById("screenResult");
   const btnStart = document.getElementById("btnStart");
   const btnChallenge = document.getElementById("btnChallenge");
+  const btnChangePlayer = document.getElementById("btnChangePlayer");
+  const selectedPlayerThumb = document.getElementById("selectedPlayerThumb");
+  const selectedPlayerName = document.getElementById("selectedPlayerName");
   const btnNext = document.getElementById("btnNext");
   const btnPlayAgain = document.getElementById("btnPlayAgain");
   const categoryIcon = null;  // removed — category ribbon no longer in UI
@@ -81,6 +85,8 @@
   const challengeTimerFill = document.getElementById("challengeTimerFill");
   const challengeTimerText = document.getElementById("challengeTimerText");
   const maolingoBadge = document.getElementById("maolingoBadge");
+  const climberHeadImage = document.getElementById("climberHeadImage");
+  const playerOptions = Array.from(document.querySelectorAll(".player-option"));
   const stepEls = Array.from(climbScene.querySelectorAll(".step")).sort(
     (a, b) => Number(a.dataset.slot) - Number(b.dataset.slot)
   );
@@ -146,14 +152,25 @@
   }
 
   function showScreen(screen) {
-    [screenStart, screenQuiz, screenResult].forEach((section) => {
+    [screenPlayerSelect, screenStart, screenQuiz, screenResult].forEach((section) => {
       section.classList.remove("active");
       section.classList.add("exiting");
     });
     setTimeout(() => {
-      [screenStart, screenQuiz, screenResult].forEach((section) => section.classList.remove("exiting"));
+      [screenPlayerSelect, screenStart, screenQuiz, screenResult].forEach((section) => section.classList.remove("exiting"));
       screen.classList.add("active");
     }, 350);
+  }
+
+  function selectPlayer(option) {
+    const image = option.dataset.image;
+    const name = option.dataset.player === "kresh" ? "Teacher Kresh" : "Teacher Ash";
+    climberHeadImage.src = image;
+    climberHeadImage.alt = `${name} player head`;
+    selectedPlayerThumb.src = image;
+    selectedPlayerName.textContent = name;
+    playerOptions.forEach((playerOption) => playerOption.classList.toggle("selected", playerOption === option));
+    showScreen(screenStart);
   }
 
   function shuffle(items) {
@@ -798,7 +815,7 @@
     canvas.height = window.innerHeight;
     canvas.style.display = "block";
     const ctx = canvas.getContext("2d");
-    const colors = ["#FFD700", "#FF6B6B", "#4ECDC4", "#A855F7", "#3B82F6", "#F59E0B", "#10B981", "#EC4899"];
+    const colors = ["#FFD700", "#FF6B6B", "#4ECDC4", "#54B85A", "#39A96B", "#F59E0B", "#10B981", "#FF8C1D"];
     const count = big ? 220 : 80;
     const pieces = [];
 
@@ -849,6 +866,8 @@
     draw();
   }
 
+  playerOptions.forEach((option) => option.addEventListener("click", () => selectPlayer(option)));
+  btnChangePlayer.addEventListener("click", () => showScreen(screenPlayerSelect));
   btnStart.addEventListener("click", startGame);
   btnChallenge.addEventListener("click", startChallenge);
   btnNext.addEventListener("click", () => nextQuestion());
