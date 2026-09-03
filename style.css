@@ -2834,3 +2834,88 @@ body:has(#screenQuiz.active) .holo-globe {
     width: min(100%, 290px);
   }
 }
+
+/* Shared regular/challenge exit control */
+.game-exit-button {
+  position: fixed;
+  top: 775px;
+  right: 20px;
+  z-index: 70;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 505px;
+  min-height: 50px;
+  padding: 11px 22px;
+  border: 2px solid #d7e6ad;
+  border-radius: 16px;
+  background: linear-gradient(180deg, #fffef8, #f4f9e4);
+  color: var(--ink-green);
+  font-weight: 900;
+  cursor: pointer;
+  box-shadow: 0 9px 20px rgba(2, 70, 38, .2);
+  transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease, background .18s ease;
+}
+
+.game-exit-button span {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #ff941d;
+  color: #fff;
+  font-family: Arial, sans-serif;
+  font-size: 1.05rem;
+  font-weight: 1000;
+  line-height: 1;
+  -webkit-text-stroke: .6px currentColor;
+}
+
+.game-exit-button:hover,
+.game-exit-button:focus-visible {
+  transform: translateY(-2px);
+  border-color: #ff9b24;
+  background: #fff;
+  outline: none;
+  box-shadow: 0 12px 25px rgba(2, 70, 38, .24), 0 0 0 4px rgba(255, 155, 36, .13);
+}
+
+.game-exit-button:active {
+  transform: translateY(1px);
+}
+
+@media (min-width: 901px) and (max-height: 850px) {
+  .game-exit-button {
+    top: 84px;
+    right: 20px;
+    width: auto;
+    min-height: 42px;
+    padding: 7px 14px;
+    border-radius: 999px;
+  }
+
+  .game-exit-button span {
+    width: 24px;
+    height: 24px;
+  }
+}
+
+@media (max-width: 900px) {
+  .game-exit-button {
+    top: 108px;
+    right: 14px;
+    width: auto;
+    min-height: 40px;
+    padding: 6px 12px;
+    border-radius: 999px;
+    font-size: .78rem;
+  }
+
+  .game-exit-button span {
+    width: 22px;
+    height: 22px;
+    font-size: .8rem;
+  }
+}

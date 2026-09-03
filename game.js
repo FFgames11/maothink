@@ -49,6 +49,7 @@
   const btnStart = document.getElementById("btnStart");
   const btnChallenge = document.getElementById("btnChallenge");
   const btnChangePlayer = document.getElementById("btnChangePlayer");
+  const btnExitGame = document.getElementById("btnExitGame");
   const selectedPlayerThumb = document.getElementById("selectedPlayerThumb");
   const selectedPlayerName = document.getElementById("selectedPlayerName");
   const btnNext = document.getElementById("btnNext");
@@ -488,6 +489,7 @@
 
   function showDanceOverlay() {
     maolingoBadge.classList.add("hidden");
+    btnExitGame.classList.add("hidden");
     danceOverlay.classList.remove("hidden");
     danceOverlay.classList.add("dance-visible");
     launchConfetti(true);
@@ -510,6 +512,7 @@
     danceOverlay.classList.remove("dance-visible");
     challengeTimerBar.classList.add("hidden");
     maolingoBadge.classList.remove("hidden");
+    btnExitGame.classList.remove("hidden");
     initClimber();
     saveSession("quiz");
     showScreen(screenQuiz);
@@ -543,6 +546,7 @@
     challengeWinOverlay.classList.add("hidden");
     challengeTimerBar.classList.remove("hidden");
     maolingoBadge.classList.remove("hidden");
+    btnExitGame.classList.remove("hidden");
     initClimber();
     saveSession("quiz");
     showScreen(screenQuiz);
@@ -623,6 +627,7 @@
     danceOverlay.classList.remove("dance-visible");
     challengeTimerBar.classList.add("hidden");
     maolingoBadge.classList.add("hidden");
+    btnExitGame.classList.add("hidden");
     climbScene.style.display = "none";
     isChallengeMode = false;
     questionList = [];
@@ -632,6 +637,32 @@
     playerLevel = 0;
     saveSession("menu");
     showScreen(screenStart);
+  }
+
+  function exitToPlayerSelect() {
+    stopChallengeTimer();
+    clearNextQuestionTimer();
+    challengeFailOverlay.classList.add("hidden");
+    challengeWinOverlay.classList.add("hidden");
+    danceOverlay.classList.add("hidden");
+    danceOverlay.classList.remove("dance-visible");
+    challengeTimerBar.classList.add("hidden");
+    maolingoBadge.classList.add("hidden");
+    btnExitGame.classList.add("hidden");
+    climbScene.style.display = "none";
+    clearNotification();
+    isChallengeMode = false;
+    questionList = [];
+    currentIndex = 0;
+    score = 0;
+    answered = false;
+    results = [];
+    playerLevel = 0;
+    stairWindowStart = 1;
+    pendingResume = null;
+    answeredQuestions = new Set();
+    saveSession("player-select");
+    showScreen(screenPlayerSelect);
   }
   function loadQuestion(preserveChallengeTime = false) {
     if (currentIndex >= questionList.length) {
@@ -753,6 +784,7 @@
       statQuestions.textContent = `${isChallengeMode ? CHALLENGE_TOTAL : TOTAL_QS} Levels`;
       challengeTimerBar.classList.toggle("hidden", !isChallengeMode);
       maolingoBadge.classList.remove("hidden");
+      btnExitGame.classList.remove("hidden");
       restoreClimber();
       activateScreenImmediately(screenQuiz);
       loadQuestion(isChallengeMode);
@@ -766,6 +798,7 @@
     }
 
     maolingoBadge.classList.add("hidden");
+    btnExitGame.classList.add("hidden");
     climbScene.style.display = "none";
     activateScreenImmediately(saved.screen === "menu" ? screenStart : screenPlayerSelect);
     saveSession(saved.screen === "menu" ? "menu" : "player-select");
@@ -1021,6 +1054,7 @@
 
   playerOptions.forEach((option) => option.addEventListener("click", () => selectPlayer(option)));
   btnChangePlayer.addEventListener("click", () => showScreen(screenPlayerSelect));
+  btnExitGame.addEventListener("click", exitToPlayerSelect);
   btnStart.addEventListener("click", startGame);
   btnChallenge.addEventListener("click", startChallenge);
   btnNext.addEventListener("click", () => nextQuestion());
