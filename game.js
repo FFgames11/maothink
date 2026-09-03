@@ -32,6 +32,7 @@
   let stairPanTimer = null;
   let climberMotionTimer = null;
   let nextQuestionTimer = null;
+  let pendingResume = null;
   let answeredQuestions = new Set(); // tracks every question object shown this session
 
   // ── Challenge Mode state ──
@@ -90,6 +91,45 @@
   const stepEls = Array.from(climbScene.querySelectorAll(".step")).sort(
     (a, b) => Number(a.dataset.slot) - Number(b.dataset.slot)
   );
+  const SESSION_KEY = "maothink-game-session-v1";
+  let activeScreenState = "player-select";
+
+  function saveSession(screen = activeScreenState) {
+    try {
+      sessionStorage.setItem(SESSION_KEY, JSON.stringify({
+        version: 1,
+        screen,
+        selectedPlayerName: selectedPlayerName.textContent,
+        selectedPlayerImage: climberHeadImage.getAttribute("src"),
+        questionList,
+        currentIndex,
+        score,
+        results,
+        playerLevel,
+        stairWindowStart,
+        isChallengeMode,
+        challengeSecondsLeft,
+        pendingResume
+      }));
+    } catch (error) {
+      console.warn("Unable to save the current MaoThink session.", error);
+    }
+  }
+
+  function screenStateFor(element) {
+    if (element === screenPlayerSelect) return "player-select";
+    if (element === screenStart) return "menu";
+    if (element === screenQuiz) return "quiz";
+    return "result";
+  }
+
+  function activateScreenImmediately(screen) {
+    [screenPlayerSelect, screenStart, screenQuiz, screenResult].forEach((section) => {
+      section.classList.remove("active", "exiting");
+    });
+    screen.classList.add("active");
+    activeScreenState = screenStateFor(screen);
+  }
 
   function initBackground() {
     const symbols = ["?", "!", "*", "#", "$", "%", "&", "+", "=", "~"];
@@ -152,6 +192,8 @@
   }
 
   function showScreen(screen) {
+    activeScreenState = screenStateFor(screen);
+    saveSession(activeScreenState);
     [screenPlayerSelect, screenStart, screenQuiz, screenResult].forEach((section) => {
       section.classList.remove("active");
       section.classList.add("exiting");
@@ -164,12 +206,13 @@
 
   function selectPlayer(option) {
     const image = option.dataset.image;
-    const name = option.dataset.player === "kresh" ? "Teacher Kresh" : "Teacher Ash";
+    const name = option.dataset.name;
     climberHeadImage.src = image;
     climberHeadImage.alt = `${name} player head`;
     selectedPlayerThumb.src = image;
     selectedPlayerName.textContent = name;
     playerOptions.forEach((playerOption) => playerOption.classList.toggle("selected", playerOption === option));
+    saveSession("menu");
     showScreen(screenStart);
   }
 
@@ -271,12 +314,19 @@
       clearTimeout(nextQuestionTimer);
       nextQuestionTimer = null;
     }
+    pendingResume = null;
   }
 
   function queueNextQuestion(step = 1, refreshCurrentLevel = false, delay = 0) {
     clearNextQuestionTimer();
+    pendingResume = {
+      index: clamp(currentIndex + step, 0, questionList.length),
+      refreshCurrentLevel
+    };
+    saveSession("quiz");
     nextQuestionTimer = setTimeout(() => {
       nextQuestionTimer = null;
+      pendingResume = null;
       nextQuestion(step, refreshCurrentLevel);
     }, delay);
   }
@@ -375,6 +425,19 @@
     climbScene.style.display = "block";
   }
 
+  function restoreClimber() {
+    clearStairPan();
+    stairWindowStart = getWindowStart(playerLevel || 1);
+    const slot = getVisibleSlot(playerLevel || 1);
+    climber.style.transition = "none";
+    setClimberPosition(slot);
+    void climber.offsetWidth;
+    climber.style.transition = "";
+    updateStairLabels();
+    updateSpeechBubble();
+    climbScene.style.display = "block";
+  }
+
   function triggerClimb() {
     const previousLevel = playerLevel;
     const nextLevel = Math.min(TOTAL_QS, playerLevel + 1);
@@ -448,6 +511,7 @@
     challengeTimerBar.classList.add("hidden");
     maolingoBadge.classList.remove("hidden");
     initClimber();
+    saveSession("quiz");
     showScreen(screenQuiz);
     setTimeout(loadQuestion, 400);
   }
@@ -480,6 +544,7 @@
     challengeTimerBar.classList.remove("hidden");
     maolingoBadge.classList.remove("hidden");
     initClimber();
+    saveSession("quiz");
     showScreen(screenQuiz);
     setTimeout(loadQuestion, 400);
   }
@@ -491,18 +556,20 @@
     }
   }
 
-  function startChallengeTimer() {
+  function startChallengeTimer(reset = true) {
     stopChallengeTimer();
-    challengeSecondsLeft = CHALLENGE_SECONDS;
-    challengeTimerFill.style.width = "100%";
-    challengeTimerText.textContent = CHALLENGE_SECONDS;
-    challengeTimerBar.classList.remove("timer-warning");
+    if (reset) challengeSecondsLeft = CHALLENGE_SECONDS;
+    const startingPct = Math.max(0, challengeSecondsLeft / CHALLENGE_SECONDS) * 100;
+    challengeTimerFill.style.width = startingPct + "%";
+    challengeTimerText.textContent = challengeSecondsLeft;
+    challengeTimerBar.classList.toggle("timer-warning", challengeSecondsLeft <= 7);
 
     challengeTimerInterval = setInterval(() => {
       challengeSecondsLeft -= 1;
       const pct = Math.max(0, challengeSecondsLeft / CHALLENGE_SECONDS) * 100;
       challengeTimerFill.style.width = pct + "%";
       challengeTimerText.textContent = challengeSecondsLeft;
+      saveSession("quiz");
 
       if (challengeSecondsLeft <= 7) {
         challengeTimerBar.classList.add("timer-warning");
@@ -558,9 +625,15 @@
     maolingoBadge.classList.add("hidden");
     climbScene.style.display = "none";
     isChallengeMode = false;
+    questionList = [];
+    currentIndex = 0;
+    score = 0;
+    results = [];
+    playerLevel = 0;
+    saveSession("menu");
     showScreen(screenStart);
   }
-  function loadQuestion() {
+  function loadQuestion(preserveChallengeTime = false) {
     if (currentIndex >= questionList.length) {
       if (isChallengeMode) {
         triggerChallengeWin();
@@ -618,8 +691,85 @@
 
     // Start per-question countdown in Challenge Mode
     if (isChallengeMode) {
-      startChallengeTimer();
+      startChallengeTimer(!preserveChallengeTime);
     }
+    saveSession("quiz");
+  }
+
+  function restoreSession() {
+    let saved;
+    try {
+      saved = JSON.parse(sessionStorage.getItem(SESSION_KEY));
+    } catch (error) {
+      sessionStorage.removeItem(SESSION_KEY);
+      return false;
+    }
+
+    if (!saved || saved.version !== 1) return false;
+
+    const selectedImage = saved.selectedPlayerImage || "ashhead.png";
+    const selectedName = saved.selectedPlayerName === "Teacher Kresh"
+      ? "Teacher Krish"
+      : saved.selectedPlayerName || "Teacher Ash";
+    climberHeadImage.src = selectedImage;
+    climberHeadImage.alt = `${selectedName} player head`;
+    selectedPlayerThumb.src = selectedImage;
+    selectedPlayerName.textContent = selectedName;
+    playerOptions.forEach((option) => option.classList.toggle("selected", option.dataset.image === selectedImage));
+
+    if (Array.isArray(saved.questionList)) {
+      const canonicalQuestions = [...QUESTION_POOL, ...HARD_QUESTION_POOL];
+      questionList = saved.questionList.map((savedQuestion) =>
+        canonicalQuestions.find((candidate) => candidate.question === savedQuestion.question) || savedQuestion
+      );
+    }
+    currentIndex = clamp(Number(saved.currentIndex) || 0, 0, questionList.length);
+    score = Number(saved.score) || 0;
+    results = Array.isArray(saved.results) ? saved.results : [];
+    playerLevel = clamp(Number(saved.playerLevel) || 1, 1, TOTAL_QS);
+    stairWindowStart = Number(saved.stairWindowStart) || getWindowStart(playerLevel);
+    isChallengeMode = Boolean(saved.isChallengeMode);
+    challengeSecondsLeft = clamp(Number(saved.challengeSecondsLeft) || CHALLENGE_SECONDS, 1, CHALLENGE_SECONDS);
+    answeredQuestions = new Set(questionList.slice(0, Math.min(currentIndex + 1, questionList.length)));
+
+    let refreshResumedLevel = false;
+    if (saved.pendingResume && Number.isFinite(Number(saved.pendingResume.index))) {
+      currentIndex = clamp(Number(saved.pendingResume.index), 0, questionList.length);
+      refreshResumedLevel = Boolean(saved.pendingResume.refreshCurrentLevel);
+      pendingResume = null;
+    }
+    if (refreshResumedLevel && currentIndex < questionList.length) {
+      refreshQuestionForLevel(currentIndex);
+    }
+    answered = false;
+
+    challengeFailOverlay.classList.add("hidden");
+    challengeWinOverlay.classList.add("hidden");
+    danceOverlay.classList.add("hidden");
+    danceOverlay.classList.remove("dance-visible");
+    clearNotification();
+
+    if (saved.screen === "quiz" && questionList.length > 0 && currentIndex < questionList.length) {
+      statQuestions.textContent = `${isChallengeMode ? CHALLENGE_TOTAL : TOTAL_QS} Levels`;
+      challengeTimerBar.classList.toggle("hidden", !isChallengeMode);
+      maolingoBadge.classList.remove("hidden");
+      restoreClimber();
+      activateScreenImmediately(screenQuiz);
+      loadQuestion(isChallengeMode);
+      return true;
+    }
+
+    if (saved.screen === "result" && questionList.length > 0) {
+      activateScreenImmediately(screenResult);
+      endGame();
+      return true;
+    }
+
+    maolingoBadge.classList.add("hidden");
+    climbScene.style.display = "none";
+    activateScreenImmediately(saved.screen === "menu" ? screenStart : screenPlayerSelect);
+    saveSession(saved.screen === "menu" ? "menu" : "player-select");
+    return true;
   }
 
   function renderHearts() {
@@ -643,7 +793,7 @@
     notifOverlay.innerHTML = `
       <div class="notif-card notif-success animate-pop">
         <div class="notif-mascot-wrap">
-          <img src="ashhead.png" alt="Player success" class="notif-mascot jump-anim" />
+          <img src="${climberHeadImage.getAttribute("src")}" alt="Player success" class="notif-mascot jump-anim" />
         </div>
         <div class="notif-content">
           <div class="notif-title">Correct</div>
@@ -720,6 +870,7 @@
       correct: false,
       attempts: 1
     });
+    saveSession("quiz");
 
     const card = document.getElementById("questionCard");
     card.classList.add("shake");
@@ -749,6 +900,7 @@
     btnNext.classList.add("hidden");
     btnNext.classList.remove("btn-enter");
     currentIndex = clamp(currentIndex + numericStep, 0, questionList.length);
+    pendingResume = null;
     if (currentIndex >= questionList.length) {
       if (isChallengeMode) {
         triggerChallengeWin();
@@ -806,6 +958,7 @@
       resultBreakdown.appendChild(row);
     });
 
+    saveSession("result");
     showDanceOverlay();
   }
 
@@ -885,6 +1038,10 @@
   });
 
   initBackground();
+  if (!restoreSession()) {
+    activateScreenImmediately(screenPlayerSelect);
+    saveSession("player-select");
+  }
 })();
 
 

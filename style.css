@@ -2586,7 +2586,8 @@ body:has(#screenQuiz.active) .holo-globe {
 }
 
 .player-select-card {
-  padding: 34px 42px 42px;
+  width: min(100%, 940px);
+  padding: 25px 34px 30px;
   border-radius: 36px;
   text-align: center;
 }
@@ -2615,7 +2616,7 @@ body:has(#screenQuiz.active) .holo-globe {
 }
 
 .select-eyebrow {
-  margin: 25px 0 8px;
+  margin: 14px 0 6px;
   color: #3d9a50;
   font-size: .72rem;
   font-weight: 900;
@@ -2631,15 +2632,15 @@ body:has(#screenQuiz.active) .holo-globe {
 }
 
 .select-subtitle {
-  margin: 10px 0 28px;
+  margin: 8px 0 19px;
   color: #4d7c5d;
   font-weight: 800;
 }
 
 .player-options {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 16px;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 14px;
 }
 
 .player-option {
@@ -2647,8 +2648,9 @@ body:has(#screenQuiz.active) .holo-globe {
   display: flex;
   flex-direction: column;
   align-items: center;
-  min-height: 250px;
-  padding: 20px 18px 18px;
+  grid-column: span 2;
+  min-height: 190px;
+  padding: 15px 14px 14px;
   border: 2px solid #d9e8b5;
   border-radius: 26px;
   background: rgba(255, 255, 255, .8);
@@ -2656,6 +2658,10 @@ body:has(#screenQuiz.active) .holo-globe {
   cursor: pointer;
   box-shadow: 0 9px 20px rgba(8, 91, 48, .1);
   transition: transform .2s ease, border-color .2s ease, box-shadow .2s ease, background .2s ease;
+}
+
+.player-option:nth-child(4) {
+  grid-column: 2 / span 2;
 }
 
 .player-option:hover,
@@ -2675,8 +2681,8 @@ body:has(#screenQuiz.active) .holo-globe {
 .player-portrait {
   display: grid;
   place-items: center;
-  width: 134px;
-  height: 134px;
+  width: 104px;
+  height: 104px;
   overflow: hidden;
   border: 5px solid #fff;
   border-radius: 50%;
@@ -2693,12 +2699,12 @@ body:has(#screenQuiz.active) .holo-globe {
 .player-option-copy {
   display: flex;
   flex-direction: column;
-  margin-top: 17px;
+  margin-top: 12px;
 }
 
 .player-option-copy strong {
   font-family: var(--font-brand);
-  font-size: 1.35rem;
+  font-size: 1.18rem;
 }
 
 .player-option-copy small {
@@ -2799,10 +2805,15 @@ body:has(#screenQuiz.active) .holo-globe {
   }
 
   .player-option {
+    grid-column: auto;
     min-height: 112px;
     flex-direction: row;
     justify-content: flex-start;
     text-align: left;
+  }
+
+  .player-option:nth-child(4) {
+    grid-column: auto;
   }
 
   .player-portrait {
