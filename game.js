@@ -9,6 +9,7 @@
   const TOTAL_QS = GAME_QUESTION_COUNT;
   const FINAL_ROUND_COUNT = Math.min(10, TOTAL_QS, HARD_QUESTION_POOL.length);
   const REGULAR_LEVEL_COUNT = Math.max(0, TOTAL_QS - FINAL_ROUND_COUNT);
+  const RETIRED_GENERATOR_KINDS = new Set(["linear-equation", "order-of-operations", "power"]);
   const CAMERA_ANCHOR_SLOT = 3;
   const STEP_SHIFT_X = 90;
   const STEP_SHIFT_Y = 72;
@@ -33,7 +34,9 @@
   let climberMotionTimer = null;
   let nextQuestionTimer = null;
   let pendingResume = null;
-  let answeredQuestions = new Set(); // tracks every question object shown this session
+  let answeredQuestions = new Set(); // tracks the text of every question shown this session
+  let questionGeneratorSeed = 0;
+  let questionGenerator = null;
 
   // ── Challenge Mode state ──
   let isChallengeMode = false;
@@ -110,7 +113,10 @@
         stairWindowStart,
         isChallengeMode,
         challengeSecondsLeft,
-        pendingResume
+        pendingResume,
+        answeredQuestions: Array.from(answeredQuestions),
+        questionGeneratorSeed,
+        questionGeneratorState: questionGenerator ? questionGenerator.getState() : null
       }));
     } catch (error) {
       console.warn("Unable to save the current MaoThink session.", error);
@@ -229,70 +235,64 @@
     return Math.min(max, Math.max(min, value));
   }
 
+  function createQuestionGenerator(seed, state) {
+    questionGeneratorSeed = Number(seed) >>> 0;
+    questionGenerator = MaoQuestionGenerator.create(questionGeneratorSeed, state);
+  }
+
+  function startQuestionGenerator() {
+    const values = new Uint32Array(1);
+    if (window.crypto && window.crypto.getRandomValues) {
+      window.crypto.getRandomValues(values);
+    } else {
+      values[0] = (Date.now() ^ Math.floor(Math.random() * 0xffffffff)) >>> 0;
+    }
+    createQuestionGenerator(values[0] || Date.now());
+  }
+
+  function generateUniqueQuestion(difficulty, excludedQuestions) {
+    return questionGenerator ? questionGenerator.generate(difficulty, excludedQuestions) : null;
+  }
+
+  function replaceRetiredGeneratedQuestions(questions) {
+    const excludedQuestions = new Set(
+      questions
+        .filter((question) => !RETIRED_GENERATOR_KINDS.has(question.generatorKind))
+        .map((question) => question.question)
+    );
+
+    return questions.map((question) => {
+      if (!RETIRED_GENERATOR_KINDS.has(question.generatorKind)) return question;
+      const replacement = generateUniqueQuestion(question.points === 20 ? "hard" : "regular", excludedQuestions);
+      if (!replacement) return question;
+      excludedQuestions.add(replacement.question);
+      return replacement;
+    });
+  }
+
   function buildQuestionList() {
-    // Pick FINAL_ROUND_COUNT random hard questions (no repeats)
-    const hardQuestions = shuffle([...HARD_QUESTION_POOL]).slice(0, FINAL_ROUND_COUNT);
-    const regularCount = Math.max(0, TOTAL_QS - hardQuestions.length);
-    const selectedRegular = shuffle([...QUESTION_POOL]).slice(0, regularCount);
-    return [...selectedRegular, ...hardQuestions].slice(0, TOTAL_QS);
-  }
-
-  function getQuestionPoolForLevel(levelIndex) {
-    if (levelIndex < REGULAR_LEVEL_COUNT) {
-      return QUESTION_POOL;
+    const generatedQuestions = [];
+    const usedQuestions = new Set();
+    for (let index = 0; index < TOTAL_QS; index += 1) {
+      const difficulty = index < REGULAR_LEVEL_COUNT ? "regular" : "hard";
+      const generatedQuestion = generateUniqueQuestion(difficulty, usedQuestions);
+      if (!generatedQuestion) break;
+      generatedQuestions.push(generatedQuestion);
+      usedQuestions.add(generatedQuestion.question);
     }
-    return HARD_QUESTION_POOL;
-  }
-
-  function getLevelRangeForLevel(levelIndex) {
-    if (levelIndex < REGULAR_LEVEL_COUNT) {
-      return [0, Math.max(0, REGULAR_LEVEL_COUNT - 1)];
-    }
-    return [REGULAR_LEVEL_COUNT, Math.max(REGULAR_LEVEL_COUNT, TOTAL_QS - 1)];
+    return generatedQuestions;
   }
 
   function refreshQuestionForLevel(levelIndex) {
     if (levelIndex < 0 || levelIndex >= questionList.length) return;
 
-    const currentQuestion = questionList[levelIndex];
-    const [rangeStart, rangeEnd] = getLevelRangeForLevel(levelIndex);
-    const pool = getQuestionPoolForLevel(levelIndex);
-    const assignedInBand = questionList.slice(rangeStart, rangeEnd + 1);
-
-    // Exclude questions already seen/answered this session to avoid repeats
-    const availableQuestions = pool.filter(
-      (candidate) =>
-        candidate !== currentQuestion &&
-        !assignedInBand.includes(candidate) &&
-        !answeredQuestions.has(candidate)
-    );
-
-    if (availableQuestions.length > 0) {
-      questionList[levelIndex] = availableQuestions[Math.floor(Math.random() * availableQuestions.length)];
-      return;
-    }
-
-    // Fallback: try any unseen question in the band (ignoring assignedInBand restriction)
-    const unseenFallback = pool.filter(
-      (candidate) => candidate !== currentQuestion && !answeredQuestions.has(candidate)
-    );
-    if (unseenFallback.length > 0) {
-      questionList[levelIndex] = unseenFallback[Math.floor(Math.random() * unseenFallback.length)];
-      return;
-    }
-
-    // Last resort: swap within the band (pool exhausted — all questions seen)
-    const swapCandidates = [];
-    for (let i = rangeStart; i <= rangeEnd; i += 1) {
-      if (i !== levelIndex && questionList[i] !== currentQuestion) {
-        swapCandidates.push(i);
-      }
-    }
-
-    if (swapCandidates.length > 0) {
-      const swapIndex = swapCandidates[Math.floor(Math.random() * swapCandidates.length)];
-      [questionList[levelIndex], questionList[swapIndex]] = [questionList[swapIndex], questionList[levelIndex]];
-    }
+    const excludedQuestions = new Set([
+      ...answeredQuestions,
+      ...questionList.map((candidate) => candidate.question)
+    ]);
+    const difficulty = levelIndex < REGULAR_LEVEL_COUNT ? "regular" : "hard";
+    const replacement = generateUniqueQuestion(difficulty, excludedQuestions);
+    if (replacement) questionList[levelIndex] = replacement;
   }
 
   function getWindowStart(level) {
@@ -499,6 +499,7 @@
   function startGame() {
     isChallengeMode = false;
     clearNextQuestionTimer();
+    startQuestionGenerator();
     questionList = buildQuestionList();
     currentIndex = 0;
     score = 0;
@@ -522,15 +523,23 @@
   // ── Challenge Mode functions ──────────────────────────────────────────────
 
   function buildChallengeQuestionList() {
-    // Combine both pools, shuffle, pick 10
-    const combined = [...QUESTION_POOL, ...HARD_QUESTION_POOL];
-    return shuffle([...combined]).slice(0, CHALLENGE_TOTAL);
+    const generatedQuestions = [];
+    const usedQuestions = new Set();
+    for (let index = 0; index < CHALLENGE_TOTAL; index += 1) {
+      const difficulty = index < 7 ? "regular" : "hard";
+      const generatedQuestion = generateUniqueQuestion(difficulty, usedQuestions);
+      if (!generatedQuestion) break;
+      generatedQuestions.push(generatedQuestion);
+      usedQuestions.add(generatedQuestion.question);
+    }
+    return shuffle(generatedQuestions);
   }
 
   function startChallenge() {
     isChallengeMode = true;
     clearNextQuestionTimer();
     stopChallengeTimer();
+    startQuestionGenerator();
     questionList = buildChallengeQuestionList();
     currentIndex = 0;
     score = 0;
@@ -675,7 +684,7 @@
     }
 
     // Mark this question as seen so it is never shown again this session
-    answeredQuestions.add(questionList[currentIndex]);
+    answeredQuestions.add(questionList[currentIndex].question);
 
     clearNextQuestionTimer();
     answered = false;
@@ -738,6 +747,8 @@
 
     if (!saved || saved.version !== 1) return false;
 
+    createQuestionGenerator(saved.questionGeneratorSeed || Date.now(), saved.questionGeneratorState);
+
     const selectedImage = saved.selectedPlayerImage || "ashhead.png";
     const selectedName = saved.selectedPlayerName === "Teacher Kresh"
       ? "Teacher Krish"
@@ -751,8 +762,11 @@
     if (Array.isArray(saved.questionList)) {
       const canonicalQuestions = [...QUESTION_POOL, ...HARD_QUESTION_POOL];
       questionList = saved.questionList.map((savedQuestion) =>
-        canonicalQuestions.find((candidate) => candidate.question === savedQuestion.question) || savedQuestion
+        savedQuestion.generated
+          ? savedQuestion
+          : canonicalQuestions.find((candidate) => candidate.question === savedQuestion.question) || savedQuestion
       );
+      questionList = replaceRetiredGeneratedQuestions(questionList);
     }
     currentIndex = clamp(Number(saved.currentIndex) || 0, 0, questionList.length);
     score = Number(saved.score) || 0;
@@ -761,7 +775,11 @@
     stairWindowStart = Number(saved.stairWindowStart) || getWindowStart(playerLevel);
     isChallengeMode = Boolean(saved.isChallengeMode);
     challengeSecondsLeft = clamp(Number(saved.challengeSecondsLeft) || CHALLENGE_SECONDS, 1, CHALLENGE_SECONDS);
-    answeredQuestions = new Set(questionList.slice(0, Math.min(currentIndex + 1, questionList.length)));
+    answeredQuestions = new Set([
+      ...(Array.isArray(saved.answeredQuestions) ? saved.answeredQuestions : []),
+      ...questionList.slice(0, Math.min(currentIndex + 1, questionList.length)).map((question) => question.question),
+      ...results.map((result) => result.question).filter(Boolean)
+    ]);
 
     let refreshResumedLevel = false;
     if (saved.pendingResume && Number.isFinite(Number(saved.pendingResume.index))) {

@@ -10,9 +10,11 @@
 **Type:** Browser-based interactive quiz game, designed for use as an overlay or screen during a livestream.  
 **Tagline:** "How smart are you today?"  
 **Tech Stack:** Vanilla HTML, CSS, JavaScript — no frameworks, no build step needed.  
-**Entry Point:** `index.html` (loads `style.css`, `questions.js`, `game.js` in that order)
+**Entry Point:** `index.html` (loads `style.css`, `questions.js`, `questions-extra.js`, `question-facts.js`, `question-generator.js`, and `game.js` in that order)
 
 ### File Structure
+
+Question logic is split across `questions.js` and `questions-extra.js` (legacy/configuration and shared base facts), `question-facts.js` (new verified raw facts), and `question-generator.js` (weighted persistent generation).
 
 ```
 livestream game/
@@ -68,7 +70,27 @@ Screens fade out with a slight downward slide (`translateY(22px) scale(0.985)`) 
 
 ## 3. Question System
 
-### 3.1 Question Pool (`questions.js`)
+> **Current implementation (September 2026):** The runtime question system is fully generated rather than selected from `QUESTION_POOL` or `HARD_QUESTION_POOL`. `question-generator.js` constructs questions on demand using procedural rules and verified local fact tables. The legacy question objects remain loaded for backward-compatible saved sessions, but new games never select from them.
+
+### 3.0 Runtime Generator (`question-generator.js`)
+
+- A new random seed is created at the start of every normal or challenge game.
+- Regular questions use a weighted mix: approximately 10% basic arithmetic and 90% knowledge/pop-culture generators.
+- The basic arithmetic group contains addition, subtraction, multiplication, division, and percentages. Each accounts for approximately 2% of regular questions.
+- Hard questions use only harder geography and harder science templates. Algebra, order-of-operations, and power generators are retired and are also replaced when found in an older saved generated session.
+- Every generated question is validated to contain exactly four unique choices and exactly one included correct answer.
+- Prompt text is tracked throughout the session to prevent generated duplicates.
+- Every generator category traverses a shuffled permutation of all its compact combination indexes. A combination cannot repeat until that category completes its entire cycle.
+- Persistent cycle records are stored under `maothink-question-history-v1` in `localStorage`. Each record contains only its category size, cycle, position, permutation parameters, and last index—not full question text.
+- Exhaustion resets only the depleted category. The new cycle uses a different permutation and cannot begin with the question that ended the previous cycle.
+- The seed, current generator state, generated question list, and seen prompt list are saved in `sessionStorage`, so a reload resumes the same game reliably.
+- Normal mode still uses 40 regular 10-point questions followed by 10 hard 20-point questions.
+- Challenge mode generates seven regular and three hard questions, then shuffles their order.
+- Wrong-answer fallback levels receive a newly generated unseen question at the appropriate difficulty.
+
+### 3.1 Legacy Question Pool (`questions.js`)
+
+The following arrays are retained for backward compatibility with sessions created before the generator migration. They are not a source for newly started games.
 
 - **`GAME_QUESTION_COUNT`** = `50` (the number of levels per game session)
 - **`QUESTION_POOL`** = a large array of question objects. Currently contains **~216 questions** across three "games" worth of content (GAME 1, GAME 2, GAME 3 + hard final round).
@@ -84,14 +106,14 @@ Screens fade out with a slight downward slide (`translateY(22px) scale(0.985)`) 
 }
 ```
 
-### 3.2 Question Difficulty Tiers
+### 3.2 Generated Question Difficulty Tiers
 
-The pool is split into two tiers by **position in the array**:
+Generated sessions are split into two tiers by level:
 
-| Tier | Pool Slice | Points | Appears At |
+| Tier | Source | Points | Appears At |
 |---|---|---|---|
-| Regular | `QUESTION_POOL[0 .. length - FINAL_ROUND_COUNT - 1]` | 10 pts | Levels 1–40 |
-| Hard (Final Round) | Last `FINAL_ROUND_COUNT` questions in the array | 20 pts | Levels 41–50 |
+| Regular | Regular generator categories | 10 pts | Levels 1–40 |
+| Hard (Final Round) | Hard generator categories | 20 pts | Levels 41–50 |
 
 - `FINAL_ROUND_COUNT` = `Math.min(10, TOTAL_QS, QUESTION_POOL.length)` = **10**
 - `REGULAR_LEVEL_COUNT` = `TOTAL_QS - FINAL_ROUND_COUNT` = **40**
@@ -99,35 +121,43 @@ The pool is split into two tiers by **position in the array**:
 ### 3.3 Question List Construction (`buildQuestionList`)
 
 On game start:
-1. Takes the last 10 questions from the pool as the "hard" final round.
-2. Shuffles the remaining regular questions and picks enough to fill levels 1–40.
-3. Concatenates: `[shuffled regular questions] + [hard questions]`.
-4. Slices to exactly `TOTAL_QS` (50).
+1. Creates a fresh seeded generator that loads persistent category-cycle positions from `localStorage`.
+2. Generates 40 unique regular questions.
+3. Generates 10 unique hard questions for the final round.
+4. Saves the resulting questions and generator state to `sessionStorage`.
 
-> **Important:** The hard questions always occupy the last 10 levels. Their relative order is preserved (not shuffled).
+> **Important:** Hard questions always occupy the last 10 levels in normal mode. Challenge mode generates seven regular and three hard questions and shuffles them together.
 
 ### 3.4 Wrong Answer — Question Refresh (`refreshQuestionForLevel`)
 
 When a player answers wrong:
 - They fall back one level (see §4.3).
 - When re-entering that level, `refreshQuestionForLevel(index)` is called.
-- It tries to assign a question that is **both (a) different from the current and (b) not yet seen this session** (`answeredQuestions` Set).
+- It generates a question that is **both (a) different from the current assignments and (b) not yet seen this session** (`answeredQuestions` Set).
 - A seen question is any question that was ever *loaded onto the screen*, tracked via `answeredQuestions.add()` at the top of `loadQuestion()`.
-- Fallback tiers:
-  1. Any unseen question not already assigned in the current difficulty band.
-  2. Any unseen question in the difficulty band (band-assignment restriction relaxed).
-  3. Last resort swap within the band (only if all pool questions have been seen — unlikely with 200+ questions).
+- The replacement advances the relevant persistent generator category, so it also cannot repeat a question used in an earlier game until that category's full cycle is exhausted.
 - `answeredQuestions` is reset to an empty `Set` on every `startGame()` call.
 
 ### 3.5 Current Categories
 
-- 🌍 Geography
-- 🔬 Science
-- 🎨 Art & Culture
-- 🔢 Math
-- 🍎 Nature
-- 📖 Language
-- 📚 History
+Regular generator families:
+
+- Basic arithmetic (low-probability group)
+- Capitals and world geography
+- Chemical elements, astronomy, and biology
+- General literature and literary characters
+- Inventions and technology
+- World history
+- Famous international songs
+- Famous games (company and protagonist patterns)
+- Famous anime (premise and creator patterns)
+- Famous movies (director and story-clue patterns)
+- Famous artists and celebrities
+
+Hard generator families:
+
+- Hard geography
+- Hard science
 
 ---
 
@@ -347,7 +377,9 @@ The confetti runs on `#confettiCanvas` (full-screen, `z-index: 180`, pointer-eve
 | `playerLevel` | `number` | Staircase position (1-based; 0 = not started) |
 | `stairWindowStart` | `number` | First level number visible in the staircase window |
 | `currentCorrectMeta` | `Object/null` | `{ label, answer }` for the current question's correct choice |
-| `answeredQuestions` | `Set` | All question objects shown this session; used to prevent repeats on fall-back |
+| `answeredQuestions` | `Set` | Question text shown this session; prevents repeats during generation and fall-back movement |
+| `questionGeneratorSeed` | `number` | Seed for the current session's pseudorandom generator |
+| `questionGenerator` | `Object/null` | Active generator with session PRNG state and persistent category-cycle access |
 
 ---
 
@@ -361,9 +393,9 @@ The confetti runs on `#confettiCanvas` (full-screen, `z-index: 180`, pointer-eve
 
 4. **`mascot.png`** — The MaoThink branded mascot. Used on the start screen, result screen, dance overlay, the fixed top-left brand panel during the quiz, and the **mascot peek** element that peeks above the question card.
 
-5. **Question pool expansion** — The pool is designed to grow. Questions are grouped in the file as "GAME 1" (questions 1–50 pool) and "GAME 2" (questions 51–100 pool). The game randomly selects from the pool each session, so adding more questions simply enriches variety without changing the 50-level structure.
+5. **Persistent generated cycles** — New games use `question-generator.js`, not the legacy question objects. Each generator category walks a compact shuffled combination cycle stored in `localStorage`, preventing cross-game repeats until that category is exhausted.
 
-6. **Hard questions at the end of the array** — The last `FINAL_ROUND_COUNT` (10) questions in `QUESTION_POOL` are always the hard round (20pts). Any new hard questions must be appended to the end of the array to maintain this structure.
+6. **Legacy pools remain loaded** — `questions.js` and the old question arrays remain for configuration, fact data setup, and backward-compatible session restoration. Do not use them when constructing a new game.
 
 7. **No timer** — Intentional. There is no countdown per question. The livestream host controls pacing verbally.
 
@@ -373,18 +405,15 @@ The confetti runs on `#confettiCanvas` (full-screen, `z-index: 180`, pointer-eve
 
 ## 13. Adding New Questions (Instructions for AI)
 
-To add more questions to the regular pool:
-1. Open `questions.js`.
-2. Insert new question objects **before** the final `FINAL_ROUND_COUNT` (10) entries.
-3. Use the existing format:
-   ```js
-   { category: "🔬 Science", question: "...", choices: ["A","B","C","D"], answer: "B_value", points: 10 },
-   ```
-4. Ensure `answer` exactly matches one of the `choices` strings.
+To add a generated question family:
+1. Open `question-generator.js`.
+2. Add a definition to `regularGenerators` or `hardGenerators` with a stable, unique `kind`, the exact number of possible combinations in `size`, and an index-driven `build()` function.
+3. Decode the supplied combination index deterministically. Do not choose the question's core operands or fact randomly inside `build()`; otherwise the cycle cannot guarantee uniqueness.
+4. Random answer-choice ordering and distractor construction are allowed because they do not change the question identity.
+5. Pass the definition, cycle, and combination index to `makeQuestion()` so `generatorKey` remains compact and stable.
+6. Ensure every result has exactly four unique choices and that `answer` matches one choice exactly.
 
-To add hard (final round) questions:
-1. Append them to the **very end** of `QUESTION_POOL`.
-2. Set `points: 20`.
+To add verified fact content, extend the relevant fact table in `question-facts.js` (or the shared legacy base tables in `questions-extra.js`). Changing a category's calculated `size` automatically starts a fresh compatible cycle record for that category.
 
 ---
 
