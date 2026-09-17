@@ -6,6 +6,7 @@
   "use strict";
 
   const TOTAL_STEPS = 5;
+  const SESSION_VERSION = 4;
   const TOTAL_QS = GAME_QUESTION_COUNT;
   const FINAL_ROUND_COUNT = Math.min(10, TOTAL_QS, HARD_QUESTION_POOL.length);
   const REGULAR_LEVEL_COUNT = Math.max(0, TOTAL_QS - FINAL_ROUND_COUNT);
@@ -101,7 +102,7 @@
   function saveSession(screen = activeScreenState) {
     try {
       sessionStorage.setItem(SESSION_KEY, JSON.stringify({
-        version: 1,
+        version: SESSION_VERSION,
         screen,
         selectedPlayerName: selectedPlayerName.textContent,
         selectedPlayerImage: climberHeadImage.getAttribute("src"),
@@ -271,16 +272,17 @@
   }
 
   function buildQuestionList() {
-    const generatedQuestions = [];
-    const usedQuestions = new Set();
-    for (let index = 0; index < TOTAL_QS; index += 1) {
-      const difficulty = index < REGULAR_LEVEL_COUNT ? "regular" : "hard";
-      const generatedQuestion = generateUniqueQuestion(difficulty, usedQuestions);
-      if (!generatedQuestion) break;
-      generatedQuestions.push(generatedQuestion);
-      usedQuestions.add(generatedQuestion.question);
-    }
-    return generatedQuestions;
+    // Mix all A1-B2 questions together across levels 1-40. Only the
+    // final ten levels are reserved for a specific CEFR band (C1).
+    const regularQuestions = shuffle([...QUESTION_POOL]).slice(0, REGULAR_LEVEL_COUNT);
+    const c1Questions = shuffle(
+      HARD_QUESTION_POOL.filter((question) => question.level === "C1")
+    ).slice(0, FINAL_ROUND_COUNT);
+
+    return [...regularQuestions, ...c1Questions].map((question) => ({
+      ...question,
+      choices: shuffle([...question.choices])
+    }));
   }
 
   function refreshQuestionForLevel(levelIndex) {
@@ -745,7 +747,7 @@
       return false;
     }
 
-    if (!saved || saved.version !== 1) return false;
+    if (!saved || saved.version !== SESSION_VERSION) return false;
 
     createQuestionGenerator(saved.questionGeneratorSeed || Date.now(), saved.questionGeneratorState);
 

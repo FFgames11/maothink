@@ -1,377 +1,272 @@
 // ============================================================
-//  MaoThink – Question Bank
-//  QUESTION_POOL   – regular questions (points: 10) drawn randomly for levels 1-40
-//  HARD_QUESTION_POOL – 100+ difficult questions (points: 20); 10 are randomly
-//                       selected each game for the final difficult round (levels 41-50)
+// MaoThink - English question bank
+// Levels 1-40: a mixed selection of A1-B2 English language,
+//              grammar, and vocabulary questions
+// Levels 41-50: C1 English language, grammar, and vocabulary
 // ============================================================
 
 const GAME_QUESTION_COUNT = 50;
 
 const QUESTION_POOL = [
-  // ── GAME 1 (Questions 1–39) ──────────────────────────────
-  { category: "🌍 Geography", question: "Which is the largest ocean on Earth?", choices: ["Atlantic Ocean", "Indian Ocean", "Pacific Ocean", "Arctic Ocean"], answer: "Pacific Ocean", points: 10 },
-  { category: "🔬 Science", question: "Which planet is known as the Red Planet?", choices: ["Venus", "Mars", "Jupiter", "Mercury"], answer: "Mars", points: 10 },
-  { category: "🌍 Geography", question: "What is the capital of Australia?", choices: ["Sydney", "Melbourne", "Perth", "Canberra"], answer: "Canberra", points: 10 },
-  { category: "🔬 Science", question: "Which organ pumps blood throughout the human body?", choices: ["Liver", "Brain", "Heart", "Lungs"], answer: "Heart", points: 10 },
-  { category: "🎨 Art & Culture", question: "Who painted the Mona Lisa?", choices: ["Pablo Picasso", "Leonardo da Vinci", "Vincent van Gogh", "Claude Monet"], answer: "Leonardo da Vinci", points: 10 },
-  { category: "🔬 Science", question: "What is H₂O commonly known as?", choices: ["Oxygen", "Hydrogen", "Salt", "Water"], answer: "Water", points: 10 },
-  { category: "🌍 Geography", question: "Which continent has the largest land area?", choices: ["Africa", "Asia", "Europe", "North America"], answer: "Asia", points: 10 },
-  { category: "🔢 Math", question: "How many sides does a hexagon have?", choices: ["Five", "Six", "Seven", "Eight"], answer: "Six", points: 10 },
-  { category: "🍎 Nature", question: "Which animal is the largest living land animal?", choices: ["Giraffe", "Hippopotamus", "African elephant", "Rhinoceros"], answer: "African elephant", points: 10 },
-  { category: "🌍 Geography", question: "What is the main language spoken in Brazil?", choices: ["Spanish", "Portuguese", "French", "Italian"], answer: "Portuguese", points: 10 },
-  { category: "🔬 Science", question: "Which gas do humans need to breathe to survive?", choices: ["Carbon dioxide", "Nitrogen", "Oxygen", "Hydrogen"], answer: "Oxygen", points: 10 },
-  { category: "🌍 Geography", question: "Which country is home to the Taj Mahal?", choices: ["Pakistan", "India", "Nepal", "Bangladesh"], answer: "India", points: 10 },
-  { category: "📖 Language", question: "What is the opposite of ancient?", choices: ["Historic", "Traditional", "Modern", "Former"], answer: "Modern", points: 10 },
-  { category: "🎨 Art & Culture", question: "Which instrument has black and white keys?", choices: ["Violin", "Flute", "Piano", "Trumpet"], answer: "Piano", points: 10 },
-  { category: "🔬 Science", question: "What is the closest star to Earth?", choices: ["Sirius", "Polaris", "The Sun", "Proxima Centauri"], answer: "The Sun", points: 10 },
-  { category: "🍎 Nature", question: "Which part of a plant usually absorbs water from the soil?", choices: ["Stem", "Flower", "Leaf", "Root"], answer: "Root", points: 10 },
-  { category: "🌍 Geography", question: "Which city is famous for the Eiffel Tower?", choices: ["Rome", "Paris", "Madrid", "Vienna"], answer: "Paris", points: 10 },
-  { category: "🍎 Nature", question: "What do bees primarily collect from flowers?", choices: ["Nectar", "Seeds", "Bark", "Leaves"], answer: "Nectar", points: 10 },
-  { category: "📖 Language", question: "Which word is a synonym for rapid?", choices: ["Slow", "Careful", "Fast", "Quiet"], answer: "Fast", points: 10 },
-  { category: "🔢 Math", question: "How many minutes are there in two hours?", choices: ["100", "120", "140", "160"], answer: "120", points: 10 },
-  { category: "🔬 Science", question: "Which planet is the largest in our Solar System?", choices: ["Saturn", "Neptune", "Jupiter", "Uranus"], answer: "Jupiter", points: 10 },
-  { category: "📚 History", question: "Which country is famous for the ancient city of Petra?", choices: ["Jordan", "Egypt", "Lebanon", "Greece"], answer: "Jordan", points: 10 },
-  { category: "🔬 Science", question: "What is the process by which plants convert light energy into chemical energy?", choices: ["Respiration", "Photosynthesis", "Digestion", "Fermentation"], answer: "Photosynthesis", points: 10 },
-  { category: "🍎 Nature", question: "Which of these is a mammal?", choices: ["Crocodile", "Penguin", "Dolphin", "Eagle"], answer: "Dolphin", points: 10 },
-  { category: "🎨 Art & Culture", question: "Who wrote Romeo and Juliet?", choices: ["William Shakespeare", "Charles Dickens", "Jane Austen", "Mark Twain"], answer: "William Shakespeare", points: 10 },
-  { category: "🌍 Geography", question: "What is the capital of Kenya?", choices: ["Kampala", "Nairobi", "Kigali", "Addis Ababa"], answer: "Nairobi", points: 10 },
-  { category: "🔬 Science", question: "Which device is primarily used to measure temperature?", choices: ["Barometer", "Thermometer", "Compass", "Hygrometer"], answer: "Thermometer", points: 10 },
-  { category: "🌍 Geography", question: "Which ocean lies between Africa, Asia, and Australia?", choices: ["Pacific Ocean", "Atlantic Ocean", "Indian Ocean", "Southern Ocean"], answer: "Indian Ocean", points: 10 },
-  { category: "📖 Language", question: "What is the plural form of child?", choices: ["Childs", "Childes", "Children", "Childrens"], answer: "Children", points: 10 },
-  { category: "📚 History", question: "Which ancient civilization built Machu Picchu?", choices: ["Maya", "Inca", "Roman", "Egyptian"], answer: "Inca", points: 10 },
-  { category: "🔬 Science", question: "Which natural satellite orbits Earth?", choices: ["Mars", "Venus", "The Moon", "Mercury"], answer: "The Moon", points: 10 },
-  { category: "🔬 Science", question: "What is the hardest natural substance commonly known?", choices: ["Iron", "Quartz", "Diamond", "Granite"], answer: "Diamond", points: 10 },
-  { category: "🌍 Geography", question: "Which country has the city of Kyoto?", choices: ["China", "South Korea", "Japan", "Thailand"], answer: "Japan", points: 10 },
-  { category: "🔬 Science", question: "What is the largest internal organ in the human body?", choices: ["Heart", "Liver", "Kidney", "Lung"], answer: "Liver", points: 10 },
-  { category: "🔬 Science", question: "Which of these is a renewable source of energy?", choices: ["Coal", "Natural gas", "Solar energy", "Petroleum"], answer: "Solar energy", points: 10 },
-  { category: "📖 Language", question: "Which punctuation mark is normally used at the end of a direct question?", choices: ["Comma", "Colon", "Period", "Question mark"], answer: "Question mark", points: 10 },
-  { category: "📚 History", question: "Which famous landmark is located in Rome?", choices: ["Colosseum", "Acropolis", "Big Ben", "Taj Mahal"], answer: "Colosseum", points: 10 },
-  { category: "🔬 Science", question: "What is the freezing point of water at standard atmospheric pressure?", choices: ["0°C", "10°C", "32°C", "100°C"], answer: "0°C", points: 10 },
-  { category: "🍎 Nature", question: "Which animal is known for changing its color to blend into its surroundings?", choices: ["Chameleon", "Zebra", "Kangaroo", "Panda"], answer: "Chameleon", points: 10 },
+  // A1 (Levels 1-10)
+  { level: "A1", category: "Grammar", question: "Which sentence uses the verb 'be' correctly?", choices: ["She are a teacher.", "She is a teacher.", "She am a teacher.", "She be a teacher."], answer: "She is a teacher.", points: 10 },
+  { level: "A1", category: "Vocabulary", question: "Which word is the opposite of 'big'?", choices: ["Tall", "Small", "Wide", "Heavy"], answer: "Small", points: 10 },
+  { level: "A1", category: "Grammar", question: "Complete the sentence: I ___ from Singapore.", choices: ["am", "is", "are", "be"], answer: "am", points: 10 },
+  { level: "A1", category: "Vocabulary", question: "Which word names a colour?", choices: ["Blue", "Chair", "Walk", "Happy"], answer: "Blue", points: 10 },
+  { level: "A1", category: "Grammar", question: "Choose the correct plural of 'book'.", choices: ["bookes", "books", "book's", "book"], answer: "books", points: 10 },
+  { level: "A1", category: "Vocabulary", question: "Which animal says 'meow'?", choices: ["Dog", "Bird", "Cat", "Horse"], answer: "Cat", points: 10 },
+  { level: "A1", category: "Grammar", question: "Complete the sentence: He ___ football every Sunday.", choices: ["play", "plays", "playing", "played"], answer: "plays", points: 10 },
+  { level: "A1", category: "English Language", question: "Which greeting is normally used in the morning?", choices: ["Good night", "Good morning", "Goodbye", "See you"], answer: "Good morning", points: 10 },
+  { level: "A1", category: "Grammar", question: "Complete the question: ___ is your name?", choices: ["Who", "What", "Where", "When"], answer: "What", points: 10 },
+  { level: "A1", category: "Vocabulary", question: "Which item do you use to write on paper?", choices: ["Spoon", "Shoe", "Pencil", "Plate"], answer: "Pencil", points: 10 },
 
-  // ── 🔥 DIFFICULT ROUND (Questions 40–50) ─────────────────
-  { category: "🔬 Science", question: "Which element has the chemical symbol Fe?", choices: ["Fluorine", "Iron", "Francium", "Fermium"], answer: "Iron", points: 20 },
-  { category: "📖 Language", question: "What is the term for a word that has the opposite meaning of another word?", choices: ["Synonym", "Homonym", "Antonym", "Acronym"], answer: "Antonym", points: 20 },
-  { category: "🔬 Science", question: "Which layer of Earth's atmosphere contains most of the ozone layer?", choices: ["Troposphere", "Stratosphere", "Mesosphere", "Thermosphere"], answer: "Stratosphere", points: 20 },
-  { category: "📚 History", question: "Which civilization developed the writing system known as cuneiform?", choices: ["Sumerians", "Romans", "Vikings", "Aztecs"], answer: "Sumerians", points: 20 },
-  { category: "🔢 Math", question: "What is the smallest prime number?", choices: ["0", "1", "2", "3"], answer: "2", points: 20 },
-  { category: "🔬 Science", question: "Which scientist formulated the three laws of planetary motion?", choices: ["Johannes Kepler", "Galileo Galilei", "Isaac Newton", "Nicolaus Copernicus"], answer: "Johannes Kepler", points: 20 },
-  { category: "🔬 Science", question: "Which blood vessels generally carry blood away from the heart?", choices: ["Veins", "Arteries", "Capillaries", "Venules"], answer: "Arteries", points: 20 },
-  { category: "📖 Language", question: "Which of these languages belongs to the Romance language family?", choices: ["German", "Portuguese", "Arabic", "Japanese"], answer: "Portuguese", points: 20 },
-  { category: "🔬 Science", question: "What is the SI unit of electric resistance?", choices: ["Volt", "Watt", "Ampere", "Ohm"], answer: "Ohm", points: 20 },
-  { category: "📚 History", question: "Which ancient city was buried by the eruption of Mount Vesuvius in 79 CE?", choices: ["Pompeii", "Athens", "Carthage", "Alexandria"], answer: "Pompeii", points: 20 },
-  { category: "🔬 Science", question: "Which part of the brain is primarily associated with balance and coordination?", choices: ["Cerebellum", "Hypothalamus", "Medulla oblongata", "Amygdala"], answer: "Cerebellum", points: 20 },
+  // A2 (Levels 11-20)
+  { level: "A2", category: "Grammar", question: "Complete the sentence: We ___ to the cinema yesterday.", choices: ["go", "goes", "went", "going"], answer: "went", points: 10 },
+  { level: "A2", category: "Vocabulary", question: "Which word means 'very tired'?", choices: ["Excited", "Exhausted", "Surprised", "Interested"], answer: "Exhausted", points: 10 },
+  { level: "A2", category: "Grammar", question: "Which sentence correctly describes several apples?", choices: ["There is some apples.", "There are some apples.", "There are an apples.", "There is any apples."], answer: "There are some apples.", points: 10 },
+  { level: "A2", category: "Vocabulary", question: "A person who serves food in a restaurant is a ___.", choices: ["waiter", "pilot", "farmer", "mechanic"], answer: "waiter", points: 10 },
+  { level: "A2", category: "Grammar", question: "Complete the sentence: This bag is ___ than that one.", choices: ["cheap", "cheapest", "cheaper", "more cheap"], answer: "cheaper", points: 10 },
+  { level: "A2", category: "English Language", question: "Which phrase is a polite way to ask for help?", choices: ["Help me now.", "Could you help me, please?", "You help me.", "Helping me?"], answer: "Could you help me, please?", points: 10 },
+  { level: "A2", category: "Grammar", question: "Complete the sentence: I have lived here ___ 2022.", choices: ["for", "since", "during", "from"], answer: "since", points: 10 },
+  { level: "A2", category: "Vocabulary", question: "Which word is closest in meaning to 'begin'?", choices: ["Finish", "Stop", "Start", "Wait"], answer: "Start", points: 10 },
+  { level: "A2", category: "Grammar", question: "Complete the sentence: You ___ wear a seat belt in a car.", choices: ["must", "might", "would", "could"], answer: "must", points: 10 },
+  { level: "A2", category: "Vocabulary", question: "If the sky is full of clouds, the weather is ___.", choices: ["cloudy", "sunny", "dry", "windless"], answer: "cloudy", points: 10 },
 
-  // ── GAME 2 (Questions 51–89) ──────────────────────────────
-  { category: "🌍 Geography", question: "Which country is the world's largest by land area?", choices: ["Canada", "China", "Russia", "United States"], answer: "Russia", points: 10 },
-  { category: "🔬 Science", question: "What is the name of the galaxy closest to the Milky Way that is expected to merge with it in the distant future?", choices: ["Andromeda Galaxy", "Whirlpool Galaxy", "Sombrero Galaxy", "Triangulum Galaxy"], answer: "Andromeda Galaxy", points: 10 },
-  { category: "🔬 Science", question: "Which organ is primarily responsible for filtering waste from the blood and producing urine?", choices: ["Liver", "Kidneys", "Pancreas", "Spleen"], answer: "Kidneys", points: 10 },
-  { category: "📚 History", question: "Which country is home to the ancient city of Chichén Itzá?", choices: ["Peru", "Mexico", "Guatemala", "Colombia"], answer: "Mexico", points: 10 },
-  { category: "📖 Language", question: "Which word means to officially cancel or end something?", choices: ["Abolish", "Establish", "Preserve", "Expand"], answer: "Abolish", points: 10 },
-  { category: "🔬 Science", question: "Which planet rotates in the opposite direction to most planets in our Solar System?", choices: ["Mars", "Venus", "Jupiter", "Neptune"], answer: "Venus", points: 10 },
-  { category: "🔬 Science", question: "Which instrument is used to measure atmospheric pressure?", choices: ["Thermometer", "Barometer", "Seismometer", "Anemometer"], answer: "Barometer", points: 10 },
-  { category: "🔬 Science", question: "Which famous scientist is associated with the discovery of penicillin?", choices: ["Alexander Fleming", "Louis Pasteur", "Gregor Mendel", "Robert Koch"], answer: "Alexander Fleming", points: 10 },
-  { category: "🌍 Geography", question: "Which continent contains the Sahara Desert?", choices: ["Asia", "South America", "Africa", "Australia"], answer: "Africa", points: 10 },
-  { category: "🔬 Science", question: "What is the study of earthquakes called?", choices: ["Meteorology", "Seismology", "Ecology", "Astronomy"], answer: "Seismology", points: 10 },
-  { category: "📚 History", question: "Which country is known for the ancient Acropolis of Athens?", choices: ["Italy", "Greece", "Cyprus", "Turkey"], answer: "Greece", points: 10 },
-  { category: "🔬 Science", question: "What is the main function of red blood cells?", choices: ["Fighting infections", "Producing hormones", "Carrying oxygen", "Digesting food"], answer: "Carrying oxygen", points: 10 },
-  { category: "🎨 Art & Culture", question: "Which of these is not a primary color in the traditional RYB color model?", choices: ["Red", "Yellow", "Blue", "Green"], answer: "Green", points: 10 },
-  { category: "🔬 Science", question: "Which planet has the most extensive ring system?", choices: ["Saturn", "Mars", "Venus", "Mercury"], answer: "Saturn", points: 10 },
-  { category: "📚 History", question: "Which famous wall divided Berlin during the Cold War?", choices: ["Iron Wall", "Berlin Wall", "Eastern Wall", "European Wall"], answer: "Berlin Wall", points: 10 },
-  { category: "🔬 Science", question: "Which of these is an example of a compound?", choices: ["Oxygen", "Gold", "Water", "Iron"], answer: "Water", points: 10 },
-  { category: "🌍 Geography", question: "What is the capital of New Zealand?", choices: ["Auckland", "Christchurch", "Wellington", "Hamilton"], answer: "Wellington", points: 10 },
-  { category: "🍎 Nature", question: "Which animal is the fastest land animal?", choices: ["Lion", "Cheetah", "Horse", "Leopard"], answer: "Cheetah", points: 10 },
-  { category: "🔢 Math", question: "Which branch of mathematics deals primarily with shapes, sizes, and spatial relationships?", choices: ["Algebra", "Geometry", "Statistics", "Calculus"], answer: "Geometry", points: 10 },
-  { category: "🌍 Geography", question: "What is the largest desert on Earth by total area?", choices: ["Sahara Desert", "Gobi Desert", "Antarctic Desert", "Arabian Desert"], answer: "Antarctic Desert", points: 10 },
-  { category: "📚 History", question: "Which country is famous for the ancient temples of Angkor?", choices: ["Cambodia", "Vietnam", "Laos", "Myanmar"], answer: "Cambodia", points: 10 },
-  { category: "🔬 Science", question: "What is the process by which liquid water changes into water vapor?", choices: ["Condensation", "Freezing", "Evaporation", "Precipitation"], answer: "Evaporation", points: 10 },
-  { category: "🔬 Science", question: "Which scientist proposed the theory of evolution by natural selection?", choices: ["Charles Darwin", "Albert Einstein", "Isaac Newton", "Gregor Mendel"], answer: "Charles Darwin", points: 10 },
-  { category: "🔬 Science", question: "Which of these is a non-renewable energy source?", choices: ["Wind", "Solar", "Coal", "Hydropower"], answer: "Coal", points: 10 },
-  { category: "🌍 Geography", question: "What is the capital of Morocco?", choices: ["Casablanca", "Marrakesh", "Rabat", "Fez"], answer: "Rabat", points: 10 },
-  { category: "🌍 Geography", question: "Which ocean surrounds Antarctica?", choices: ["Atlantic Ocean", "Southern Ocean", "Indian Ocean", "Pacific Ocean"], answer: "Southern Ocean", points: 10 },
-  { category: "🔬 Science", question: "Which vitamin is primarily produced by the body when skin is exposed to sunlight?", choices: ["Vitamin A", "Vitamin B12", "Vitamin C", "Vitamin D"], answer: "Vitamin D", points: 10 },
-  { category: "📚 History", question: "Which ancient people are associated with the city of Tenochtitlan?", choices: ["Aztecs", "Incas", "Sumerians", "Phoenicians"], answer: "Aztecs", points: 10 },
-  { category: "🔢 Math", question: "Which type of triangle has all three sides equal in length?", choices: ["Isosceles", "Scalene", "Equilateral", "Right"], answer: "Equilateral", points: 10 },
-  { category: "🔬 Science", question: "Which gas makes up the largest percentage of Earth's atmosphere?", choices: ["Oxygen", "Nitrogen", "Carbon dioxide", "Hydrogen"], answer: "Nitrogen", points: 10 },
-  { category: "📚 History", question: "Which country is home to the ancient city of Timbuktu?", choices: ["Mali", "Niger", "Senegal", "Chad"], answer: "Mali", points: 10 },
-  { category: "📖 Language", question: "What does the prefix bio- generally relate to?", choices: ["Earth", "Life", "Water", "Light"], answer: "Life", points: 10 },
-  { category: "🔬 Science", question: "Which scientist is known for pioneering research on radioactivity and winning Nobel Prizes in two different scientific fields?", choices: ["Marie Curie", "Ada Lovelace", "Rosalind Franklin", "Jane Goodall"], answer: "Marie Curie", points: 10 },
-  { category: "🔬 Science", question: "What is the approximate speed of light in a vacuum?", choices: ["30,000 km/s", "150,000 km/s", "300,000 km/s", "3,000,000 km/s"], answer: "300,000 km/s", points: 10 },
-  { category: "🌍 Geography", question: "Which country is home to the Galápagos Islands?", choices: ["Ecuador", "Chile", "Peru", "Costa Rica"], answer: "Ecuador", points: 10 },
-  { category: "🔬 Science", question: "Which part of a cell contains most of its genetic material?", choices: ["Cell wall", "Nucleus", "Ribosome", "Cytoplasm"], answer: "Nucleus", points: 10 },
-  { category: "🎨 Art & Culture", question: "Which literary work begins with the character Bilbo Baggins?", choices: ["The Hobbit", "The Odyssey", "Don Quixote", "The Little Prince"], answer: "The Hobbit", points: 10 },
-  { category: "🔢 Math", question: "Which mathematical constant is approximately equal to 3.14159?", choices: ["Phi", "Pi", "Euler's number", "Tau"], answer: "Pi", points: 10 },
-  { category: "📚 History", question: "Which country is traditionally associated with the origin of paper as a major written material?", choices: ["China", "Greece", "Egypt", "India"], answer: "China", points: 10 },
+  // B1 (Levels 21-30)
+  { level: "B1", category: "Grammar", question: "Complete the sentence: If it rains, we ___ at home.", choices: ["stay", "stayed", "will stay", "would stay"], answer: "will stay", points: 10 },
+  { level: "B1", category: "Vocabulary", question: "Which word is closest in meaning to 'reliable'?", choices: ["Dependable", "Careless", "Unusual", "Temporary"], answer: "Dependable", points: 10 },
+  { level: "B1", category: "Grammar", question: "Choose the correct passive sentence.", choices: ["The bridge built in 1990.", "The bridge was built in 1990.", "The bridge was build in 1990.", "The bridge is built in 1990."], answer: "The bridge was built in 1990.", points: 10 },
+  { level: "B1", category: "English Language", question: "What does the phrase 'give up' mean in 'Don't give up'?", choices: ["Donate something", "Stop trying", "Stand up", "Return something"], answer: "Stop trying", points: 10 },
+  { level: "B1", category: "Grammar", question: "Complete the sentence: She asked me where I ___.", choices: ["live", "lived", "will live", "am living"], answer: "lived", points: 10 },
+  { level: "B1", category: "Vocabulary", question: "Choose the correct word: The instructions were clear and easy to ___.", choices: ["follow", "lead", "catch", "reach"], answer: "follow", points: 10 },
+  { level: "B1", category: "Grammar", question: "Complete the sentence: I ___ this book yet.", choices: ["didn't finish", "haven't finished", "don't finish", "wasn't finishing"], answer: "haven't finished", points: 10 },
+  { level: "B1", category: "English Language", question: "Which sentence expresses a suggestion?", choices: ["You must leave now.", "Why don't we take a break?", "I left yesterday.", "Are you leaving?"], answer: "Why don't we take a break?", points: 10 },
+  { level: "B1", category: "Vocabulary", question: "What does 'avoid' mean?", choices: ["To keep away from", "To look carefully at", "To agree with", "To prepare for"], answer: "To keep away from", points: 10 },
+  { level: "B1", category: "Grammar", question: "Complete the sentence: He is interested ___ learning Japanese.", choices: ["at", "on", "in", "for"], answer: "in", points: 10 },
 
-  // ── GAME 3 (Questions 101–200) ──────────────────────────────
-  { category: "🌍 Geography", question: "Which river is the longest in the world?", choices: ["Amazon", "Nile", "Yangtze", "Mississippi"], answer: "Nile", points: 10 },
-  { category: "🔬 Science", question: "What type of animal is a shark?", choices: ["Mammal", "Amphibian", "Fish", "Reptile"], answer: "Fish", points: 10 },
-  { category: "📚 History", question: "Which country was the first to grant women the right to vote?", choices: ["United States", "United Kingdom", "New Zealand", "France"], answer: "New Zealand", points: 10 },
-  { category: "🎨 Art & Culture", question: "Which famous Dutch painter cut off part of his own ear?", choices: ["Rembrandt", "Jan Vermeer", "Vincent van Gogh", "Pieter Bruegel"], answer: "Vincent van Gogh", points: 10 },
-  { category: "🔢 Math", question: "What is the value of 12 squared?", choices: ["124", "144", "132", "154"], answer: "144", points: 10 },
-  { category: "🍎 Nature", question: "Which gas is released by plants during photosynthesis?", choices: ["Carbon dioxide", "Nitrogen", "Oxygen", "Hydrogen"], answer: "Oxygen", points: 10 },
-  { category: "📖 Language", question: "What is the synonym of 'enormous'?", choices: ["Tiny", "Huge", "Narrow", "Faint"], answer: "Huge", points: 10 },
-  { category: "🌍 Geography", question: "Which country contains the most natural lakes in the world?", choices: ["Russia", "Brazil", "Canada", "United States"], answer: "Canada", points: 10 },
-  { category: "🔬 Science", question: "What is the chemical symbol for gold?", choices: ["Gd", "Go", "Au", "Ag"], answer: "Au", points: 10 },
-  { category: "📚 History", question: "Which empire was ruled by Julius Caesar?", choices: ["Greek Empire", "Ottoman Empire", "Roman Empire", "Persian Empire"], answer: "Roman Empire", points: 10 },
-  { category: "🎨 Art & Culture", question: "Which instrument is Yo-Yo Ma famous for playing?", choices: ["Violin", "Piano", "Cello", "Trumpet"], answer: "Cello", points: 10 },
-  { category: "🔢 Math", question: "How many degrees are in a right angle?", choices: ["45", "60", "90", "180"], answer: "90", points: 10 },
-  { category: "🍎 Nature", question: "What type of rock is formed from cooled lava?", choices: ["Sedimentary", "Metamorphic", "Igneous", "Fossil"], answer: "Igneous", points: 10 },
-  { category: "📖 Language", question: "Which of these is a conjunction?", choices: ["Quickly", "Beautiful", "And", "Jump"], answer: "And", points: 10 },
-  { category: "🌍 Geography", question: "Which country is home to Angel Falls, the world's highest uninterrupted waterfall?", choices: ["Brazil", "Colombia", "Venezuela", "Peru"], answer: "Venezuela", points: 10 },
-  { category: "🔬 Science", question: "What organ produces insulin in the human body?", choices: ["Liver", "Kidney", "Pancreas", "Gallbladder"], answer: "Pancreas", points: 10 },
-  { category: "📚 History", question: "In which year did the Berlin Wall fall?", choices: ["1987", "1989", "1991", "1993"], answer: "1989", points: 10 },
-  { category: "🎨 Art & Culture", question: "What is the name of the world-famous opera house located in Sydney, Australia?", choices: ["Royal Albert Hall", "La Scala", "Sydney Opera House", "Bolshoi Theatre"], answer: "Sydney Opera House", points: 10 },
-  { category: "🔢 Math", question: "What is 15% of 200?", choices: ["25", "30", "35", "40"], answer: "30", points: 10 },
-  { category: "🍎 Nature", question: "Which planet in our solar system has the most moons?", choices: ["Jupiter", "Saturn", "Uranus", "Neptune"], answer: "Saturn", points: 10 },
-  { category: "📖 Language", question: "What does the word 'aqua' mean in Latin?", choices: ["Fire", "Earth", "Air", "Water"], answer: "Water", points: 10 },
-  { category: "🌍 Geography", question: "What is the smallest country in the world by area?", choices: ["Monaco", "San Marino", "Vatican City", "Liechtenstein"], answer: "Vatican City", points: 10 },
-  { category: "🔬 Science", question: "What is the most abundant element in the universe?", choices: ["Oxygen", "Carbon", "Hydrogen", "Helium"], answer: "Hydrogen", points: 10 },
-  { category: "📚 History", question: "Which ancient wonder of the world was located in Alexandria, Egypt?", choices: ["Hanging Gardens", "Lighthouse of Alexandria", "Colossus of Rhodes", "Statue of Zeus"], answer: "Lighthouse of Alexandria", points: 10 },
-  { category: "🎨 Art & Culture", question: "Who wrote the novel '1984'?", choices: ["Aldous Huxley", "George Orwell", "H.G. Wells", "Ray Bradbury"], answer: "George Orwell", points: 10 },
-  { category: "🔢 Math", question: "What is the perimeter of a square with sides of 7cm?", choices: ["21 cm", "28 cm", "35 cm", "14 cm"], answer: "28 cm", points: 10 },
-  { category: "🍎 Nature", question: "What is the term for a group of wolves?", choices: ["Herd", "Pack", "Flock", "Colony"], answer: "Pack", points: 10 },
-  { category: "📖 Language", question: "What is a word that imitates the sound it describes called?", choices: ["Metaphor", "Onomatopoeia", "Simile", "Alliteration"], answer: "Onomatopoeia", points: 10 },
-  { category: "🌍 Geography", question: "Which sea lies between Europe and Africa?", choices: ["Red Sea", "Black Sea", "Mediterranean Sea", "Caspian Sea"], answer: "Mediterranean Sea", points: 10 },
-  { category: "🔬 Science", question: "How many bones are in an adult human body?", choices: ["196", "206", "216", "226"], answer: "206", points: 10 },
-  { category: "📚 History", question: "Who was the first President of the United States?", choices: ["Thomas Jefferson", "John Adams", "George Washington", "Benjamin Franklin"], answer: "George Washington", points: 10 },
-  { category: "🎨 Art & Culture", question: "Which country is flamenco dancing originally from?", choices: ["Italy", "Portugal", "Mexico", "Spain"], answer: "Spain", points: 10 },
-  { category: "🔢 Math", question: "What is the next prime number after 7?", choices: ["8", "9", "10", "11"], answer: "11", points: 10 },
-  { category: "🍎 Nature", question: "What is the hardest part of the human body?", choices: ["Bone", "Fingernail", "Tooth enamel", "Cartilage"], answer: "Tooth enamel", points: 10 },
-  { category: "📖 Language", question: "Which of these words is an adverb?", choices: ["Happy", "Happiness", "Happily", "Happier"], answer: "Happily", points: 10 },
-  { category: "🌍 Geography", question: "What is the capital city of Canada?", choices: ["Toronto", "Vancouver", "Montreal", "Ottawa"], answer: "Ottawa", points: 10 },
-  { category: "🔬 Science", question: "Which force keeps planets in orbit around the Sun?", choices: ["Magnetism", "Friction", "Gravity", "Nuclear force"], answer: "Gravity", points: 10 },
-  { category: "📚 History", question: "Who was the Egyptian queen who famously allied with Julius Caesar and Mark Antony?", choices: ["Nefertiti", "Cleopatra", "Hatshepsut", "Isis"], answer: "Cleopatra", points: 10 },
-  { category: "🎨 Art & Culture", question: "Which of Shakespeare's plays features the character Hamlet?", choices: ["Macbeth", "Othello", "Hamlet", "King Lear"], answer: "Hamlet", points: 10 },
-  { category: "🔢 Math", question: "If a triangle has angles of 60° and 80°, what is the third angle?", choices: ["30°", "40°", "50°", "60°"], answer: "40°", points: 10 },
-  { category: "🍎 Nature", question: "What is the scientific study of birds called?", choices: ["Entomology", "Ornithology", "Herpetology", "Ichthyology"], answer: "Ornithology", points: 10 },
-  { category: "📖 Language", question: "Which word means 'to officially end or abolish something by law'?", choices: ["Ratify", "Repeal", "Enact", "Enforce"], answer: "Repeal", points: 10 },
-  { category: "🌍 Geography", question: "Which African country has the largest population?", choices: ["Egypt", "South Africa", "Nigeria", "Kenya"], answer: "Nigeria", points: 10 },
-  { category: "🔬 Science", question: "What is the most common type of star in the Milky Way galaxy?", choices: ["Red giant", "White dwarf", "Red dwarf", "Yellow dwarf"], answer: "Red dwarf", points: 10 },
-  { category: "📚 History", question: "Which ancient Greek city-state was famous for its military warriors?", choices: ["Athens", "Corinth", "Sparta", "Thebes"], answer: "Sparta", points: 10 },
-  { category: "🎨 Art & Culture", question: "Who composed the famous symphony 'Ode to Joy'?", choices: ["Mozart", "Bach", "Beethoven", "Chopin"], answer: "Beethoven", points: 10 },
-  { category: "🔢 Math", question: "What is the cube root of 27?", choices: ["3", "6", "9", "12"], answer: "3", points: 10 },
-  { category: "🍎 Nature", question: "Which animal has the longest lifespan on average?", choices: ["Elephant", "Giant tortoise", "Blue whale", "Koi fish"], answer: "Giant tortoise", points: 10 },
-  { category: "📖 Language", question: "What is the plural of 'phenomenon'?", choices: ["Phenomenons", "Phenomenas", "Phenomena", "Phenomeni"], answer: "Phenomena", points: 10 },
-  { category: "🌍 Geography", question: "What mountain range separates Europe from Asia?", choices: ["Himalayas", "Alps", "Ural Mountains", "Caucasus"], answer: "Ural Mountains", points: 10 },
-  { category: "🔬 Science", question: "What is the name of the process by which water moves through a plant from roots to leaves?", choices: ["Transpiration", "Osmosis", "Diffusion", "Absorption"], answer: "Transpiration", points: 10 },
-  { category: "📚 History", question: "Which dynasty built the Great Wall of China as we know it today?", choices: ["Han", "Tang", "Ming", "Qing"], answer: "Ming", points: 10 },
-  { category: "🎨 Art & Culture", question: "Which novel features the character Elizabeth Bennet?", choices: ["Jane Eyre", "Wuthering Heights", "Pride and Prejudice", "Sense and Sensibility"], answer: "Pride and Prejudice", points: 10 },
-  { category: "🔢 Math", question: "What is 3/4 expressed as a percentage?", choices: ["65%", "70%", "75%", "80%"], answer: "75%", points: 10 },
-  { category: "🍎 Nature", question: "What is the name for the layer of gases surrounding Earth?", choices: ["Hydrosphere", "Lithosphere", "Atmosphere", "Biosphere"], answer: "Atmosphere", points: 10 },
-  { category: "📖 Language", question: "What does the prefix 'tele-' mean?", choices: ["Under", "Above", "Distant", "Between"], answer: "Distant", points: 10 },
-  { category: "🌍 Geography", question: "Which two continents are connected by the Isthmus of Panama?", choices: ["North America and South America", "Europe and Africa", "Asia and Africa", "Australia and Asia"], answer: "North America and South America", points: 10 },
-  { category: "🔬 Science", question: "What colour is a vein when seen under the skin?", choices: ["Red", "Blue", "Green", "Purple"], answer: "Blue", points: 10 },
-  { category: "📚 History", question: "What was the name of the ship on which Charles Darwin famously sailed?", choices: ["HMS Victory", "HMS Endeavour", "HMS Beagle", "HMS Bounty"], answer: "HMS Beagle", points: 10 },
-  { category: "🎨 Art & Culture", question: "Which artist created the sculpture 'The Thinker'?", choices: ["Michelangelo", "Donatello", "Auguste Rodin", "Bernini"], answer: "Auguste Rodin", points: 10 },
-  { category: "🔢 Math", question: "What is the sum of interior angles of a triangle?", choices: ["90°", "180°", "270°", "360°"], answer: "180°", points: 10 },
-  { category: "🍎 Nature", question: "What is the primary source of energy for nearly all life on Earth?", choices: ["Wind", "Water", "The Sun", "Geothermal heat"], answer: "The Sun", points: 10 },
-  { category: "📖 Language", question: "Which of these sentences is in the passive voice?", choices: ["The dog chased the cat.", "The cat was chased by the dog.", "She ran quickly.", "He built the house."], answer: "The cat was chased by the dog.", points: 10 },
-  { category: "🌍 Geography", question: "Which country has the most official languages?", choices: ["India", "South Africa", "Switzerland", "Belgium"], answer: "South Africa", points: 10 },
-  { category: "🔬 Science", question: "What is the name of the scale used to measure earthquake magnitude?", choices: ["Richter scale", "Kelvin scale", "Beaufort scale", "Mohs scale"], answer: "Richter scale", points: 10 },
-  { category: "📚 History", question: "Which civilisation built the Pyramids of Giza?", choices: ["Mesopotamian", "Roman", "Ancient Egyptian", "Greek"], answer: "Ancient Egyptian", points: 10 },
-  { category: "🎨 Art & Culture", question: "What type of art involves creating images from small pieces of coloured glass or stone?", choices: ["Fresco", "Mosaic", "Bas-relief", "Pointillism"], answer: "Mosaic", points: 10 },
-  { category: "🔢 Math", question: "What is the value of 2 to the power of 10?", choices: ["512", "1024", "2048", "256"], answer: "1024", points: 10 },
-  { category: "🍎 Nature", question: "Which type of cloud is associated with thunderstorms?", choices: ["Cirrus", "Stratus", "Cumulonimbus", "Altocumulus"], answer: "Cumulonimbus", points: 10 },
-  { category: "📖 Language", question: "What is a group of words that contains a subject and a verb called?", choices: ["Phrase", "Clause", "Paragraph", "Fragment"], answer: "Clause", points: 10 },
-  { category: "🌍 Geography", question: "Which country is both an island and a continent?", choices: ["Greenland", "Indonesia", "Australia", "New Zealand"], answer: "Australia", points: 10 },
-  { category: "🔬 Science", question: "What is the unit used to measure the frequency of sound waves?", choices: ["Decibel", "Hertz", "Watt", "Pascal"], answer: "Hertz", points: 10 },
-  { category: "📚 History", question: "Who was the first human to walk on the Moon?", choices: ["Buzz Aldrin", "Yuri Gagarin", "Neil Armstrong", "John Glenn"], answer: "Neil Armstrong", points: 10 },
-  { category: "🎨 Art & Culture", question: "Which novel was written by Mary Shelley?", choices: ["Dracula", "Frankenstein", "The Strange Case of Dr Jekyll and Mr Hyde", "The Picture of Dorian Gray"], answer: "Frankenstein", points: 10 },
-  { category: "🔢 Math", question: "A rectangle is 8cm long and 5cm wide. What is its area?", choices: ["26 cm²", "40 cm²", "13 cm²", "30 cm²"], answer: "40 cm²", points: 10 },
-  { category: "🍎 Nature", question: "Which metal is liquid at room temperature?", choices: ["Lead", "Tin", "Mercury", "Aluminium"], answer: "Mercury", points: 10 },
-  { category: "📖 Language", question: "What word describes the repetition of initial consonant sounds in nearby words?", choices: ["Assonance", "Rhyme", "Alliteration", "Consonance"], answer: "Alliteration", points: 10 },
-  { category: "🌍 Geography", question: "What is the name of the deepest lake in the world?", choices: ["Lake Superior", "Lake Baikal", "Lake Titicaca", "Caspian Sea"], answer: "Lake Baikal", points: 10 },
-  { category: "🔬 Science", question: "What is the powerhouse of the cell?", choices: ["Nucleus", "Ribosome", "Mitochondria", "Vacuole"], answer: "Mitochondria", points: 10 },
-  { category: "📚 History", question: "Which war was fought between the North and South of the United States?", choices: ["War of Independence", "World War I", "American Civil War", "Mexican-American War"], answer: "American Civil War", points: 10 },
-  { category: "🎨 Art & Culture", question: "Which country is the birthplace of the Olympic Games?", choices: ["Italy", "Egypt", "Greece", "Turkey"], answer: "Greece", points: 10 },
-  { category: "🔢 Math", question: "What is the least common multiple (LCM) of 4 and 6?", choices: ["8", "12", "18", "24"], answer: "12", points: 10 },
-  { category: "🍎 Nature", question: "How many chambers does a human heart have?", choices: ["2", "3", "4", "5"], answer: "4", points: 10 },
-  { category: "📖 Language", question: "Which of these is an example of a metaphor?", choices: ["She runs like the wind.", "Time is money.", "The wind howled.", "He is very tall."], answer: "Time is money.", points: 10 },
-  { category: "🌍 Geography", question: "Which country is the largest in South America by area?", choices: ["Argentina", "Colombia", "Brazil", "Peru"], answer: "Brazil", points: 10 },
-  { category: "🔬 Science", question: "What is the name of the protein that carries oxygen in red blood cells?", choices: ["Keratin", "Collagen", "Haemoglobin", "Albumin"], answer: "Haemoglobin", points: 10 },
-  { category: "📚 History", question: "Which explorer is credited with the first circumnavigation of the Earth?", choices: ["Christopher Columbus", "Vasco da Gama", "Ferdinand Magellan", "James Cook"], answer: "Ferdinand Magellan", points: 10 },
-  { category: "🎨 Art & Culture", question: "Which musical uses the song 'Memory'?", choices: ["Chicago", "Cats", "Phantom of the Opera", "Grease"], answer: "Cats", points: 10 },
-  { category: "🔢 Math", question: "What is the square root of 169?", choices: ["11", "12", "13", "14"], answer: "13", points: 10 },
-  { category: "🍎 Nature", question: "What is the name for a young kangaroo?", choices: ["Cub", "Pup", "Joey", "Kit"], answer: "Joey", points: 10 },
-  { category: "📖 Language", question: "What does the word 'benevolent' mean?", choices: ["Cruel and harsh", "Well-meaning and kind", "Bold and brave", "Quiet and reserved"], answer: "Well-meaning and kind", points: 10 },
-  { category: "🌍 Geography", question: "In which country is Mount Kilimanjaro located?", choices: ["Kenya", "Tanzania", "Ethiopia", "Uganda"], answer: "Tanzania", points: 10 },
-  { category: "🔬 Science", question: "Which vitamin is essential for the clotting of blood?", choices: ["Vitamin A", "Vitamin C", "Vitamin D", "Vitamin K"], answer: "Vitamin K", points: 10 },
-  { category: "📚 History", question: "Which country was Napoleon Bonaparte born in?", choices: ["France", "Italy", "Corsica (France)", "Spain"], answer: "Corsica (France)", points: 10 },
-  { category: "🎨 Art & Culture", question: "What is the art of arranging flowers called?", choices: ["Topiary", "Ikebana", "Bonsai", "Origami"], answer: "Ikebana", points: 10 },
-  { category: "🔢 Math", question: "How many faces does a cube have?", choices: ["4", "5", "6", "8"], answer: "6", points: 10 },
-  { category: "🍎 Nature", question: "What is the name of the process by which a caterpillar transforms into a butterfly?", choices: ["Germination", "Metamorphosis", "Mitosis", "Pollination"], answer: "Metamorphosis", points: 10 },
-  { category: "📖 Language", question: "Which of these is a preposition?", choices: ["Run", "Quickly", "Beneath", "Beautiful"], answer: "Beneath", points: 10 },
-  { category: "🌍 Geography", question: "Which is the only sea without any coasts?", choices: ["Dead Sea", "Coral Sea", "Sargasso Sea", "Red Sea"], answer: "Sargasso Sea", points: 10 },
-  { category: "🔬 Science", question: "What causes the seasons on Earth?", choices: ["Earth's distance from the Sun", "The tilt of Earth's axis", "Sun's temperature changes", "Moon's gravitational pull"], answer: "The tilt of Earth's axis", points: 10 },
-
-  // ── GAME 4 (Questions 201–250) ──────────────────────────────
-  { category: "🌍 Geography", question: "Which country has the longest coastline in the world?", choices: ["Norway", "Russia", "Australia", "Canada"], answer: "Canada", points: 10 },
-  { category: "🔬 Science", question: "What is the name of the force that opposes motion between two surfaces in contact?", choices: ["Gravity", "Friction", "Tension", "Inertia"], answer: "Friction", points: 10 },
-  { category: "📚 History", question: "Which ancient wonder of the world still stands today?", choices: ["Colossus of Rhodes", "Great Pyramid of Giza", "Hanging Gardens of Babylon", "Lighthouse of Alexandria"], answer: "Great Pyramid of Giza", points: 10 },
-  { category: "🎨 Art & Culture", question: "Which country is the origin of the martial art Taekwondo?", choices: ["Japan", "China", "Korea", "Thailand"], answer: "Korea", points: 10 },
-  { category: "🔢 Math", question: "What is the formula for the area of a circle?", choices: ["2πr", "πr²", "πd", "2πr²"], answer: "πr²", points: 10 },
-  { category: "🍎 Nature", question: "Which is the only continent with no active volcanoes?", choices: ["Antarctica", "Africa", "Australia", "Europe"], answer: "Australia", points: 10 },
-  { category: "📖 Language", question: "What is the name for a word that sounds the same as another but has a different meaning and spelling?", choices: ["Synonym", "Antonym", "Homophone", "Homograph"], answer: "Homophone", points: 10 },
-  { category: "🌍 Geography", question: "Which river flows through the Grand Canyon?", choices: ["Mississippi River", "Missouri River", "Colorado River", "Rio Grande"], answer: "Colorado River", points: 10 },
-  { category: "🔬 Science", question: "What is the term for the change of a gas directly into a solid without passing through the liquid state?", choices: ["Evaporation", "Condensation", "Sublimation", "Deposition"], answer: "Deposition", points: 10 },
-  { category: "📚 History", question: "Which empire was known as the 'Empire on which the sun never sets'?", choices: ["Roman Empire", "Mongol Empire", "Ottoman Empire", "British Empire"], answer: "British Empire", points: 10 },
-  { category: "🎨 Art & Culture", question: "In which city is the Louvre museum located?", choices: ["London", "Rome", "Paris", "Madrid"], answer: "Paris", points: 10 },
-  { category: "🔢 Math", question: "What is the result of 7 × 8?", choices: ["54", "56", "48", "64"], answer: "56", points: 10 },
-  { category: "🍎 Nature", question: "What is the name of the process by which plants lose water through their leaves?", choices: ["Respiration", "Transpiration", "Perspiration", "Evaporation"], answer: "Transpiration", points: 10 },
-  { category: "📖 Language", question: "Which of these words is an antonym of 'generous'?", choices: ["Kind", "Giving", "Stingy", "Warm"], answer: "Stingy", points: 10 },
-  { category: "🌍 Geography", question: "Which country is home to the fjords of Scandinavia?", choices: ["Sweden", "Denmark", "Norway", "Finland"], answer: "Norway", points: 10 },
-  { category: "🔬 Science", question: "What is the name of the hormone that regulates sleep cycles?", choices: ["Adrenaline", "Insulin", "Melatonin", "Cortisol"], answer: "Melatonin", points: 10 },
-  { category: "📚 History", question: "Who was the first female Prime Minister of the United Kingdom?", choices: ["Queen Victoria", "Margaret Thatcher", "Theresa May", "Angela Merkel"], answer: "Margaret Thatcher", points: 10 },
-  { category: "🎨 Art & Culture", question: "What is the name of the traditional Japanese art of paper folding?", choices: ["Ikebana", "Origami", "Bonsai", "Haiku"], answer: "Origami", points: 10 },
-  { category: "🔢 Math", question: "How many edges does a triangular prism have?", choices: ["6", "7", "8", "9"], answer: "9", points: 10 },
-  { category: "🍎 Nature", question: "Which bird is known for its ability to mimic the sounds of other birds and even mechanical noises?", choices: ["Parrot", "Lyrebird", "Mockingbird", "Mynah bird"], answer: "Lyrebird", points: 10 },
-  { category: "📖 Language", question: "What punctuation mark is used to show possession?", choices: ["Comma", "Semicolon", "Apostrophe", "Colon"], answer: "Apostrophe", points: 10 },
-  { category: "🌍 Geography", question: "Which country is home to the ruins of Troy?", choices: ["Greece", "Italy", "Turkey", "Lebanon"], answer: "Turkey", points: 10 },
-  { category: "🔬 Science", question: "What is the name of the longest bone in the human body?", choices: ["Tibia", "Humerus", "Femur", "Fibula"], answer: "Femur", points: 10 },
-  { category: "📚 History", question: "Which civilisation invented the wheel?", choices: ["Ancient Egyptians", "Romans", "Sumerians", "Greeks"], answer: "Sumerians", points: 10 },
-  { category: "🎨 Art & Culture", question: "Which painting technique involves applying thick paint to a canvas with a palette knife?", choices: ["Fresco", "Watercolour", "Impasto", "Tempera"], answer: "Impasto", points: 10 },
-  { category: "🔢 Math", question: "What is the highest common factor (HCF) of 24 and 36?", choices: ["6", "8", "12", "18"], answer: "12", points: 10 },
-  { category: "🍎 Nature", question: "Which planet is known as the 'Morning Star' or 'Evening Star'?", choices: ["Mars", "Venus", "Mercury", "Jupiter"], answer: "Venus", points: 10 },
-  { category: "📖 Language", question: "What is the term for a word formed from the initial letters of other words, such as NASA?", choices: ["Abbreviation", "Acronym", "Initialism", "Contraction"], answer: "Acronym", points: 10 },
-  { category: "🌍 Geography", question: "What is the name of the strait that connects the Atlantic and Pacific Oceans at the southern tip of South America?", choices: ["Drake Passage", "Strait of Magellan", "Strait of Gibraltar", "Torres Strait"], answer: "Strait of Magellan", points: 10 },
-  { category: "🔬 Science", question: "Which type of electromagnetic radiation has the shortest wavelength?", choices: ["Radio waves", "Visible light", "X-rays", "Gamma rays"], answer: "Gamma rays", points: 10 },
-  { category: "📚 History", question: "In which city did Rosa Parks refuse to give up her bus seat in 1955?", choices: ["Birmingham", "Atlanta", "Montgomery", "Memphis"], answer: "Montgomery", points: 10 },
-  { category: "🎨 Art & Culture", question: "Which author created the detective Sherlock Holmes?", choices: ["Agatha Christie", "Arthur Conan Doyle", "Raymond Chandler", "G.K. Chesterton"], answer: "Arthur Conan Doyle", points: 10 },
-  { category: "🔢 Math", question: "What is the name of a polygon with ten sides?", choices: ["Nonagon", "Decagon", "Octagon", "Heptagon"], answer: "Decagon", points: 10 },
-  { category: "🍎 Nature", question: "What is the name of the deepest ocean trench on Earth?", choices: ["Puerto Rico Trench", "Java Trench", "Mariana Trench", "Tonga Trench"], answer: "Mariana Trench", points: 10 },
-  { category: "📖 Language", question: "Which of these is an example of a simile?", choices: ["The world is a stage.", "He ran like the wind.", "The stars danced.", "Time flew by."], answer: "He ran like the wind.", points: 10 },
-  { category: "🌍 Geography", question: "Which country is home to the ancient Inca ruins of Machu Picchu?", choices: ["Bolivia", "Chile", "Ecuador", "Peru"], answer: "Peru", points: 10 },
-  { category: "🔬 Science", question: "What is the main gas found inside the Sun?", choices: ["Oxygen", "Helium", "Hydrogen", "Nitrogen"], answer: "Hydrogen", points: 10 },
-  { category: "📚 History", question: "Which leader was known as 'El Libertador' for liberating much of South America from Spanish rule?", choices: ["José de San Martín", "Simón Bolívar", "Toussaint Louverture", "Miguel Hidalgo"], answer: "Simón Bolívar", points: 10 },
-  { category: "🎨 Art & Culture", question: "What style of music originated in New Orleans in the early 20th century?", choices: ["Blues", "Jazz", "Rock", "Gospel"], answer: "Jazz", points: 10 },
-  { category: "🔢 Math", question: "What is 20% of 350?", choices: ["60", "65", "70", "75"], answer: "70", points: 10 },
-  { category: "🍎 Nature", question: "Which organ in the human body produces bile?", choices: ["Pancreas", "Spleen", "Liver", "Stomach"], answer: "Liver", points: 10 },
-  { category: "📖 Language", question: "What is the term for a story in which characters and events represent abstract ideas or moral qualities?", choices: ["Fable", "Allegory", "Parable", "Myth"], answer: "Allegory", points: 10 },
-  { category: "🌍 Geography", question: "Which African country has the most pyramids?", choices: ["Egypt", "Libya", "Ethiopia", "Sudan"], answer: "Sudan", points: 10 },
-  { category: "🔬 Science", question: "What is the name of the process by which a solid turns directly into a gas?", choices: ["Evaporation", "Condensation", "Sublimation", "Melting"], answer: "Sublimation", points: 10 },
-  { category: "📚 History", question: "Which country launched the world's first artificial satellite, Sputnik, in 1957?", choices: ["United States", "China", "Soviet Union", "Germany"], answer: "Soviet Union", points: 10 },
-  { category: "🎨 Art & Culture", question: "Which famous music festival was held in Woodstock, New York in 1969?", choices: ["Coachella", "Glastonbury", "Woodstock Festival", "Lollapalooza"], answer: "Woodstock Festival", points: 10 },
-  { category: "🔢 Math", question: "What is the sum of the first five positive integers?", choices: ["10", "12", "15", "20"], answer: "15", points: 10 },
-  { category: "🍎 Nature", question: "What type of animal is a Komodo dragon?", choices: ["Snake", "Crocodile", "Lizard", "Turtle"], answer: "Lizard", points: 10 },
-  { category: "📖 Language", question: "What is the name for words that are spelled the same forwards and backwards, such as 'racecar'?", choices: ["Anagram", "Palindrome", "Homonym", "Acronym"], answer: "Palindrome", points: 10 },
-  { category: "🌍 Geography", question: "In which country would you find the city of Casablanca?", choices: ["Tunisia", "Algeria", "Morocco", "Libya"], answer: "Morocco", points: 10 },
-  { category: "🔬 Science", question: "Which part of the human eye controls the amount of light entering it?", choices: ["Cornea", "Retina", "Iris", "Lens"], answer: "Iris", points: 10 },
-
+  // B2 (Levels 31-40)
+  { level: "B2", category: "Grammar", question: "Complete the sentence: If I ___ about the delay, I would have called you.", choices: ["knew", "had known", "would know", "have known"], answer: "had known", points: 10 },
+  { level: "B2", category: "Vocabulary", question: "Which word is closest in meaning to 'significant'?", choices: ["Minor", "Important", "Ordinary", "Uncertain"], answer: "Important", points: 10 },
+  { level: "B2", category: "Grammar", question: "Which sentence correctly expresses a present wish?", choices: ["I wish I can speak French.", "I wish I could speak French.", "I wish I will speak French.", "I wish I speak French."], answer: "I wish I could speak French.", points: 10 },
+  { level: "B2", category: "English Language", question: "What does 'to get the hang of something' mean?", choices: ["To become skilled at it", "To lose interest in it", "To postpone it", "To explain it badly"], answer: "To become skilled at it", points: 10 },
+  { level: "B2", category: "Grammar", question: "Complete the sentence: By next June, they ___ the project.", choices: ["complete", "completed", "will complete", "will have completed"], answer: "will have completed", points: 10 },
+  { level: "B2", category: "Vocabulary", question: "Choose the best word: The company plans to ___ its services into new markets.", choices: ["expand", "scatter", "stretch", "inflate"], answer: "expand", points: 10 },
+  { level: "B2", category: "Grammar", question: "Complete the sentence: She denied ___ the confidential document.", choices: ["to copy", "copy", "copying", "copied"], answer: "copying", points: 10 },
+  { level: "B2", category: "English Language", question: "Which sentence is the most formal?", choices: ["Send me the details soon.", "I want the details right now.", "Could you please provide the details at your earliest convenience?", "Can you shoot me the details?"], answer: "Could you please provide the details at your earliest convenience?", points: 10 },
+  { level: "B2", category: "Vocabulary", question: "What does 'inevitable' mean?", choices: ["Able to be prevented", "Certain to happen", "Difficult to explain", "Unlikely to matter"], answer: "Certain to happen", points: 10 },
+  { level: "B2", category: "Grammar", question: "Complete the sentence: Not only ___ late, but he also forgot the tickets.", choices: ["he arrived", "did he arrive", "he did arrive", "arrived he"], answer: "did he arrive", points: 10 }
 ];
 
-// ── 🔥 HARD QUESTION POOL (100 questions, points: 20 each) ─────────────────
-//    10 are randomly selected each game for the final difficult round.
 const HARD_QUESTION_POOL = [
-  // Science
-  { category: "🔬 Science", question: "Which phenomenon occurs when the Moon passes between Earth and the Sun, blocking some or all of the Sun's light?", choices: ["Lunar eclipse", "Solar eclipse", "Solstice", "Equinox"], answer: "Solar eclipse", points: 20 },
-  { category: "🔬 Science", question: "Which element has the atomic number 79?", choices: ["Silver", "Platinum", "Gold", "Mercury"], answer: "Gold", points: 20 },
-  { category: "🔬 Science", question: "Which fundamental force is responsible for holding atomic nuclei together?", choices: ["Electromagnetic force", "Gravitational force", "Strong nuclear force", "Weak nuclear force"], answer: "Strong nuclear force", points: 20 },
-  { category: "🔬 Science", question: "Which blood type is often described as the universal red-cell donor type?", choices: ["AB positive", "A positive", "O negative", "B negative"], answer: "O negative", points: 20 },
-  { category: "🔬 Science", question: "Which geological process describes the movement of large sections of Earth's lithosphere?", choices: ["Erosion", "Plate tectonics", "Sedimentation", "Weathering"], answer: "Plate tectonics", points: 20 },
-  { category: "🔬 Science", question: "Which scientific principle states that energy cannot be created or destroyed, only transformed from one form to another?", choices: ["Principle of relativity", "Law of conservation of energy", "Heisenberg uncertainty principle", "Archimedes' principle"], answer: "Law of conservation of energy", points: 20 },
-  { category: "🔬 Science", question: "Which element has the chemical symbol Fe?", choices: ["Fluorine", "Iron", "Francium", "Fermium"], answer: "Iron", points: 20 },
-  { category: "🔬 Science", question: "Which layer of Earth's atmosphere contains most of the ozone layer?", choices: ["Troposphere", "Stratosphere", "Mesosphere", "Thermosphere"], answer: "Stratosphere", points: 20 },
-  { category: "🔬 Science", question: "Which scientist formulated the three laws of planetary motion?", choices: ["Johannes Kepler", "Galileo Galilei", "Isaac Newton", "Nicolaus Copernicus"], answer: "Johannes Kepler", points: 20 },
-  { category: "🔬 Science", question: "Which blood vessels generally carry blood away from the heart?", choices: ["Veins", "Arteries", "Capillaries", "Venules"], answer: "Arteries", points: 20 },
-  { category: "🔬 Science", question: "What is the SI unit of electric resistance?", choices: ["Volt", "Watt", "Ampere", "Ohm"], answer: "Ohm", points: 20 },
-  { category: "🔬 Science", question: "Which part of the brain is primarily associated with balance and coordination?", choices: ["Cerebellum", "Hypothalamus", "Medulla oblongata", "Amygdala"], answer: "Cerebellum", points: 20 },
-  { category: "🔬 Science", question: "What is the name of the DNA structure described as a double helix?", choices: ["RNA", "ATP", "DNA double helix", "Ribosome"], answer: "DNA double helix", points: 20 },
-  { category: "🔬 Science", question: "Which particle has no electric charge and is found in the nucleus of an atom?", choices: ["Proton", "Electron", "Neutron", "Photon"], answer: "Neutron", points: 20 },
-  { category: "🔬 Science", question: "What is the name of the force that causes objects at rest to remain at rest?", choices: ["Gravity", "Inertia", "Friction", "Tension"], answer: "Inertia", points: 20 },
-  { category: "🔬 Science", question: "Which type of electromagnetic radiation has the shortest wavelength?", choices: ["Radio waves", "Visible light", "X-rays", "Gamma rays"], answer: "Gamma rays", points: 20 },
-  { category: "🔬 Science", question: "What is the term for the change of a gas directly into a solid without passing through the liquid state?", choices: ["Evaporation", "Condensation", "Sublimation", "Deposition"], answer: "Deposition", points: 20 },
-  { category: "🔬 Science", question: "Which gas is produced when acids react with metals?", choices: ["Oxygen", "Carbon dioxide", "Hydrogen", "Nitrogen"], answer: "Hydrogen", points: 20 },
-  { category: "🔬 Science", question: "What is the speed of light in a vacuum approximately equal to?", choices: ["100,000 km/s", "200,000 km/s", "300,000 km/s", "400,000 km/s"], answer: "300,000 km/s", points: 20 },
-  { category: "🔬 Science", question: "Which organ in the human body is responsible for producing insulin?", choices: ["Liver", "Kidney", "Pancreas", "Adrenal gland"], answer: "Pancreas", points: 20 },
-  { category: "🔬 Science", question: "What is the name of the unit used to measure the amount of a substance in chemistry?", choices: ["Gram", "Litre", "Mole", "Joule"], answer: "Mole", points: 20 },
-  { category: "🔬 Science", question: "What is the chemical formula for table salt?", choices: ["KCl", "NaOH", "NaCl", "MgCl₂"], answer: "NaCl", points: 20 },
-  { category: "🔬 Science", question: "Which planet has the Great Red Spot, a giant storm system?", choices: ["Saturn", "Mars", "Jupiter", "Neptune"], answer: "Jupiter", points: 20 },
-  { category: "🔬 Science", question: "What is the name for the study of heredity and genetic variation?", choices: ["Ecology", "Genetics", "Microbiology", "Physiology"], answer: "Genetics", points: 20 },
-  { category: "🔬 Science", question: "Which element is a liquid at room temperature and is also a metal?", choices: ["Bromine", "Mercury", "Gallium", "Cesium"], answer: "Mercury", points: 20 },
-  { category: "🔬 Science", question: "What is the term for the bending of light as it passes from one medium to another?", choices: ["Reflection", "Diffraction", "Refraction", "Absorption"], answer: "Refraction", points: 20 },
-  { category: "🔬 Science", question: "What is the name of the theory that describes the origin of the universe from an initial singularity?", choices: ["Steady State Theory", "Big Bang Theory", "String Theory", "Multiverse Theory"], answer: "Big Bang Theory", points: 20 },
-  { category: "🔬 Science", question: "Which bone is commonly known as the collarbone?", choices: ["Sternum", "Clavicle", "Scapula", "Humerus"], answer: "Clavicle", points: 20 },
-  { category: "🔬 Science", question: "What is the process by which bacteria convert atmospheric nitrogen into ammonia?", choices: ["Denitrification", "Nitrification", "Nitrogen fixation", "Ammonification"], answer: "Nitrogen fixation", points: 20 },
-  { category: "🔬 Science", question: "Which part of the neuron receives signals from other neurons?", choices: ["Axon", "Dendrite", "Myelin sheath", "Synapse"], answer: "Dendrite", points: 20 },
-
-  // History
-  { category: "📚 History", question: "Which ancient civilization is credited with developing one of the earliest known alphabetic writing systems?", choices: ["Phoenicians", "Mongols", "Vikings", "Aztecs"], answer: "Phoenicians", points: 20 },
-  { category: "📚 History", question: "Which civilization developed the writing system known as cuneiform?", choices: ["Sumerians", "Romans", "Vikings", "Aztecs"], answer: "Sumerians", points: 20 },
-  { category: "📚 History", question: "Which ancient city was buried by the eruption of Mount Vesuvius in 79 CE?", choices: ["Pompeii", "Athens", "Carthage", "Alexandria"], answer: "Pompeii", points: 20 },
-  { category: "📚 History", question: "Which treaty is commonly associated with formally ending the First World War between Germany and the Allied Powers?", choices: ["Treaty of Paris", "Treaty of Versailles", "Treaty of Vienna", "Treaty of Utrecht"], answer: "Treaty of Versailles", points: 20 },
-  { category: "📚 History", question: "Who was the first Emperor of a unified China?", choices: ["Kublai Khan", "Qin Shi Huang", "Liu Bang", "Yongle Emperor"], answer: "Qin Shi Huang", points: 20 },
-  { category: "📚 History", question: "Which country was the first to industrialize during the Industrial Revolution?", choices: ["France", "Germany", "United States", "United Kingdom"], answer: "United Kingdom", points: 20 },
-  { category: "📚 History", question: "Which event in 1789 marked the beginning of the French Revolution?", choices: ["Execution of Louis XVI", "Storming of the Bastille", "Declaration of the Rights of Man", "The Tennis Court Oath"], answer: "Storming of the Bastille", points: 20 },
-  { category: "📚 History", question: "Who was the leader of the Soviet Union during the Cuban Missile Crisis?", choices: ["Joseph Stalin", "Leonid Brezhnev", "Nikita Khrushchev", "Mikhail Gorbachev"], answer: "Nikita Khrushchev", points: 20 },
-  { category: "📚 History", question: "Which Roman general crossed the Rubicon river in 49 BC, triggering a civil war?", choices: ["Pompey", "Julius Caesar", "Mark Antony", "Augustus"], answer: "Julius Caesar", points: 20 },
-  { category: "📚 History", question: "The Meiji Restoration of 1868 was a pivotal event in which country's history?", choices: ["China", "Korea", "Japan", "Vietnam"], answer: "Japan", points: 20 },
-  { category: "📚 History", question: "Who was the first person to circumnavigate the globe?", choices: ["Vasco da Gama", "Christopher Columbus", "James Cook", "Ferdinand Magellan"], answer: "Ferdinand Magellan", points: 20 },
-  { category: "📚 History", question: "Which empire was ruled by Suleiman the Magnificent?", choices: ["Persian Empire", "Ottoman Empire", "Mongol Empire", "Byzantine Empire"], answer: "Ottoman Empire", points: 20 },
-  { category: "📚 History", question: "In which year did the Russian Revolution take place?", choices: ["1905", "1914", "1917", "1921"], answer: "1917", points: 20 },
-  { category: "📚 History", question: "Which battle in 1815 marked Napoleon Bonaparte's final defeat?", choices: ["Battle of Austerlitz", "Battle of Trafalgar", "Battle of Waterloo", "Battle of Leipzig"], answer: "Battle of Waterloo", points: 20 },
-  { category: "📚 History", question: "Which African leader was the first President of an independent Ghana?", choices: ["Nelson Mandela", "Kwame Nkrumah", "Julius Nyerere", "Jomo Kenyatta"], answer: "Kwame Nkrumah", points: 20 },
-
-  // Math
-  { category: "🔢 Math", question: "Which of these numbers is irrational?", choices: ["0.5", "3/4", "√2", "2"], answer: "√2", points: 20 },
-  { category: "🔢 Math", question: "What is the smallest prime number?", choices: ["0", "1", "2", "3"], answer: "2", points: 20 },
-  { category: "🔢 Math", question: "What is the value of log₁₀(1000)?", choices: ["2", "3", "4", "10"], answer: "3", points: 20 },
-  { category: "🔢 Math", question: "How many degrees does the interior of a regular hexagon contain in total?", choices: ["540°", "720°", "900°", "1080°"], answer: "720°", points: 20 },
-  { category: "🔢 Math", question: "What is the derivative of sin(x)?", choices: ["cos(x)", "-cos(x)", "tan(x)", "-sin(x)"], answer: "cos(x)", points: 20 },
-  { category: "🔢 Math", question: "What is the formula for the volume of a sphere?", choices: ["(4/3)πr³", "πr²h", "(2/3)πr³", "4πr²"], answer: "(4/3)πr³", points: 20 },
-  { category: "🔢 Math", question: "If a function f(x) = 3x² + 2x − 5, what is f(2)?", choices: ["9", "11", "13", "15"], answer: "11", points: 20 },
-  { category: "🔢 Math", question: "What is the sum of all interior angles of a pentagon?", choices: ["360°", "450°", "540°", "720°"], answer: "540°", points: 20 },
-  { category: "🔢 Math", question: "Which number is both a perfect square and a perfect cube?", choices: ["8", "27", "64", "16"], answer: "64", points: 20 },
-  { category: "🔢 Math", question: "What is Euler's number (e) approximately equal to?", choices: ["2.14", "2.72", "3.14", "1.62"], answer: "2.72", points: 20 },
-  { category: "🔢 Math", question: "In a right triangle, if one angle is 30° and the hypotenuse is 10, what is the length of the side opposite the 30° angle?", choices: ["3", "5", "7", "8"], answer: "5", points: 20 },
-  { category: "🔢 Math", question: "What is the 10th term of the Fibonacci sequence (starting 1, 1, 2, 3, 5, …)?", choices: ["34", "55", "89", "44"], answer: "55", points: 20 },
-  { category: "🔢 Math", question: "What is the probability of rolling two sixes in a row on a standard die?", choices: ["1/12", "1/36", "1/18", "1/6"], answer: "1/36", points: 20 },
-
-  // Language
-  { category: "📖 Language", question: "What is the term for a word that has the opposite meaning of another word?", choices: ["Synonym", "Homonym", "Antonym", "Acronym"], answer: "Antonym", points: 20 },
-  { category: "📖 Language", question: "Which of these languages belongs to the Romance language family?", choices: ["German", "Portuguese", "Arabic", "Japanese"], answer: "Portuguese", points: 20 },
-  { category: "📖 Language", question: "What is the grammatical term for the subject of a passive sentence?", choices: ["Direct object", "Indirect object", "Agent", "Predicate"], answer: "Agent", points: 20 },
-  { category: "📖 Language", question: "What literary device is used when a writer gives human qualities to non-human things?", choices: ["Metaphor", "Simile", "Personification", "Irony"], answer: "Personification", points: 20 },
-  { category: "📖 Language", question: "Which of these is an example of dramatic irony?", choices: ["A character trips on a banana peel.", "The audience knows the villain is hiding behind the door, but the hero does not.", "A storm reflects a character's anger.", "A character says they are fine when they are not."], answer: "The audience knows the villain is hiding behind the door, but the hero does not.", points: 20 },
-  { category: "📖 Language", question: "What is the term for a narrative technique where the story is told by a character within the story?", choices: ["Third-person omniscient", "First-person narrative", "Stream of consciousness", "Free indirect discourse"], answer: "First-person narrative", points: 20 },
-  { category: "📖 Language", question: "What is the name for the repetition of a word or phrase at the beginning of successive clauses?", choices: ["Epistrophe", "Chiasmus", "Anaphora", "Zeugma"], answer: "Anaphora", points: 20 },
-  { category: "📖 Language", question: "Which grammatical mood is used to express wishes, hypotheticals, or doubts?", choices: ["Indicative", "Imperative", "Subjunctive", "Conditional"], answer: "Subjunctive", points: 20 },
-  { category: "📖 Language", question: "What is a portmanteau word?", choices: ["A word with multiple meanings", "A word blending two other words", "A borrowed word from another language", "A word that has become obsolete"], answer: "A word blending two other words", points: 20 },
-  { category: "📖 Language", question: "What is the term for using a part to represent the whole, such as 'all hands on deck'?", choices: ["Metonymy", "Synecdoche", "Euphemism", "Hyperbole"], answer: "Synecdoche", points: 20 },
-
-  // Art & Culture
-  { category: "🎨 Art & Culture", question: "Which philosopher wrote The Republic?", choices: ["Aristotle", "Socrates", "Plato", "Epicurus"], answer: "Plato", points: 20 },
-  { category: "🎨 Art & Culture", question: "What artistic movement was Salvador Dalí associated with?", choices: ["Cubism", "Surrealism", "Impressionism", "Futurism"], answer: "Surrealism", points: 20 },
-  { category: "🎨 Art & Culture", question: "Which novel by Franz Kafka tells the story of a man who wakes up transformed into a giant insect?", choices: ["The Trial", "Amerika", "The Metamorphosis", "The Castle"], answer: "The Metamorphosis", points: 20 },
-  { category: "🎨 Art & Culture", question: "Who composed the opera 'La Traviata'?", choices: ["Puccini", "Verdi", "Mozart", "Wagner"], answer: "Verdi", points: 20 },
-  { category: "🎨 Art & Culture", question: "Which ancient Greek tragedy was written by Sophocles and features the character Oedipus?", choices: ["Medea", "Antigone", "Oedipus Rex", "The Oresteia"], answer: "Oedipus Rex", points: 20 },
-  { category: "🎨 Art & Culture", question: "In which city is the Uffizi Gallery, home to Botticelli's 'The Birth of Venus', located?", choices: ["Rome", "Venice", "Florence", "Milan"], answer: "Florence", points: 20 },
-  { category: "🎨 Art & Culture", question: "Which author wrote the novel 'One Hundred Years of Solitude'?", choices: ["Mario Vargas Llosa", "Jorge Luis Borges", "Gabriel García Márquez", "Pablo Neruda"], answer: "Gabriel García Márquez", points: 20 },
-  { category: "🎨 Art & Culture", question: "What is the name of the narrative technique used in James Joyce's 'Ulysses' that mimics the flow of thoughts?", choices: ["Free verse", "Stream of consciousness", "Magic realism", "Epistolary"], answer: "Stream of consciousness", points: 20 },
-  { category: "🎨 Art & Culture", question: "Which Renaissance artist painted the ceiling of the Sistine Chapel?", choices: ["Leonardo da Vinci", "Raphael", "Michelangelo", "Donatello"], answer: "Michelangelo", points: 20 },
-  { category: "🎨 Art & Culture", question: "What musical term describes a gradual increase in tempo?", choices: ["Ritardando", "Accelerando", "Crescendo", "Diminuendo"], answer: "Accelerando", points: 20 },
-
-  // Geography
-  { category: "🌍 Geography", question: "What is the name of the tectonic plate boundary where plates move apart from each other?", choices: ["Convergent boundary", "Transform boundary", "Divergent boundary", "Subduction zone"], answer: "Divergent boundary", points: 20 },
-  { category: "🌍 Geography", question: "Which country contains more than 17,000 islands?", choices: ["Philippines", "Japan", "Indonesia", "Malaysia"], answer: "Indonesia", points: 20 },
-  { category: "🌍 Geography", question: "What is the name of the boundary between the troposphere and stratosphere?", choices: ["Mesopause", "Tropopause", "Stratopause", "Thermopause"], answer: "Tropopause", points: 20 },
-  { category: "🌍 Geography", question: "Which country is home to the world's largest salt flat, Salar de Uyuni?", choices: ["Argentina", "Chile", "Bolivia", "Peru"], answer: "Bolivia", points: 20 },
-  { category: "🌍 Geography", question: "In which ocean is the island of Madagascar located?", choices: ["Atlantic Ocean", "Pacific Ocean", "Indian Ocean", "Southern Ocean"], answer: "Indian Ocean", points: 20 },
-  { category: "🌍 Geography", question: "Which mountain range contains the highest peak in North America?", choices: ["Rocky Mountains", "Sierra Nevada", "Appalachians", "Alaska Range"], answer: "Alaska Range", points: 20 },
-  { category: "🌍 Geography", question: "What is the term for a narrow strip of land connecting two larger land masses?", choices: ["Peninsula", "Isthmus", "Cape", "Archipelago"], answer: "Isthmus", points: 20 },
-  { category: "🌍 Geography", question: "Which river is the primary source of water for ancient Egyptian civilization?", choices: ["Tigris", "Euphrates", "Nile", "Congo"], answer: "Nile", points: 20 },
-  { category: "🌍 Geography", question: "Which sea has the highest salinity of any major body of water?", choices: ["Mediterranean Sea", "Red Sea", "Dead Sea", "Caspian Sea"], answer: "Dead Sea", points: 20 },
-  { category: "🌍 Geography", question: "What is the name of the biogeographic region that includes Australia, New Zealand, and nearby islands?", choices: ["Nearctic", "Palearctic", "Australasia", "Afrotropic"], answer: "Australasia", points: 20 },
-
-  // Nature
-  { category: "🍎 Nature", question: "What is the term for animals that are active mainly during the night?", choices: ["Aquatic", "Nocturnal", "Diurnal", "Arboreal"], answer: "Nocturnal", points: 20 },
-  { category: "🍎 Nature", question: "What is the name of the symbiotic relationship where both species benefit?", choices: ["Parasitism", "Commensalism", "Mutualism", "Predation"], answer: "Mutualism", points: 20 },
-  { category: "🍎 Nature", question: "What is the largest organ of the human body?", choices: ["Liver", "Lung", "Skin", "Brain"], answer: "Skin", points: 20 },
-  { category: "🍎 Nature", question: "What is the name of the process by which RNA is used to make a protein?", choices: ["Transcription", "Replication", "Translation", "Mutation"], answer: "Translation", points: 20 },
-  { category: "🍎 Nature", question: "Which animal has the highest blood pressure of any land animal?", choices: ["Elephant", "Giraffe", "Blue whale", "Cheetah"], answer: "Giraffe", points: 20 },
-  { category: "🍎 Nature", question: "What is the name of the ecological concept describing the role of a species in its environment?", choices: ["Habitat", "Niche", "Biome", "Ecosystem"], answer: "Niche", points: 20 },
-  { category: "🍎 Nature", question: "Which type of rock is formed by the alteration of existing rocks due to heat and pressure?", choices: ["Igneous", "Sedimentary", "Metamorphic", "Volcanic"], answer: "Metamorphic", points: 20 },
-  { category: "🍎 Nature", question: "What is the name for the outermost layer of Earth?", choices: ["Mantle", "Core", "Crust", "Lithosphere"], answer: "Crust", points: 20 },
-  { category: "🍎 Nature", question: "Which biome is characterized by the highest biodiversity on Earth?", choices: ["Savanna", "Taiga", "Tropical rainforest", "Temperate forest"], answer: "Tropical rainforest", points: 20 },
-  { category: "🍎 Nature", question: "What is the correct term for a group of lions?", choices: ["Pack", "Herd", "Pride", "Colony"], answer: "Pride", points: 20 }
+  // C1 (Levels 41-50)
+  { level: "C1", category: "Grammar", question: "Complete the sentence: Seldom ___ such a compelling argument.", choices: ["I have heard", "have I heard", "I heard", "did I have heard"], answer: "have I heard", points: 20 },
+  { level: "C1", category: "Vocabulary", question: "Which word best completes the sentence? Her explanation was so ___ that it resolved every doubt.", choices: ["ambiguous", "cogent", "arbitrary", "tentative"], answer: "cogent", points: 20 },
+  { level: "C1", category: "Grammar", question: "Complete the sentence: Had the warning been issued earlier, the damage ___.", choices: ["might have been avoided", "might be avoided", "will have avoided", "would avoid"], answer: "might have been avoided", points: 20 },
+  { level: "C1", category: "English Language", question: "What does the idiom 'to play devil's advocate' mean?", choices: ["To support a dishonest person", "To argue an opposing view for discussion", "To avoid taking any position", "To deliberately offend someone"], answer: "To argue an opposing view for discussion", points: 20 },
+  { level: "C1", category: "Vocabulary", question: "Which word means 'to make a problem less severe'?", choices: ["Exacerbate", "Mitigate", "Invalidate", "Proliferate"], answer: "Mitigate", points: 20 },
+  { level: "C1", category: "Grammar", question: "Choose the sentence with the correct subjunctive form.", choices: ["The committee recommended that he resign immediately.", "The committee recommended that he resigns immediately.", "The committee recommended that he resigned immediately.", "The committee recommended him to resigns immediately."], answer: "The committee recommended that he resign immediately.", points: 20 },
+  { level: "C1", category: "Vocabulary", question: "Which word best describes a statement that appears self-contradictory but may be true?", choices: ["Paradoxical", "Superficial", "Redundant", "Unanimous"], answer: "Paradoxical", points: 20 },
+  { level: "C1", category: "Grammar", question: "Complete the sentence: No sooner ___ the announcement than the phones began ringing.", choices: ["they made", "had they made", "they had made", "did they made"], answer: "had they made", points: 20 },
+  { level: "C1", category: "English Language", question: "Which sentence uses 'disinterested' in its standard formal sense?", choices: ["She was disinterested because the lecture was dull.", "A disinterested judge considered both sides fairly.", "He felt disinterested in joining the club.", "The bored audience became increasingly disinterested."], answer: "A disinterested judge considered both sides fairly.", points: 20 },
+  { level: "C1", category: "Vocabulary", question: "Choose the best word: The report was criticised for being ___, as it mentioned only evidence supporting its conclusion.", choices: ["impartial", "selective", "comprehensive", "conclusive"], answer: "selective", points: 20 }
 ];
+
+// Build a large, varied bank without storing hundreds of repetitive object
+// literals. Every generated entry is a complete question object used by the
+// same game logic as the hand-written questions above.
+function addQuestion(pool, level, category, question, choices, answer, points) {
+  pool.push({ level, category, question, choices, answer, points });
+}
+
+function otherValues(entries, field, index) {
+  return [1, 3, 5].map((offset) => entries[(index + offset) % entries.length][field]);
+}
+
+function addVocabularySet(pool, level, points, entries) {
+  entries.forEach((entry, index) => {
+    addQuestion(pool, level, "Vocabulary", `${level} vocabulary: Which word is closest in meaning to '${entry.word}'?`, [entry.synonym, ...otherValues(entries, "synonym", index)], entry.synonym, points);
+    addQuestion(pool, level, "Vocabulary", `${level} vocabulary: Which word is the opposite of '${entry.word}'?`, [entry.antonym, ...otherValues(entries, "antonym", index)], entry.antonym, points);
+    addQuestion(pool, level, "Vocabulary", `${level} vocabulary: What is the best definition of '${entry.word}'?`, [entry.definition, ...otherValues(entries, "definition", index)], entry.definition, points);
+    addQuestion(pool, level, "English Language", entry.context, [entry.word, ...otherValues(entries, "word", index)], entry.word, points);
+    addQuestion(pool, level, "English Language", `Choose the word that means '${entry.definition}'.`, [entry.word, ...otherValues(entries, "word", index)], entry.word, points);
+  });
+}
+
+const REGULAR_VOCABULARY = {
+  A1: [
+    { word: "quick", synonym: "fast", antonym: "slow", definition: "moving with speed", context: "The rabbit is very ___ and wins the race." },
+    { word: "happy", synonym: "glad", antonym: "sad", definition: "feeling pleased", context: "Mina feels ___ because today is her birthday." },
+    { word: "begin", synonym: "start", antonym: "finish", definition: "to do the first part of something", context: "The lesson will ___ at nine o'clock." },
+    { word: "quiet", synonym: "silent", antonym: "noisy", definition: "making little or no sound", context: "Please be ___ while the baby is sleeping." },
+    { word: "easy", synonym: "simple", antonym: "difficult", definition: "not hard to do", context: "This puzzle is ___, so I can solve it quickly." },
+    { word: "near", synonym: "close", antonym: "far", definition: "a short distance away", context: "The shop is ___ my house, so I walk there." },
+    { word: "clean", synonym: "tidy", antonym: "dirty", definition: "free from dirt", context: "Wash the table so that it is ___." },
+    { word: "strong", synonym: "powerful", antonym: "weak", definition: "having a lot of physical power", context: "The ___ athlete can lift the heavy box." }
+  ],
+  A2: [
+    { word: "ancient", synonym: "old", antonym: "modern", definition: "belonging to a very distant past", context: "We visited an ___ castle built centuries ago." },
+    { word: "repair", synonym: "fix", antonym: "damage", definition: "to make something work again", context: "A mechanic will ___ my broken bicycle." },
+    { word: "choose", synonym: "select", antonym: "reject", definition: "to decide which one you want", context: "You may ___ one dessert from the menu." },
+    { word: "crowded", synonym: "packed", antonym: "empty", definition: "full of people", context: "The train was very ___ during the morning rush." },
+    { word: "polite", synonym: "courteous", antonym: "rude", definition: "showing good manners", context: "It is ___ to say please and thank you." },
+    { word: "borrow", synonym: "take temporarily", antonym: "lend", definition: "to use something and return it later", context: "May I ___ your pen for a minute?" },
+    { word: "arrive", synonym: "reach", antonym: "depart", definition: "to get to a place", context: "Our flight will ___ at six in the evening." },
+    { word: "healthy", synonym: "well", antonym: "ill", definition: "in good physical condition", context: "Regular exercise helps you stay ___." }
+  ],
+  B1: [
+    { word: "accurate", synonym: "correct", antonym: "incorrect", definition: "free from mistakes", context: "The map is ___ and shows every street clearly." },
+    { word: "benefit", synonym: "advantage", antonym: "drawback", definition: "a helpful or positive effect", context: "One ___ of cycling is improved fitness." },
+    { word: "decline", synonym: "decrease", antonym: "increase", definition: "to become smaller or less", context: "Sales began to ___ after the price rose." },
+    { word: "essential", synonym: "necessary", antonym: "optional", definition: "completely needed", context: "Clean water is ___ for human life." },
+    { word: "flexible", synonym: "adaptable", antonym: "rigid", definition: "able to change easily", context: "Our schedule is ___, so we can meet tomorrow instead." },
+    { word: "maintain", synonym: "preserve", antonym: "neglect", definition: "to keep in good condition", context: "You should ___ your car by checking it regularly." },
+    { word: "persuade", synonym: "convince", antonym: "discourage", definition: "to make someone agree to do something", context: "She tried to ___ her friends to join the club." },
+    { word: "require", synonym: "need", antonym: "waive", definition: "to make something necessary", context: "Most jobs ___ applicants to submit a résumé." }
+  ],
+  B2: [
+    { word: "ambiguous", synonym: "unclear", antonym: "explicit", definition: "open to more than one interpretation", context: "The instruction was ___, so nobody knew exactly what to do." },
+    { word: "compelling", synonym: "convincing", antonym: "unpersuasive", definition: "able to attract attention or belief", context: "The lawyer presented a ___ argument supported by evidence." },
+    { word: "diminish", synonym: "lessen", antonym: "intensify", definition: "to make or become smaller", context: "The pain should ___ after you take the medicine." },
+    { word: "feasible", synonym: "practical", antonym: "impossible", definition: "possible and realistic to achieve", context: "The team must decide whether the plan is financially ___." },
+    { word: "impartial", synonym: "unbiased", antonym: "prejudiced", definition: "treating all sides fairly", context: "A judge must remain ___ throughout a trial." },
+    { word: "prevalent", synonym: "widespread", antonym: "rare", definition: "common in a particular place or time", context: "Remote work has become increasingly ___ in the industry." },
+    { word: "reluctant", synonym: "unwilling", antonym: "eager", definition: "hesitant about doing something", context: "He was ___ to speak before such a large audience." },
+    { word: "subsequent", synonym: "following", antonym: "previous", definition: "coming after something else", context: "The first experiment failed, but ___ attempts succeeded." }
+  ]
+};
+
+Object.entries(REGULAR_VOCABULARY).forEach(([level, entries]) => addVocabularySet(QUESTION_POOL, level, 10, entries));
+
+// Each function below contributes 25 distinct grammar questions to its CEFR
+// band. Together with the vocabulary sets and the ten original questions,
+// each band contains exactly 125 questions.
+const A1_SUBJECTS = [["I", "am"], ["You", "are"], ["He", "is"], ["She", "is"], ["We", "are"]];
+const A1_COMPLEMENTS = ["ready for class", "at the library", "very hungry", "from Malaysia", "happy today"];
+A1_SUBJECTS.forEach(([subject, answer]) => A1_COMPLEMENTS.forEach((ending) =>
+  addQuestion(QUESTION_POOL, "A1", "Grammar", `Complete the sentence: ${subject} ___ ${ending}.`, ["am", "is", "are", "be"], answer, 10)
+));
+
+const A1_VERBS = [["work", "works", "working", "worked"], ["play", "plays", "playing", "played"], ["cook", "cooks", "cooking", "cooked"], ["help", "helps", "helping", "helped"], ["walk", "walks", "walking", "walked"]];
+const A1_PEOPLE = [["My brother", true], ["Sara", true], ["They", false], ["My friends", false], ["The teacher", true]];
+A1_PEOPLE.forEach(([subject, singular]) => A1_VERBS.forEach(([base, third, ing, past]) =>
+  addQuestion(QUESTION_POOL, "A1", "Grammar", `Use the verb '${base}' in the present simple: ${subject} ___ every day.`, [base, third, ing, past], singular ? third : base, 10)
+));
+
+const A1_ARTICLES = [["apple", "an"], ["banana", "a"], ["umbrella", "an"], ["book", "a"], ["orange", "an"]];
+const A1_BUYERS = ["I bought", "She wants", "He found", "We need", "They shared"];
+A1_BUYERS.forEach((lead) => A1_ARTICLES.forEach(([noun, answer]) =>
+  addQuestion(QUESTION_POOL, "A1", "Grammar", `Complete the sentence: ${lead} ___ ${noun}.`, ["a", "an", "the", "some"], answer, 10)
+));
+
+const A2_PAST = [["go", "went", "gone", "going"], ["see", "saw", "seen", "seeing"], ["buy", "bought", "boughten", "buying"], ["write", "wrote", "written", "writing"], ["take", "took", "taken", "taking"]];
+const A2_TIME_LEADS = ["Yesterday I", "Last week we", "On Monday they", "This morning she", "Two days ago he"];
+A2_TIME_LEADS.forEach((lead) => A2_PAST.forEach(([base, past, participle, ing]) =>
+  addQuestion(QUESTION_POOL, "A2", "Grammar", `Use the verb '${base}' in the past simple: ${lead} ___ it.`, [base, past, participle, ing], past, 10)
+));
+
+const A2_ADJECTIVES = [["tall", "taller", "tallest", "more tall"], ["fast", "faster", "fastest", "more fast"], ["cheap", "cheaper", "cheapest", "more cheap"], ["small", "smaller", "smallest", "more small"], ["young", "younger", "youngest", "more young"]];
+const A2_COMPARE = ["This one", "My bicycle", "The blue building", "Her dog", "Their new model"];
+A2_COMPARE.forEach((subject) => A2_ADJECTIVES.forEach(([base, comparative, superlative, wrong]) =>
+  addQuestion(QUESTION_POOL, "A2", "Grammar", `Use the comparative form of '${base}': ${subject} is ___ than the old one.`, [base, comparative, superlative, wrong], comparative, 10)
+));
+
+const A2_DURATIONS = [["Monday", "since"], ["2019", "since"], ["three hours", "for"], ["a long time", "for"], ["last summer", "since"]];
+const A2_RESIDENTS = ["I have lived here", "She has worked there", "We have known him", "They have studied English", "He has owned the shop"];
+A2_RESIDENTS.forEach((lead) => A2_DURATIONS.forEach(([time, answer]) =>
+  addQuestion(QUESTION_POOL, "A2", "Grammar", `Complete the sentence: ${lead} ___ ${time}.`, ["since", "for", "during", "from"], answer, 10)
+));
+
+const B1_CONDITIONS = ["it rains tomorrow", "you study regularly", "we leave now", "she calls tonight", "they miss the bus"];
+const B1_RESULTS = ["we will stay inside", "you will improve", "we will arrive early", "I will tell her", "they will be late"];
+B1_CONDITIONS.forEach((condition) => B1_RESULTS.forEach((result) =>
+  addQuestion(QUESTION_POOL, "B1", "Grammar", `Complete the first conditional to express this result: '${result}'. If ${condition}, ___.`, [result, result.replace("will", "would"), result.replace("will", "had"), result.replace("will", "have")], result, 10)
+));
+
+const B1_OBJECTS = ["The report", "The meal", "The road", "The invitations", "The room"];
+const B1_ACTIONS = [["complete", "completed"], ["prepare", "prepared"], ["close", "closed"], ["send", "sent"], ["clean", "cleaned"]];
+B1_OBJECTS.forEach((subject) => B1_ACTIONS.forEach(([base, participle]) =>
+  addQuestion(QUESTION_POOL, "B1", "Grammar", `Use the verb '${base}' to complete the passive sentence: ${subject} was ___ yesterday.`, [base, participle, `${base}s`, `${base}ing`], participle, 10)
+));
+
+const B1_PREPOSITIONS = [["interested", "in"], ["afraid", "of"], ["good", "at"], ["responsible", "for"], ["familiar", "with"]];
+const B1_TOPICS = ["learning languages", "large spiders", "solving puzzles", "organising the event", "this software"];
+B1_PREPOSITIONS.forEach(([adjective, answer]) => B1_TOPICS.forEach((topic) =>
+  addQuestion(QUESTION_POOL, "B1", "Grammar", `Complete the sentence: She is ${adjective} ___ ${topic}.`, ["in", "of", "at", "for", "with"].filter((value, index, array) => array.indexOf(value) === index).slice(0, 4).includes(answer) ? [answer, ...["in", "of", "at", "for", "with"].filter((value) => value !== answer).slice(0, 3)] : [answer, "in", "of", "at"], answer, 10)
+));
+
+const B2_IF_CLAUSES = ["I had known about the traffic", "she had checked the address", "we had booked earlier", "they had followed the advice", "he had saved the document"];
+const B2_OUTCOMES = ["I would have left sooner", "she would have arrived", "we would have found seats", "they would have avoided the problem", "he would not have lost his work"];
+B2_IF_CLAUSES.forEach((condition) => B2_OUTCOMES.forEach((result) =>
+  addQuestion(QUESTION_POOL, "B2", "Grammar", `Complete the third conditional to express this outcome: '${result}'. If ${condition}, ___.`, [result, result.replace("would", "will"), result.replace("would", "might"), result.replace("would", "had")], result, 10)
+));
+
+const B2_TASKS = ["finish the project", "write the report", "complete the course", "review every application", "deliver all the orders"];
+const B2_DEADLINES = ["by Friday", "by next June", "before the meeting", "by the end of the day", "before you arrive"];
+B2_TASKS.forEach((task) => B2_DEADLINES.forEach((deadline) => {
+  const answer = `will have ${task.replace(/^\w+/, (verb) => ({ finish: "finished", write: "written", complete: "completed", review: "reviewed", deliver: "delivered" }[verb]))}`;
+  addQuestion(QUESTION_POOL, "B2", "Grammar", `Use the future perfect for the task '${task}': They ___ ${deadline}.`, [answer, `will ${task}`, `have ${task}`, `would ${task}`], answer, 10);
+}));
+
+const B2_PATTERNS = [["denied", "taking", "take", "took"], ["admitted", "making", "make", "made"], ["considered", "moving", "move", "moved"], ["suggested", "waiting", "wait", "waited"], ["avoided", "answering", "answer", "answered"]];
+const B2_ENDINGS = ["the file", "a mistake", "to another city", "until Monday", "the difficult question"];
+B2_PATTERNS.forEach(([verb, answer, base, past]) => B2_ENDINGS.forEach((ending) =>
+  addQuestion(QUESTION_POOL, "B2", "Grammar", `Complete the sentence: She ${verb} ___ ${ending}.`, [answer, `to ${base}`, past, base], answer, 10)
+));
+
+const C1_VOCABULARY = [
+  { word: "abate", synonym: "subside", antonym: "intensify", definition: "to become less severe", context: "The storm began to ___ shortly before dawn." },
+  { word: "austere", synonym: "severe", antonym: "luxurious", definition: "plain and without comfort", context: "The monastery's rooms were deliberately ___." },
+  { word: "candid", synonym: "frank", antonym: "evasive", definition: "truthful and straightforward", context: "The director gave a ___ account of the company's failures." },
+  { word: "dearth", synonym: "scarcity", antonym: "abundance", definition: "a serious lack of something", context: "A ___ of reliable evidence weakened the claim." },
+  { word: "eclectic", synonym: "diverse", antonym: "uniform", definition: "drawn from many different sources", context: "Her ___ taste ranges from opera to electronic music." },
+  { word: "fastidious", synonym: "meticulous", antonym: "careless", definition: "very attentive to detail", context: "The editor is ___ about punctuation and formatting." },
+  { word: "gregarious", synonym: "sociable", antonym: "reclusive", definition: "fond of being with other people", context: "His ___ nature makes him comfortable at large events." },
+  { word: "hackneyed", synonym: "overused", antonym: "original", definition: "lacking impact because of repeated use", context: "The speech relied on ___ phrases and tired clichés." }
+];
+addVocabularySet(HARD_QUESTION_POOL, "C1", 20, C1_VOCABULARY);
+
+// Five advanced grammar families add 450 C1 questions (90 per family).
+const C1_OPENERS = ["Rarely", "Seldom", "Never before", "At no time", "Under no circumstances", "On no account", "Not once", "Hardly ever", "Only rarely", "In no way"];
+const C1_CLAUSES = [
+  ["the committee", "has", "encountered such resistance"], ["the researchers", "have", "observed this phenomenon"], ["the company", "has", "faced a greater challenge"],
+  ["the delegates", "have", "reached agreement so quickly"], ["the court", "has", "considered such evidence"], ["the editors", "have", "received so many complaints"],
+  ["the system", "has", "failed without warning"], ["the participants", "have", "questioned the underlying assumption"], ["the policy", "has", "attracted widespread support"]
+];
+C1_OPENERS.forEach((opener) => C1_CLAUSES.forEach(([subject, auxiliary, ending]) => {
+  const answer = `${auxiliary} ${subject} ${ending}`;
+  addQuestion(HARD_QUESTION_POOL, "C1", "Grammar", `Invert the clause '${subject} ${auxiliary} ${ending}' after '${opener}': ${opener} ___ .`, [answer, `${subject} ${auxiliary} ${ending}`, `did ${subject} ${ending}`, `${auxiliary} ${ending} ${subject}`], answer, 20);
+}));
+
+const C1_RECOMMENDATIONS = ["The board recommended", "The doctor insisted", "The chairperson proposed", "The report suggested", "The judge ordered", "The adviser requested", "The committee demanded", "The policy requires", "The director urged", "The regulation stipulates"];
+const C1_ACTIONS = [
+  ["he", "resign immediately"], ["she", "submit a revised draft"], ["the company", "disclose the figures"], ["each member", "attend the hearing"], ["the applicant", "provide identification"],
+  ["the team", "reconsider its approach"], ["the tenant", "vacate the property"], ["the minister", "address the issue"], ["every report", "be independently reviewed"]
+];
+C1_RECOMMENDATIONS.forEach((lead) => C1_ACTIONS.forEach(([subject, base]) => {
+  const answer = `${subject} ${base}`;
+  addQuestion(HARD_QUESTION_POOL, "C1", "Grammar", `Use the formal subjunctive for '${subject} ${base}': ${lead} that ___ .`, [answer, `${subject} to ${base}`, `${subject} would ${base}`, `${subject} should to ${base}`], answer, 20);
+}));
+
+const C1_IF_CLAUSES = ["the data been verified", "the warning arrived sooner", "the talks not collapsed", "the funds been allocated", "the witness come forward", "the flaw been detected", "the rules been clarified", "the market remained stable", "the evidence been disclosed", "the system been tested"];
+const C1_MODAL_RESULTS = ["the error might have been avoided", "the outcome could have been different", "the project would have continued", "the damage might have been limited", "the inquiry could have concluded sooner", "the decision would have been reconsidered", "the dispute might have been resolved", "the investment could have succeeded", "the verdict might have changed"];
+C1_IF_CLAUSES.forEach((condition) => C1_MODAL_RESULTS.forEach((result) =>
+  addQuestion(HARD_QUESTION_POOL, "C1", "Grammar", `Complete the advanced conditional with the outcome '${result}': Had ${condition}, ___.`, [result, result.replace(/(might|could|would) have/, "$1"), result.replace(/^(the \w+ )?(might|could|would)/, "$1will"), result.replace(/^(the \w+ )?(might|could|would)/, "$1can")], result, 20)
+));
+
+const C1_FOCUS = ["the lack of evidence", "her persistence", "the revised timetable", "their shared objective", "the final interview", "his detailed notes", "the unexpected delay", "the public response", "the second proposal", "the independent review"];
+const C1_EFFECTS = ["changed the committee's mind", "enabled the team to succeed", "caused the greatest concern", "ultimately resolved the dispute", "revealed the central problem", "made the difference", "prompted further investigation", "secured widespread support", "led to the policy change"];
+C1_FOCUS.forEach((focus) => C1_EFFECTS.forEach((effect) => {
+  const answer = `It was ${focus} that ${effect}`;
+  addQuestion(HARD_QUESTION_POOL, "C1", "Grammar", `Form a cleft sentence emphasising '${focus}' in the statement '${focus} ${effect}'.`, [answer, `It ${focus} was that ${effect}`, `What was ${focus} that ${effect}`, `There was ${focus} who ${effect}`], answer, 20);
+}));
+
+const C1_CONCESSIONS = ["Difficult though the task was", "Compelling though the argument seemed", "Carefully though the plan was devised", "Experienced though the team was", "Limited though the evidence remained", "Unlikely though the outcome appeared", "Complex though the procedure became", "Strong though the opposition was", "Persuasive though her case sounded", "Costly though the solution proved"];
+const C1_MAIN_CLAUSES = ["they completed it on schedule", "the panel remained unconvinced", "several flaws eventually emerged", "it still required outside support", "the inquiry reached a firm conclusion", "the possibility could not be dismissed", "the staff followed every step", "the measure was ultimately approved", "the jury rejected it"];
+C1_CONCESSIONS.forEach((concession) => C1_MAIN_CLAUSES.forEach((mainClause) => {
+  const answer = `${concession}, ${mainClause}`;
+  addQuestion(HARD_QUESTION_POOL, "C1", "English Language", `Combine '${concession}' with '${mainClause}' using a correct inverted concessive clause.`, [answer, `${concession.replace(" though", " despite")}, ${mainClause}`, `Although ${concession}, but ${mainClause}`, `${concession} however ${mainClause}`], answer, 20);
+}));
+
+if (QUESTION_POOL.length !== 500 || HARD_QUESTION_POOL.length !== 500) {
+  throw new Error(`Question bank size mismatch: ${QUESTION_POOL.length} regular, ${HARD_QUESTION_POOL.length} C1.`);
+}
