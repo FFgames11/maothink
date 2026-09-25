@@ -2660,10 +2660,6 @@ body:has(#screenQuiz.active) .holo-globe {
   transition: transform .2s ease, border-color .2s ease, box-shadow .2s ease, background .2s ease;
 }
 
-.player-option:nth-child(4) {
-  grid-column: 2 / span 2;
-}
-
 .player-option:hover,
 .player-option:focus-visible {
   transform: translateY(-5px);
@@ -2810,10 +2806,6 @@ body:has(#screenQuiz.active) .holo-globe {
     flex-direction: row;
     justify-content: flex-start;
     text-align: left;
-  }
-
-  .player-option:nth-child(4) {
-    grid-column: auto;
   }
 
   .player-portrait {
