@@ -51,8 +51,11 @@ The game has **three primary screens** managed via CSS classes (`.screen`, `.act
 - Wordle hint evaluation:
   - **Green** (`correct`): Letter is in the exact right place.
   - **Yellow** (`present`): Letter is in the word, but in a different position.
-  - **Black / Dark Gray** (`absent`): Letter is not in the word.
-- Words change randomly/deterministically each day based on calendar date with zero library setup required by the user.
+- Hybrid Word Generation Engine:
+  - Backed by the complete official pool of 2,319 verified 5-letter English words.
+  - Non-repeating coprimes permutation formula guarantees **over 6.35 years** of daily words without a single repetition.
+  - Dynamically enriches word definitions, phonetic guides, and sample sentences on-the-fly via free dictionary APIs (Free Dictionary API & Wiktionary) with intelligent offline fallback so livestreams never hang.
+  - "🎲 New Word" button allows instant on-demand random word generation for replayability.
 - **Victory Pop-up Modal** (`#wordleModalOverlay`):
   - Headline: "Congratulations! You got the right word".
   - Displays the mystery word, phonetic guide, and part of speech tag.
