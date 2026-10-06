@@ -41,9 +41,26 @@ The game has **three primary screens** managed via CSS classes (`.screen`, `.act
   - `?` — "50 Levels"
   - `T` — "Multiple Choice"
   - `!` — "One Chance"
-- A **"Let's Play!"** button triggers `startGame()`.
+- A **"Let's Play!"** button triggers the **Wordle Icebreaker** (`#screenWordle`).
 
-### 2.2 Quiz Screen (`#screenQuiz`)
+### 2.2 Wordle Icebreaker Screen (`#screenWordle`)
+- Inserted before the general questions quiz.
+- Implemented in a dedicated module (`wordle.js`).
+- Presents a 5-letter mystery word of the day on a 5×6 grid with 6 attempts.
+- Real-time typing via physical keyboard and on-screen virtual keyboard (QWERTY layout).
+- Wordle hint evaluation:
+  - **Green** (`correct`): Letter is in the exact right place.
+  - **Yellow** (`present`): Letter is in the word, but in a different position.
+  - **Black / Dark Gray** (`absent`): Letter is not in the word.
+- Words change randomly/deterministically each day based on calendar date with zero library setup required by the user.
+- **Victory Pop-up Modal** (`#wordleModalOverlay`):
+  - Headline: "Congratulations! You got the right word".
+  - Displays the mystery word, phonetic guide, and part of speech tag.
+  - Explains the correct answer with **Meaning** and **Sample Sentence**.
+  - **Audio buttons** for Word, Meaning, and Sentence powered by native Web Speech API (`SpeechSynthesis`).
+  - **"Proceed to Quiz →"** button transitions smoothly to `#screenQuiz` Level 1 / 50.
+
+### 2.3 Quiz Screen (`#screenQuiz`)
 - The main gameplay screen.
 - Fixed brand panel in top-left (mascot + "MaoThink" name).
 - A **mascot peek** element (`.quiz-mascot-peek`): the mascot is absolutely positioned above the question card via a `.card-wrapper` positioning context. It uses `top: -170px`, `width: 280px`, `z-index: 1`. The lower body overlaps/hides behind the card. It bounces gently using `softBounce` animation. These values were manually tuned by the developer — **do not change them without checking visually first**.

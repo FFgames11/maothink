@@ -48,9 +48,11 @@
 
   const screenPlayerSelect = document.getElementById("screenPlayerSelect");
   const screenStart = document.getElementById("screenStart");
+  const screenWordle = document.getElementById("screenWordle");
   const screenQuiz = document.getElementById("screenQuiz");
   const screenResult = document.getElementById("screenResult");
   const btnStart = document.getElementById("btnStart");
+  const btnWordleDirect = document.getElementById("btnWordleDirect");
   const btnChallenge = document.getElementById("btnChallenge");
   const btnChangePlayer = document.getElementById("btnChangePlayer");
   const btnExitGame = document.getElementById("btnExitGame");
@@ -127,12 +129,13 @@
   function screenStateFor(element) {
     if (element === screenPlayerSelect) return "player-select";
     if (element === screenStart) return "menu";
+    if (element === screenWordle) return "wordle";
     if (element === screenQuiz) return "quiz";
     return "result";
   }
 
   function activateScreenImmediately(screen) {
-    [screenPlayerSelect, screenStart, screenQuiz, screenResult].forEach((section) => {
+    [screenPlayerSelect, screenStart, screenWordle, screenQuiz, screenResult].forEach((section) => {
       section.classList.remove("active", "exiting");
     });
     screen.classList.add("active");
@@ -202,12 +205,12 @@
   function showScreen(screen) {
     activeScreenState = screenStateFor(screen);
     saveSession(activeScreenState);
-    [screenPlayerSelect, screenStart, screenQuiz, screenResult].forEach((section) => {
+    [screenPlayerSelect, screenStart, screenWordle, screenQuiz, screenResult].forEach((section) => {
       section.classList.remove("active");
       section.classList.add("exiting");
     });
     setTimeout(() => {
-      [screenPlayerSelect, screenStart, screenQuiz, screenResult].forEach((section) => section.classList.remove("exiting"));
+      [screenPlayerSelect, screenStart, screenWordle, screenQuiz, screenResult].forEach((section) => section.classList.remove("exiting"));
       screen.classList.add("active");
     }, 350);
   }
@@ -811,6 +814,26 @@
       return true;
     }
 
+    if (saved.screen === "wordle") {
+      maolingoBadge.classList.add("hidden");
+      btnExitGame.classList.add("hidden");
+      climbScene.style.display = "none";
+      activateScreenImmediately(screenWordle);
+      if (window.MaoWordle && window.MaoWordle.startWordle) {
+        window.MaoWordle.startWordle({
+          playerName: selectedPlayerName.textContent,
+          playerImage: climberHeadImage.getAttribute("src"),
+          onProceed: () => {
+            startGame();
+          },
+          onBack: () => {
+            showScreen(screenStart);
+          }
+        });
+      }
+      return true;
+    }
+
     if (saved.screen === "result" && questionList.length > 0) {
       activateScreenImmediately(screenResult);
       endGame();
@@ -1072,13 +1095,42 @@
     draw();
   }
 
+  function launchWordleGame() {
+    clearNextQuestionTimer();
+    stopChallengeTimer();
+    challengeFailOverlay.classList.add("hidden");
+    challengeWinOverlay.classList.add("hidden");
+    danceOverlay.classList.add("hidden");
+    danceOverlay.classList.remove("dance-visible");
+    challengeTimerBar.classList.add("hidden");
+    maolingoBadge.classList.add("hidden");
+    btnExitGame.classList.add("hidden");
+    climbScene.style.display = "none";
+    clearNotification();
+    saveSession("wordle");
+    showScreen(screenWordle);
+    if (window.MaoWordle && window.MaoWordle.startWordle) {
+      window.MaoWordle.startWordle({
+        playerName: selectedPlayerName.textContent,
+        playerImage: climberHeadImage.getAttribute("src"),
+        onProceed: () => {
+          startGame();
+        },
+        onBack: () => {
+          showScreen(screenStart);
+        }
+      });
+    }
+  }
+
   playerOptions.forEach((option) => option.addEventListener("click", () => selectPlayer(option)));
   btnChangePlayer.addEventListener("click", () => showScreen(screenPlayerSelect));
   btnExitGame.addEventListener("click", exitToPlayerSelect);
-  btnStart.addEventListener("click", startGame);
+  btnStart.addEventListener("click", launchWordleGame);
+  if (btnWordleDirect) btnWordleDirect.addEventListener("click", launchWordleGame);
   btnChallenge.addEventListener("click", startChallenge);
   btnNext.addEventListener("click", () => nextQuestion());
-  btnPlayAgain.addEventListener("click", startGame);
+  btnPlayAgain.addEventListener("click", launchWordleGame);
   btnTryAgain.addEventListener("click", startChallenge);
   btnFailBack.addEventListener("click", returnToMenu);
   btnWinBack.addEventListener("click", returnToMenu);

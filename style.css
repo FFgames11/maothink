@@ -2911,3 +2911,704 @@ body:has(#screenQuiz.active) .holo-globe {
     font-size: .8rem;
   }
 }
+
+/* ============================================================
+   Wordle Icebreaker Screen & Modal Styles
+   ============================================================ */
+
+#screenWordle {
+  align-items: center;
+  justify-content: center;
+  padding: 32px 16px;
+  min-height: 100vh;
+}
+
+.wordle-card {
+  width: min(100%, 720px);
+  border-radius: 36px;
+  padding: 30px 28px;
+  text-align: center;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.wordle-header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 18px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding-bottom: 16px;
+}
+
+.wordle-brand-badge {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.wordle-mini-mascot {
+  width: 58px;
+  height: 58px;
+  object-fit: contain;
+  filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.35));
+}
+
+.wordle-title-block {
+  text-align: left;
+}
+
+.wordle-eyebrow {
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 900;
+  letter-spacing: 0.14em;
+  color: var(--clr-orange);
+  text-transform: uppercase;
+}
+
+.wordle-title {
+  margin: 2px 0 0;
+  font-family: var(--font-brand);
+  font-size: clamp(1.4rem, 2.8vw, 1.9rem);
+  color: #ffffff;
+  line-height: 1.15;
+}
+
+.wordle-meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.wordle-player-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  font-size: 0.82rem;
+  color: var(--clr-text-dim);
+}
+
+.wordle-player-thumb {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.wordle-date-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 14px;
+  border-radius: 999px;
+  background: rgba(255, 211, 138, 0.12);
+  border: 1px solid rgba(255, 211, 138, 0.28);
+  color: #ffd38a;
+  font-weight: 800;
+  font-size: 0.8rem;
+}
+
+.wordle-btn-random {
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+  border-radius: 999px;
+  padding: 6px 12px;
+  font-size: 0.78rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.wordle-btn-random:hover {
+  background: rgba(255, 255, 255, 0.18);
+  transform: translateY(-1px);
+}
+
+.wordle-hint-bar {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.hint-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--clr-text-dim);
+}
+
+.hint-box {
+  display: inline-grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  font-size: 0.72rem;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.hint-box-green {
+  background: #22c55e;
+  color: #fff;
+}
+
+.hint-box-yellow {
+  background: #eab308;
+  color: #fff;
+}
+
+.hint-box-black {
+  background: #191a24;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.7);
+}
+
+/* ── 5x6 Board Layout ── */
+.wordle-board-wrap {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 22px;
+}
+
+.wordle-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.wordle-row {
+  display: flex;
+  gap: 8px;
+}
+
+.row-shake {
+  animation: wordleShake 0.45s ease-in-out;
+}
+
+.wordle-tile {
+  width: 58px;
+  height: 58px;
+  border: 2px solid rgba(255, 255, 255, 0.16);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.04);
+  color: #ffffff;
+  font-family: var(--font-brand);
+  font-size: 1.85rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-transform: uppercase;
+  user-select: none;
+  transition: border-color 0.14s ease, background-color 0.2s ease, transform 0.15s ease;
+}
+
+.wordle-tile.tile-filled {
+  border-color: rgba(255, 255, 255, 0.48);
+  background: rgba(255, 255, 255, 0.09);
+}
+
+.wordle-tile.tile-pop {
+  animation: tilePop 0.14s ease;
+}
+
+.wordle-tile.tile-flip {
+  animation: tileFlip 0.5s ease forwards;
+}
+
+.wordle-tile.tile-correct {
+  background: #22c55e !important;
+  border-color: #22c55e !important;
+  color: #ffffff !important;
+  box-shadow: 0 4px 16px rgba(34, 197, 94, 0.4);
+}
+
+.wordle-tile.tile-present {
+  background: #eab308 !important;
+  border-color: #eab308 !important;
+  color: #ffffff !important;
+  box-shadow: 0 4px 16px rgba(234, 179, 8, 0.4);
+}
+
+.wordle-tile.tile-absent {
+  background: #181924 !important;
+  border-color: #252838 !important;
+  color: rgba(255, 255, 255, 0.4) !important;
+}
+
+.wordle-tile.tile-win-dance {
+  animation: tileDance 0.65s ease-in-out;
+}
+
+/* ── Toast Alert ── */
+.wordle-toast {
+  position: absolute;
+  top: -24px;
+  left: 50%;
+  transform: translateX(-50%) translateY(0);
+  background: #ffffff;
+  color: #120712;
+  font-weight: 900;
+  font-size: 0.92rem;
+  padding: 8px 20px;
+  border-radius: 999px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.55);
+  z-index: 20;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.wordle-toast.toast-visible {
+  opacity: 1;
+  transform: translateX(-50%) translateY(-10px);
+}
+
+/* ── Keyboard Layout ── */
+.wordle-keyboard {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  width: 100%;
+  max-width: 520px;
+  margin: 0 auto 18px;
+}
+
+.keyboard-row {
+  display: flex;
+  gap: 6px;
+  justify-content: center;
+  width: 100%;
+}
+
+.key-btn {
+  flex: 1;
+  height: 52px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+  font-family: var(--font-body);
+  font-weight: 800;
+  font-size: 1.05rem;
+  cursor: pointer;
+  user-select: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.1s ease, background 0.18s ease, border-color 0.18s ease;
+}
+
+.key-btn:hover {
+  background: rgba(255, 255, 255, 0.18);
+  border-color: rgba(255, 255, 255, 0.3);
+  transform: translateY(-2px);
+}
+
+.key-btn:active {
+  transform: translateY(1px);
+}
+
+.key-btn.key-wide {
+  flex: 1.6;
+  font-size: 0.82rem;
+  letter-spacing: 0.05em;
+}
+
+.key-btn.key-correct {
+  background: #22c55e !important;
+  border-color: #22c55e !important;
+  color: #ffffff !important;
+  box-shadow: 0 4px 12px rgba(34, 197, 94, 0.35);
+}
+
+.key-btn.key-present {
+  background: #eab308 !important;
+  border-color: #eab308 !important;
+  color: #ffffff !important;
+  box-shadow: 0 4px 12px rgba(234, 179, 8, 0.35);
+}
+
+.key-btn.key-absent {
+  background: #171822 !important;
+  border-color: #222534 !important;
+  color: rgba(255, 255, 255, 0.32) !important;
+}
+
+/* ── Bottom Bar ── */
+.wordle-bottom-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  max-width: 520px;
+  margin: 0 auto;
+}
+
+.wordle-btn-skip {
+  background: transparent;
+  border: none;
+  color: var(--clr-text-dim);
+  font-weight: 700;
+  font-size: 0.95rem;
+  cursor: pointer;
+  padding: 8px 14px;
+  border-radius: 999px;
+  transition: color 0.18s ease, transform 0.18s ease;
+}
+
+.wordle-btn-skip:hover {
+  color: #ffffff;
+  transform: translateX(3px);
+}
+
+/* ============================================================
+   Wordle Victory / Explanation Pop-Up Modal
+   ============================================================ */
+
+.wordle-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 170;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 20px;
+  background: rgba(8, 3, 16, 0.86);
+  backdrop-filter: blur(20px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.32s ease;
+}
+
+.wordle-modal-overlay.modal-open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.wordle-modal-card {
+  width: min(100%, 650px);
+  border-radius: 36px;
+  padding: 36px 32px;
+  text-align: center;
+  position: relative;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  box-shadow: 0 32px 85px rgba(0, 0, 0, 0.65), 0 0 50px rgba(34, 197, 94, 0.22);
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.wordle-modal-header {
+  margin-bottom: 22px;
+}
+
+.wordle-modal-mascot-wrap {
+  width: fit-content;
+  margin: 0 auto 10px;
+}
+
+.wordle-modal-mascot {
+  width: 110px;
+  height: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 14px 28px rgba(0, 0, 0, 0.4));
+}
+
+.wordle-modal-badge {
+  font-size: 0.8rem;
+  font-weight: 900;
+  letter-spacing: 0.16em;
+  color: var(--clr-amber);
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+.wordle-modal-title {
+  margin: 0;
+  font-family: var(--font-brand);
+  font-size: clamp(2rem, 3.8vw, 2.7rem);
+  color: #ffffff;
+  line-height: 1.1;
+}
+
+.wordle-modal-subtitle {
+  margin: 8px 0 0;
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--clr-text-dim);
+}
+
+/* ── Mystery Word Showcase Card ── */
+.wordle-word-showcase {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.04));
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 22px;
+  padding: 18px 24px;
+  margin-bottom: 16px;
+  text-align: left;
+  flex-wrap: wrap;
+}
+
+.wordle-word-display {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.wordle-revealed-word {
+  font-family: var(--font-brand);
+  font-size: 2.3rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  color: #ffd38a;
+  line-height: 1;
+}
+
+.wordle-tags-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.wordle-word-phonetic {
+  font-size: 0.95rem;
+  color: rgba(255, 255, 255, 0.75);
+  font-family: monospace;
+}
+
+.wordle-word-tag {
+  font-size: 0.74rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  background: rgba(56, 189, 248, 0.22);
+  color: #7dd3fc;
+  border-radius: 999px;
+  padding: 3px 10px;
+}
+
+/* ── Audio Buttons ── */
+.wordle-audio-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  background: linear-gradient(135deg, rgba(56, 189, 248, 0.28), rgba(34, 197, 94, 0.28));
+  border: 1px solid rgba(56, 189, 248, 0.45);
+  border-radius: 999px;
+  padding: 10px 18px;
+  color: #ffffff;
+  font-weight: 800;
+  font-size: 0.88rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.wordle-audio-btn:hover {
+  background: linear-gradient(135deg, rgba(56, 189, 248, 0.45), rgba(34, 197, 94, 0.45));
+  border-color: rgba(56, 189, 248, 0.7);
+  transform: scale(1.03);
+}
+
+.wordle-audio-btn.mini-audio-btn {
+  padding: 6px 14px;
+  font-size: 0.8rem;
+}
+
+.wordle-audio-btn.speaking {
+  background: linear-gradient(135deg, var(--clr-orange), var(--clr-amber)) !important;
+  border-color: var(--clr-amber) !important;
+  color: #200d02 !important;
+  box-shadow: 0 0 24px rgba(249, 115, 22, 0.6);
+  transform: scale(1.04);
+}
+
+.audio-icon {
+  font-size: 1rem;
+}
+
+.audio-waves {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  height: 14px;
+}
+
+.audio-waves span {
+  width: 3px;
+  height: 5px;
+  background: currentColor;
+  border-radius: 2px;
+  transition: height 0.15s ease;
+}
+
+.audio-waves span:nth-child(2) {
+  height: 10px;
+}
+
+.audio-waves span:nth-child(3) {
+  height: 7px;
+}
+
+.wordle-audio-btn.speaking .audio-waves span {
+  animation: audioWaveBar 0.5s ease-in-out infinite alternate;
+}
+
+.wordle-audio-btn.speaking .audio-waves span:nth-child(1) {
+  animation-delay: 0.1s;
+}
+
+.wordle-audio-btn.speaking .audio-waves span:nth-child(2) {
+  animation-delay: 0.25s;
+}
+
+.wordle-audio-btn.speaking .audio-waves span:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+/* ── Detail Cards (Meaning & Sentence) ── */
+.wordle-detail-card {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 20px;
+  padding: 16px 20px;
+  margin-bottom: 14px;
+  text-align: left;
+}
+
+.wordle-detail-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.wordle-detail-title-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.detail-icon {
+  font-size: 1.1rem;
+}
+
+.detail-title {
+  font-weight: 800;
+  font-size: 0.88rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--clr-amber);
+}
+
+.wordle-detail-text {
+  margin: 0;
+  font-size: 1.05rem;
+  line-height: 1.5;
+  color: var(--clr-text);
+}
+
+.wordle-sentence-text {
+  font-style: italic;
+  color: #fef08a;
+}
+
+.wordle-modal-footer {
+  margin-top: 24px;
+}
+
+.btn-wordle-proceed {
+  width: 100%;
+  font-size: 1.25rem;
+  padding: 16px 28px;
+  border-radius: 22px;
+}
+
+/* ── Keyframe Animations ── */
+@keyframes tilePop {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.16); }
+  100% { transform: scale(1); }
+}
+
+@keyframes tileFlip {
+  0% { transform: rotateX(0deg); }
+  50% { transform: rotateX(90deg); }
+  100% { transform: rotateX(0deg); }
+}
+
+@keyframes wordleShake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-8px); }
+  40%, 80% { transform: translateX(8px); }
+}
+
+@keyframes tileDance {
+  0%, 100% { transform: translateY(0); }
+  40% { transform: translateY(-24px); }
+}
+
+@keyframes audioWaveBar {
+  0% { height: 4px; }
+  100% { height: 14px; }
+}
+
+/* ── Responsiveness for Wordle ── */
+@media (max-width: 600px) {
+  .wordle-card {
+    padding: 20px 14px;
+    border-radius: 28px;
+  }
+
+  .wordle-tile {
+    width: 48px;
+    height: 48px;
+    font-size: 1.5rem;
+    border-radius: 9px;
+  }
+
+  .key-btn {
+    height: 46px;
+    font-size: 0.92rem;
+    border-radius: 7px;
+  }
+
+  .key-btn.key-wide {
+    font-size: 0.72rem;
+  }
+
+  .wordle-revealed-word {
+    font-size: 1.9rem;
+  }
+
+  .wordle-modal-card {
+    padding: 24px 18px;
+    border-radius: 26px;
+  }
+}

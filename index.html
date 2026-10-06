@@ -100,6 +100,7 @@
           <span aria-hidden="true">Change</span>
         </button>
         <div class="start-stats">
+          <div class="stat-pill"><span class="stat-icon">&#128292;</span><span>Wordle Icebreaker</span></div>
           <div class="stat-pill"><span class="stat-icon">?</span><span id="statQuestions">50 Levels</span></div>
           <div class="stat-pill"><span class="stat-icon">T</span><span>Multiple Choice</span></div>
           <div class="stat-pill"><span class="stat-icon">!</span><span>One Chance</span></div>
@@ -111,6 +112,59 @@
           <button class="btn btn-challenge btn-challenge-glow" id="btnChallenge">
             <span class="btn-icon">&#9889;</span> Challenge Mode
           </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="screen" id="screenWordle">
+      <div class="wordle-card glass-card">
+        <div class="wordle-header">
+          <div class="wordle-brand-badge">
+            <img src="mascot.png" alt="MaoThink mascot" class="wordle-mini-mascot" draggable="false" />
+            <div class="wordle-title-block">
+              <span class="wordle-eyebrow">DAILY ICEBREAKER</span>
+              <h2 class="wordle-title">Wordle of the Day</h2>
+            </div>
+          </div>
+          <div class="wordle-meta">
+            <div class="wordle-player-pill" id="wordlePlayerPill">
+              <img src="ashhead.png" alt="" class="wordle-player-thumb" />
+              <span>Playing as <strong>Teacher Ash</strong></span>
+            </div>
+            <span class="wordle-date-pill" id="wordleDatePill">Today • 5 Letters</span>
+            <button class="wordle-btn-random" id="btnWordleRandomWord" type="button" title="Generate a new random mystery word">
+              &#127922; New Word
+            </button>
+          </div>
+        </div>
+
+        <div class="wordle-hint-bar">
+          <div class="hint-pill hint-green">
+            <span class="hint-box hint-box-green">A</span>
+            <span>Correct place</span>
+          </div>
+          <div class="hint-pill hint-yellow">
+            <span class="hint-box hint-box-yellow">B</span>
+            <span>Wrong placement</span>
+          </div>
+          <div class="hint-pill hint-black">
+            <span class="hint-box hint-box-black">C</span>
+            <span>Not in word</span>
+          </div>
+        </div>
+
+        <!-- 5x6 Wordle Board -->
+        <div class="wordle-board-wrap">
+          <div class="wordle-grid" id="wordleGrid" role="grid" aria-label="Wordle 6 attempts grid"></div>
+          <div class="wordle-toast hidden" id="wordleToast">Not enough letters</div>
+        </div>
+
+        <!-- Virtual Keyboard -->
+        <div class="wordle-keyboard" id="wordleKeyboard" role="group" aria-label="Wordle Keyboard"></div>
+
+        <div class="wordle-bottom-bar">
+          <button class="btn btn-back" id="btnWordleBack" type="button">&#8592; Back to Menu</button>
+          <button class="wordle-btn-skip" id="btnWordleSkip" type="button">Skip to Quiz &#8594;</button>
         </div>
       </div>
     </div>
@@ -262,11 +316,81 @@
     <span class="maolingo-badge-arrow">↗</span>
   </a>
 
+  <!-- Wordle Victory / Explanation Pop-up Modal -->
+  <div class="wordle-modal-overlay hidden" id="wordleModalOverlay">
+    <div class="wordle-modal-card glass-card animate-pop">
+      <div class="wordle-modal-header">
+        <div class="wordle-modal-mascot-wrap bounce-anim">
+          <img src="mascot.png" alt="MaoThink mascot celebrating" class="wordle-modal-mascot" draggable="false" />
+        </div>
+        <div class="wordle-modal-badge">&#10024; WORDLE OF THE DAY &#10024;</div>
+        <h2 class="wordle-modal-title" id="wordleModalTitle">Congratulations!</h2>
+        <p class="wordle-modal-subtitle" id="wordleModalSubtitle">You got the right word</p>
+      </div>
+
+      <div class="wordle-word-showcase">
+        <div class="wordle-word-display">
+          <span class="wordle-revealed-word" id="wordleRevealedWord">SPARK</span>
+          <div class="wordle-tags-row">
+            <span class="wordle-word-phonetic" id="wordleWordPhonetic">/spɑːrk/</span>
+            <span class="wordle-word-tag" id="wordleWordTag">noun</span>
+          </div>
+        </div>
+        <button class="wordle-audio-btn word-audio-btn" id="btnAudioWord" type="button" aria-label="Listen to word pronunciation">
+          <span class="audio-icon">&#128266;</span>
+          <span class="audio-label">Pronounce Word</span>
+          <span class="audio-waves" aria-hidden="true"><span></span><span></span><span></span></span>
+        </button>
+      </div>
+
+      <div class="wordle-detail-card wordle-meaning-card">
+        <div class="wordle-detail-header">
+          <div class="wordle-detail-title-group">
+            <span class="detail-icon">&#128218;</span>
+            <span class="detail-title">Meaning</span>
+          </div>
+          <button class="wordle-audio-btn mini-audio-btn" id="btnAudioMeaning" type="button" aria-label="Listen to word meaning">
+            <span class="audio-icon">&#128266;</span>
+            <span class="audio-label">Listen</span>
+            <span class="audio-waves" aria-hidden="true"><span></span><span></span><span></span></span>
+          </button>
+        </div>
+        <p class="wordle-detail-text" id="wordleRevealedMeaning">
+          Loading definition...
+        </p>
+      </div>
+
+      <div class="wordle-detail-card wordle-sentence-card">
+        <div class="wordle-detail-header">
+          <div class="wordle-detail-title-group">
+            <span class="detail-icon">&#128172;</span>
+            <span class="detail-title">Sample Sentence</span>
+          </div>
+          <button class="wordle-audio-btn mini-audio-btn" id="btnAudioSentence" type="button" aria-label="Listen to sample sentence">
+            <span class="audio-icon">&#128266;</span>
+            <span class="audio-label">Listen</span>
+            <span class="audio-waves" aria-hidden="true"><span></span><span></span><span></span></span>
+          </button>
+        </div>
+        <p class="wordle-detail-text wordle-sentence-text" id="wordleRevealedSentence">
+          Loading sample sentence...
+        </p>
+      </div>
+
+      <div class="wordle-modal-footer">
+        <button class="btn btn-primary btn-glow btn-wordle-proceed" id="btnWordleProceed" type="button">
+          Proceed to Quiz &#8594;
+        </button>
+      </div>
+    </div>
+  </div>
+
   <div class="notif-overlay" id="notifOverlay" aria-live="polite"></div>
   <canvas id="confettiCanvas" aria-hidden="true"></canvas>
 
   <script src="questions.js"></script>
   <script src="question-generator.js"></script>
+  <script src="wordle.js"></script>
   <script src="game.js"></script>
 </body>
 </html>
