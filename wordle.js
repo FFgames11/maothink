@@ -1,1173 +1,48 @@
 /* ============================================================
-   MaoThink - Wordle Icebreaker Game Logic
-   Self-contained mechanics for the 5-letter daily Wordle mystery word.
+   MaoThink - Wordle Icebreaker Game Logic (API-Driven Engine)
+   - Fetches mystery words directly from online linguistic APIs
+   - Validates user guesses against real English dictionaries
+   - Conditional Skip button visibility (hidden on first visit)
+   - Web Speech API audio narration for Word, Meaning & Sentence
    ============================================================ */
 
 (function () {
     "use strict";
 
-    // ── Rich Curated 5-Letter English Vocabulary Catalog ─────────
-    // Educational, positive, and varied words with accurate definitions,
-    // phonetic guides, and natural sample sentences.
-    const WORD_CATALOG = [
-        {
-            word: "SPARK",
-            phonetic: "/spɑːrk/",
-            partOfSpeech: "noun / verb",
-            meaning: "A small fiery particle, or a vital quality that ignites enthusiasm, passion, or creative action.",
-            sentence: "Her uplifting speech ignited a creative spark in all of the students."
-        },
-        {
-            word: "BRAVE",
-            phonetic: "/breɪv/",
-            partOfSpeech: "adjective",
-            meaning: "Ready to face and endure danger, difficulty, or pain with courage and resilience.",
-            sentence: "The brave firefighter rushed into the smoke-filled building without hesitation."
-        },
-        {
-            word: "BLOOM",
-            phonetic: "/bluːm/",
-            partOfSpeech: "verb / noun",
-            meaning: "To produce vibrant flowers, or to grow, mature, and flourish into one's full potential.",
-            sentence: "Under gentle guidance, the quiet young musician began to bloom."
-        },
-        {
-            word: "CHAMP",
-            phonetic: "/tʃæmp/",
-            partOfSpeech: "noun",
-            meaning: "A champion or victor; someone who achieves excellence through dedication and practice.",
-            sentence: "He trained diligently every morning and proudly became the regional chess champ."
-        },
-        {
-            word: "SWIFT",
-            phonetic: "/swɪft/",
-            partOfSpeech: "adjective",
-            meaning: "Moving or capable of moving with great speed, quickness, and grace.",
-            sentence: "The swift runner crossed the finish line several strides ahead of the pack."
-        },
-        {
-            word: "NOBLE",
-            phonetic: "/ˈnoʊbəl/",
-            partOfSpeech: "adjective",
-            meaning: "Having or showing fine personal qualities, high moral standards, or magnificent character.",
-            sentence: "Standing up for fairness and honesty is always a noble choice."
-        },
-        {
-            word: "PEARL",
-            phonetic: "/pɜːrl/",
-            partOfSpeech: "noun",
-            meaning: "A precious lustrous gem, or a rare and valuable item or piece of good advice.",
-            sentence: "The grandmother shared a timeless pearl of wisdom before the journey."
-        },
-        {
-            word: "FLAIR",
-            phonetic: "/flɛər/",
-            partOfSpeech: "noun",
-            meaning: "A special or instinctive aptitude, talent, or stylish elegance in doing things.",
-            sentence: "She presented her science project with remarkable artistic flair and confidence."
-        },
-        {
-            word: "OASIS",
-            phonetic: "/oʊˈeɪsɪs/",
-            partOfSpeech: "noun",
-            meaning: "A fertile spot in a desert, or a peaceful haven that offers refuge and calm.",
-            sentence: "The quiet botanical garden is a serene oasis in the heart of the noisy city."
-        },
-        {
-            word: "VIVID",
-            phonetic: "/ˈvɪvɪd/",
-            partOfSpeech: "adjective",
-            meaning: "Producing powerful feelings or clear, strikingly bright and realistic mental images.",
-            sentence: "His vivid descriptions made the history lesson feel like a real adventure."
-        },
-        {
-            word: "CREST",
-            phonetic: "/krɛst/",
-            partOfSpeech: "noun",
-            meaning: "The top or highest ridge of a mountain, hill, or wave.",
-            sentence: "The hikers reached the mountain crest just as the morning sun rose over the clouds."
-        },
-        {
-            word: "TRAIL",
-            phonetic: "/treɪl/",
-            partOfSpeech: "noun",
-            meaning: "A marked path through a forest, meadow, or mountainous wild territory.",
-            sentence: "They followed the winding forest trail until they reached a glistening waterfall."
-        },
-        {
-            word: "SHINE",
-            phonetic: "/ʃaɪn/",
-            partOfSpeech: "verb",
-            meaning: "To give off or reflect light, or to excel conspicuously in an activity or subject.",
-            sentence: "Give every student a chance to shine and celebrate their unique talents."
-        },
-        {
-            word: "CRAFT",
-            phonetic: "/kræft/",
-            partOfSpeech: "noun / verb",
-            meaning: "An activity involving skilled artistry, or to create something with care and precision.",
-            sentence: "The author took months to craft an inspiring and suspenseful story."
-        },
-        {
-            word: "BLISS",
-            phonetic: "/blɪs/",
-            partOfSpeech: "noun",
-            meaning: "A state of perfect happiness, supreme peace, or profound spiritual joy.",
-            sentence: "Listening to acoustic music while sipping warm tea was complete bliss."
-        },
-        {
-            word: "PRIDE",
-            phonetic: "/praɪd/",
-            partOfSpeech: "noun",
-            meaning: "A feeling of deep pleasure and satisfaction derived from one's own or others' achievements.",
-            sentence: "The teacher beamed with pride as her students presented their projects."
-        },
-        {
-            word: "SCOUT",
-            phonetic: "/skaʊt/",
-            partOfSpeech: "noun / verb",
-            meaning: "A person dispatched to explore, investigate, and gather valuable information.",
-            sentence: "The expedition scout discovered a safe route across the freezing river."
-        },
-        {
-            word: "FORGE",
-            phonetic: "/fɔːrdʒ/",
-            partOfSpeech: "verb",
-            meaning: "To create, shape, or build something strong through dedicated effort and commitment.",
-            sentence: "The group worked together to forge strong bonds of teamwork and trust."
-        },
-        {
-            word: "SAVVY",
-            phonetic: "/ˈsævi/",
-            partOfSpeech: "adjective",
-            meaning: "Shrewd, perceptive, and possessing practical common sense and technical skill.",
-            sentence: "A savvy reader knows how to find credible information across multiple sources."
-        },
-        {
-            word: "GLEAM",
-            phonetic: "/ɡliːm/",
-            partOfSpeech: "verb / noun",
-            meaning: "To shine softly with a warm gleam, or an instant flash of light or joyful expression.",
-            sentence: "A cheerful gleam of pride lit up the teacher's eyes as the class applauded."
-        },
-        {
-            word: "SMART",
-            phonetic: "/smɑːrt/",
-            partOfSpeech: "adjective",
-            meaning: "Having or showing quick intelligence, clever problem solving, and sharp thinking.",
-            sentence: "Her smart strategy enabled the team to solve the puzzle in record time."
-        },
-        {
-            word: "BRIEF",
-            phonetic: "/briːf/",
-            partOfSpeech: "adjective",
-            meaning: "Of short duration; concise, direct, and effectively communicating essential points.",
-            sentence: "The manager delivered a brief, inspiring overview before the big presentation."
-        },
-        {
-            word: "PIVOT",
-            phonetic: "/ˈpɪvət/",
-            partOfSpeech: "verb / noun",
-            meaning: "To rotate around a fixed point, or to change direction or strategy successfully.",
-            sentence: "The innovative team managed to pivot quickly when customer feedback arrived."
-        },
-        {
-            word: "EPOCH",
-            phonetic: "/ˈɛpək/",
-            partOfSpeech: "noun",
-            meaning: "A distinct period of time in history characterized by notable events or changes.",
-            sentence: "The widespread adoption of renewable energy marks a hopeful new epoch."
-        },
-        {
-            word: "HAVEN",
-            phonetic: "/ˈheɪvən/",
-            partOfSpeech: "noun",
-            meaning: "A place of safety, refuge, calm sanctuary, or peaceful retreat.",
-            sentence: "The school library became a welcoming haven for avid young readers."
-        },
-        {
-            word: "LUCID",
-            phonetic: "/ˈluːsɪd/",
-            partOfSpeech: "adjective",
-            meaning: "Expressed clearly and easy to comprehend; completely rational and well structured.",
-            sentence: "The professor offered a lucid explanation of an intricate scientific principle."
-        },
-        {
-            word: "VALOR",
-            phonetic: "/ˈvælər/",
-            partOfSpeech: "noun",
-            meaning: "Great bravery, exceptional boldness, and heroic fortitude in the presence of danger.",
-            sentence: "The community honored the young citizen for acts of selflessness and valor."
-        },
-        {
-            word: "ACUTE",
-            phonetic: "/əˈkjuːt/",
-            partOfSpeech: "adjective",
-            meaning: "Showing keen insight and sharp perception; perceptive, critical, or urgent.",
-            sentence: "Her acute eye for subtle detail made her an outstanding proofreader and editor."
-        },
-        {
-            word: "APTLY",
-            phonetic: "/ˈæptli/",
-            partOfSpeech: "adverb",
-            meaning: "In a manner that is suitably appropriate, fitting, and accurately expressive.",
-            sentence: "The cozy mountain retreat was aptly named 'Starlight Cabin' for its clear night skies."
-        },
-        {
-            word: "CHEER",
-            phonetic: "/tʃɪər/",
-            partOfSpeech: "verb / noun",
-            meaning: "To shout for joy or encouragement, or a feeling of good spirits and happiness.",
-            sentence: "A warm cup of cocoa and good news brought great cheer to the family."
-        },
-        {
-            word: "DRAFT",
-            phonetic: "/dræft/",
-            partOfSpeech: "noun / verb",
-            meaning: "A preliminary version of a piece of writing, or to compose a thoughtful plan.",
-            sentence: "She completed the first draft of her captivating essay ahead of schedule."
-        },
-        {
-            word: "EAGER",
-            phonetic: "/ˈiːɡər/",
-            partOfSpeech: "adjective",
-            meaning: "Keenly expectant, enthusiastic, and ready to participate with genuine interest.",
-            sentence: "The eager students raised their hands to share their original hypotheses."
-        },
-        {
-            word: "FABLE",
-            phonetic: "/ˈfeɪbəl/",
-            partOfSpeech: "noun",
-            meaning: "A short, meaningful story featuring animals or mythical characters that teaches a moral lesson.",
-            sentence: "Aesop's classic fable reminded everyone that patience and consistency bring victory."
-        },
-        {
-            word: "GIANT",
-            phonetic: "/ˈdʒaɪənt/",
-            partOfSpeech: "noun / adjective",
-            meaning: "Of colossal size, immense power, or someone of monumental influence and stature.",
-            sentence: "William Shakespeare stands as an enduring giant in world literature."
-        },
-        {
-            word: "HONOR",
-            phonetic: "/ˈɒnər/",
-            partOfSpeech: "noun / verb",
-            meaning: "High respect, great esteem, integrity, and adherence to virtuous principles.",
-            sentence: "It was a true honor to be selected as the keynote speaker for the ceremony."
-        },
-        {
-            word: "IDEAL",
-            phonetic: "/aɪˈdiːəl/",
-            partOfSpeech: "adjective / noun",
-            meaning: "Satisfying one's highest standards of perfection; the most suitable option.",
-            sentence: "The quiet study lounge provided an ideal environment for exam preparation."
-        },
-        {
-            word: "JOLLY",
-            phonetic: "/ˈdʒɒli/",
-            partOfSpeech: "adjective",
-            meaning: "Warmly happy, cheerful, friendly, and full of pleasant humor and goodwill.",
-            sentence: "Lively folk music set a jolly atmosphere throughout the harvest festival."
-        },
-        {
-            word: "SHARP",
-            phonetic: "/ʃɑːrp/",
-            partOfSpeech: "adjective",
-            meaning: "Having a keen edge, or intellectually quick, perceptive, and observant.",
-            sentence: "His sharp mind enabled him to detect the pattern in the riddle quickly."
-        },
-        {
-            word: "LOGIC",
-            phonetic: "/ˈlɒdʒɪk/",
-            partOfSpeech: "noun",
-            meaning: "Reasoning conducted according to strict principles of validity, coherence, and truth.",
-            sentence: "Sound logic helped the debate team construct an airtight opening argument."
-        },
-        {
-            word: "MIRTH",
-            phonetic: "/mɜːrθ/",
-            partOfSpeech: "noun",
-            meaning: "Gladness, amusement, and high spirits, particularly expressed in laughter.",
-            sentence: "The comedy sketches filled the lecture hall with spontaneous mirth."
-        },
-        {
-            word: "NEXUS",
-            phonetic: "/ˈnɛksəs/",
-            partOfSpeech: "noun",
-            meaning: "A focal connection, linking point, or central hub uniting multiple ideas or networks.",
-            sentence: "The university acts as a nexus where technology, art, and science converge."
-        },
-        {
-            word: "ORBIT",
-            phonetic: "/ˈɔːrbɪt/",
-            partOfSpeech: "noun / verb",
-            meaning: "The curved, repeating path of a celestial body or satellite around a central object.",
-            sentence: "The space probe entered stable orbit around Mars and transmitted stunning photos."
-        },
-        {
-            word: "PULSE",
-            phonetic: "/pʌls/",
-            partOfSpeech: "noun",
-            meaning: "A regular, rhythmic throb or beat, or the vibrant energy and spirit of a community.",
-            sentence: "You could feel the lively pulse of the city in its open-air evening markets."
-        },
-        {
-            word: "QUIRK",
-            phonetic: "/kwɜːrk/",
-            partOfSpeech: "noun",
-            meaning: "An endearing peculiarity or unique behavioral trait that makes someone memorable.",
-            sentence: "His funny quirk was wearing mismatched bright socks whenever taking an exam."
-        },
-        {
-            word: "REALM",
-            phonetic: "/rɛlm/",
-            partOfSpeech: "noun",
-            meaning: "A kingdom, sphere of influence, or broad field of knowledge and human endeavor.",
-            sentence: "Artificial intelligence continues to unlock new possibilities in the realm of medicine."
-        },
-        {
-            word: "SURGE",
-            phonetic: "/sɜːrdʒ/",
-            partOfSpeech: "noun / verb",
-            meaning: "A sudden, powerful forward rush or rapid increase in energy, power, or emotion.",
-            sentence: "A surge of excitement spread through the auditorium as the winner was announced."
-        },
-        {
-            word: "TEMPO",
-            phonetic: "/ˈtɛmpoʊ/",
-            partOfSpeech: "noun",
-            meaning: "The speed, cadence, or pace of music, rhythm, or a sequence of unfolding events.",
-            sentence: "The cheerful song sped up to an exhilarating tempo during the joyful chorus."
-        },
-        {
-            word: "UNITY",
-            phonetic: "/ˈjuːnɪti/",
-            partOfSpeech: "noun",
-            meaning: "The state of being united, working together in harmony, and mutual solidarity.",
-            sentence: "The diverse team demonstrated tremendous unity in achieving their common goal."
-        },
-        {
-            word: "VITAL",
-            phonetic: "/ˈvaɪtəl/",
-            partOfSpeech: "adjective",
-            meaning: "Crucially essential, indispensable for life, or full of dynamic living energy.",
-            sentence: "Adequate rest and proper hydration play a vital role in academic performance."
-        },
-        {
-            word: "WHARF",
-            phonetic: "/wɔːrf/",
-            partOfSpeech: "noun",
-            meaning: "A level landing stage beside water where ships moor to load passengers and cargo.",
-            sentence: "Seagulls circled high above the historic wooden wharf as fishing boats arrived."
-        },
-        {
-            word: "YIELD",
-            phonetic: "/jiːld/",
-            partOfSpeech: "verb / noun",
-            meaning: "To produce a valuable crop or result, or to give way politely to others.",
-            sentence: "Diligent daily practice will yield remarkable improvements in your fluency."
-        },
-        {
-            word: "ZESTY",
-            phonetic: "/ˈzɛsti/",
-            partOfSpeech: "adjective",
-            meaning: "Having an appetizing, fresh, stimulating flavor or an energetic and spirited quality.",
-            sentence: "The chef seasoned the salad with a zesty lemon-herb dressing that delighted everyone."
-        },
-        {
-            word: "AMITY",
-            phonetic: "/ˈæmɪti/",
-            partOfSpeech: "noun",
-            meaning: "Friendly, peaceful relations, goodwill, and mutual harmony between people or nations.",
-            sentence: "The cultural exchange program fostered lasting amity between youth from both countries."
-        },
-        {
-            word: "BOUND",
-            phonetic: "/baʊnd/",
-            partOfSpeech: "adjective / verb",
-            meaning: "Leaping forward with enthusiasm, or destined and determined to achieve a milestone.",
-            sentence: "Armed with perseverance and curiosity, she was bound for great achievements."
-        },
-        {
-            word: "DRIVE",
-            phonetic: "/draɪv/",
-            partOfSpeech: "noun / verb",
-            meaning: "An innate determination, strong motivation, and energy to achieve goals.",
-            sentence: "Her relentless drive and curiosity propelled her toward scientific discoveries."
-        },
-        {
-            word: "ELITE",
-            phonetic: "/ɪˈliːt/",
-            partOfSpeech: "adjective / noun",
-            meaning: "Representing the best, most skilled, or most accomplished individuals in a group.",
-            sentence: "She earned an invitation to join the elite national mathematics olympiad team."
-        },
-        {
-            word: "FOCUS",
-            phonetic: "/ˈfoʊkəs/",
-            partOfSpeech: "noun / verb",
-            meaning: "The center of interest, or the ability to concentrate deeply on a specific objective.",
-            sentence: "Unwavering focus during study sessions allowed him to master the vocabulary list."
-        },
-        {
-            word: "GLINT",
-            phonetic: "/ɡlɪnt/",
-            partOfSpeech: "noun / verb",
-            meaning: "A tiny, bright flash of light, or a momentary sparkle of wit or humor.",
-            sentence: "There was a mischievous glint in his eye as he revealed the surprise."
-        },
-        {
-            word: "HAZEL",
-            phonetic: "/ˈheɪzəl/",
-            partOfSpeech: "noun / adjective",
-            meaning: "A small tree producing edible nuts, or a rich reddish-brown or golden-green color.",
-            sentence: "The autumn leaves displayed a magnificent palette of amber and hazel."
-        },
-        {
-            word: "INGOT",
-            phonetic: "/ˈɪŋɡət/",
-            partOfSpeech: "noun",
-            meaning: "A block of steel, gold, or silver cast in a standard shape for storage or trade.",
-            sentence: "The museum display featured a pure silver ingot recovered from a centuries-old galleon."
-        },
-        {
-            word: "KARMA",
-            phonetic: "/ˈkɑːrmə/",
-            partOfSpeech: "noun",
-            meaning: "The universal spiritual principle that good intentions and deeds yield positive results.",
-            sentence: "Helping others without expecting praise brings genuine happiness and good karma."
-        },
-        {
-            word: "LEMON",
-            phonetic: "/ˈlɛmən/",
-            partOfSpeech: "noun",
-            meaning: "A yellow citrus fruit known for its refreshing, tangy flavor and fragrant peel.",
-            sentence: "A slice of fresh lemon added a bright, refreshing taste to the chilled iced tea."
-        },
-        {
-            word: "MAGIC",
-            phonetic: "/ˈmædʒɪk/",
-            partOfSpeech: "noun / adjective",
-            meaning: "The power of apparent supernatural phenomena, or captivating and wondrous beauty.",
-            sentence: "The quiet snowfall cast an enchanting magic over the sleeping winter village."
-        },
-        {
-            word: "NORTH",
-            phonetic: "/nɔːrθ/",
-            partOfSpeech: "noun / adjective",
-            meaning: "The compass direction toward the Arctic pole, guiding explorers and navigators.",
-            sentence: "The migrating birds flew north as the warm spring weather arrived."
-        },
-        {
-            word: "OCEAN",
-            phonetic: "/ˈoʊʃən/",
-            partOfSpeech: "noun",
-            meaning: "A vast expanse of sea covering the majority of the Earth's surface.",
-            sentence: "The boundless ocean is home to millions of extraordinary marine species."
-        },
-        {
-            word: "PLAZA",
-            phonetic: "/ˈplɑːzə/",
-            partOfSpeech: "noun",
-            meaning: "A public square, open courtyard, or marketplace in a city or town.",
-            sentence: "Musicians gathered in the sunny plaza to entertain locals and traveling tourists."
-        },
-        {
-            word: "QUOTA",
-            phonetic: "/ˈkwoʊtə/",
-            partOfSpeech: "noun",
-            meaning: "A targeted share, proportion, or designated quantity of something to be achieved.",
-            sentence: "The volunteer team exceeded their reading club quota well ahead of schedule."
-        },
-        {
-            word: "RADAR",
-            phonetic: "/ˈreɪdɑːr/",
-            partOfSpeech: "noun",
-            meaning: "A system for detecting objects via radio waves, or acute situational awareness.",
-            sentence: "A talent scout kept talented young students on her radar for future scholarships."
-        },
-        {
-            word: "SALVO",
-            phonetic: "/ˈsælvoʊ/",
-            partOfSpeech: "noun",
-            meaning: "A simultaneous discharge of applause, questions, or fireworks in celebration.",
-            sentence: "The audience erupted into a thunderous salvo of cheers when the curtain fell."
-        },
-        {
-            word: "TITAN",
-            phonetic: "/ˈtaɪtən/",
-            partOfSpeech: "noun",
-            meaning: "A person or entity of gigantic size, extraordinary strength, or exceptional achievement.",
-            sentence: "Marie Curie remains a pioneering titan in the history of modern physics."
-        },
-        {
-            word: "URBAN",
-            phonetic: "/ˈɜːrbən/",
-            partOfSpeech: "adjective",
-            meaning: "Relating to, characteristic of, or located in a town or city environment.",
-            sentence: "Urban community gardens bring refreshing green spaces into lively city centers."
-        },
-        {
-            word: "VERVE",
-            phonetic: "/vɜːrv/",
-            partOfSpeech: "noun",
-            meaning: "Vigor, lively spirit, enthusiasm, and sparkling vitality in performance or expression.",
-            sentence: "The youth choir sang each upbeat anthem with contagious verve and joy."
-        },
-        {
-            word: "WHEAT",
-            phonetic: "/wiːt/",
-            partOfSpeech: "noun",
-            meaning: "A cultivated cereal grain yielding flour for wholesome breads and pastries.",
-            sentence: "Golden fields of ripe wheat swayed gently under the warm autumn afternoon breeze."
-        },
-        {
-            word: "ZEBRA",
-            phonetic: "/ˈziːbrə/",
-            partOfSpeech: "noun",
-            meaning: "An African wild equine animal known for its distinctive black-and-white striped coat.",
-            sentence: "A majestic zebra galloped gracefully across the open savanna plains."
-        },
-        {
-            word: "ABBEY",
-            phonetic: "/ˈæbi/",
-            partOfSpeech: "noun",
-            meaning: "A historic monastery, convent, or grand church building filled with heritage.",
-            sentence: "Visitors admired the ancient stone arches and stained glass inside the abbey."
-        },
-        {
-            word: "ACORN",
-            phonetic: "/ˈeɪkɔːrn/",
-            partOfSpeech: "noun",
-            meaning: "The smooth, oval nut of an oak tree, symbolizing great potential from humble beginnings.",
-            sentence: "From a tiny acorn grows a mighty oak tree that shelters generations of birds."
-        },
-        {
-            word: "ALERT",
-            phonetic: "/əˈlɜːrt/",
-            partOfSpeech: "adjective",
-            meaning: "Quick to notice any unusual and potentially important circumstances; watchful.",
-            sentence: "The alert guard dog kept a careful eye on the orchard throughout the night."
-        },
-        {
-            word: "AMBER",
-            phonetic: "/ˈæmbər/",
-            partOfSpeech: "noun / adjective",
-            meaning: "A warm honey-yellow gemstone of fossilized resin, or a golden-orange hue.",
-            sentence: "The late afternoon sun cast an amber glow across the quiet classroom walls."
-        },
-        {
-            word: "ANGEL",
-            phonetic: "/ˈeɪndʒəl/",
-            partOfSpeech: "noun",
-            meaning: "A spiritual messenger, or a person of exemplary kindness, sweetness, and virtue.",
-            sentence: "The nurse was an absolute angel who comforted every worried patient with warmth."
-        },
-        {
-            word: "APPLY",
-            phonetic: "/əˈplaɪ/",
-            partOfSpeech: "verb",
-            meaning: "To put to practical use, or to make a formal application for study or work.",
-            sentence: "Students learn how to apply scientific concepts to solve real-world problems."
-        },
-        {
-            word: "ARMOR",
-            phonetic: "/ˈɑːrmər/",
-            partOfSpeech: "noun",
-            meaning: "A protective covering worn to defend against harm, or mental resilience.",
-            sentence: "Self-confidence and kindness serve as strong armor against negativity."
-        },
-        {
-            word: "ARROW",
-            phonetic: "/ˈæroʊ/",
-            partOfSpeech: "noun",
-            meaning: "A pointed projectile shot from a bow, or a symbol indicating direction.",
-            sentence: "Follow the green arrow on the trail sign to reach the panoramic summit."
-        },
-        {
-            word: "ASSET",
-            phonetic: "/ˈæsɛt/",
-            partOfSpeech: "noun",
-            meaning: "A useful or valuable quality, person, skill, or resource.",
-            sentence: "Fluency in multiple languages is an invaluable asset in today's global world."
-        },
-        {
-            word: "BADGE",
-            phonetic: "/bædʒ/",
-            partOfSpeech: "noun",
-            meaning: "A distinctive emblem or token worn as a symbol of achievement or membership.",
-            sentence: "She proudly earned the top scout badge for leadership and community service."
-        },
-        {
-            word: "BLAZE",
-            phonetic: "/bleɪz/",
-            partOfSpeech: "noun / verb",
-            meaning: "A bright, brilliant flame or fire, or to set a trail of innovation for others to follow.",
-            sentence: "Pioneering scientists blaze a trail that illuminates future technological breakthroughs."
-        },
-        {
-            word: "BOOST",
-            phonetic: "/buːst/",
-            partOfSpeech: "verb / noun",
-            meaning: "To help, encourage, or cause something to increase, improve, or flourish.",
-            sentence: "A nutritious breakfast gives your mind a wonderful boost for morning study."
-        },
-        {
-            word: "BRAIN",
-            phonetic: "/breɪn/",
-            partOfSpeech: "noun",
-            meaning: "The remarkable organ of thought, memory, consciousness, and imagination.",
-            sentence: "Solving puzzles every day helps keep the human brain sharp and active."
-        },
-        {
-            word: "BROOK",
-            phonetic: "/brʊk/",
-            partOfSpeech: "noun",
-            meaning: "A small, clear, natural stream flowing pleasantly through the countryside.",
-            sentence: "Wildflowers bloomed on the grassy banks of the babbling brook."
-        },
-        {
-            word: "CEDAR",
-            phonetic: "/ˈsiːdər/",
-            partOfSpeech: "noun",
-            meaning: "A tall coniferous tree known for its fragrant, durable, and weather-resistant wood.",
-            sentence: "The scent of cedar filled the carpenter's workshop as he finished the bookshelf."
-        },
-        {
-            word: "CHIME",
-            phonetic: "/tʃaɪm/",
-            partOfSpeech: "verb / noun",
-            meaning: "A melodious ringing sound produced by bells, or to harmonize pleasantly.",
-            sentence: "The grandfather clock began to chime noon with rich, resonant notes."
-        },
-        {
-            word: "CHORD",
-            phonetic: "/kɔːrd/",
-            partOfSpeech: "noun",
-            meaning: "A harmonic combination of musical notes sounded together, or an emotional resonance.",
-            sentence: "The pianist struck an emotional chord that moved the entire listening audience."
-        },
-        {
-            word: "CLOAK",
-            phonetic: "/kloʊk/",
-            partOfSpeech: "noun / verb",
-            meaning: "An outdoor overgarment, or something that envelops or conceals like a veil.",
-            sentence: "A mysterious cloak of silver mist covered the harbor in the early dawn."
-        },
-        {
-            word: "CLOUD",
-            phonetic: "/klaʊd/",
-            partOfSpeech: "noun",
-            meaning: "A visible mass of condensed water vapor floating high in the atmosphere.",
-            sentence: "A single fluffy white cloud drifted peacefully across the clear azure sky."
-        },
-        {
-            word: "CORAL",
-            phonetic: "/ˈkɒrəl/",
-            partOfSpeech: "noun / adjective",
-            meaning: "A marine colonial organism that builds vibrant underwater reefs, or a warm pinkish hue.",
-            sentence: "Snorkelers marveled at the kaleidoscopic coral reef teeming with colorful fish."
-        },
-        {
-            word: "CRISP",
-            phonetic: "/krɪsp/",
-            partOfSpeech: "adjective",
-            meaning: "Pleasantly clean, cool, and invigorating; fresh and sharply defined.",
-            sentence: "We took a refreshing morning walk in the crisp October mountain air."
-        },
-        {
-            word: "CROWN",
-            phonetic: "/kraʊn/",
-            partOfSpeech: "noun / verb",
-            meaning: "An ornate circular headpiece worn by a monarch, or the supreme culmination of an effort.",
-            sentence: "Winning the championship was the glorious crown of their undefeated season."
-        },
-        {
-            word: "DREAM",
-            phonetic: "/driːm/",
-            partOfSpeech: "noun / verb",
-            meaning: "A cherished aspiration, ambition, or imaginative vision of what the future could be.",
-            sentence: "With grit and optimism, she turned her childhood dream into inspiring reality."
-        },
-        {
-            word: "DRIFT",
-            phonetic: "/drɪft/",
-            partOfSpeech: "verb / noun",
-            meaning: "To be carried slowly along by a current of air or water in a serene manner.",
-            sentence: "We watched colorful paper lanterns drift gently across the mirror-like lake."
-        },
-        {
-            word: "EAGLE",
-            phonetic: "/ˈiːɡəl/",
-            partOfSpeech: "noun",
-            meaning: "A majestic bird of prey celebrated for its powerful flight and keen vision.",
-            sentence: "A golden eagle soared gracefully over the rugged peaks of the mountain range."
-        },
-        {
-            word: "EARTH",
-            phonetic: "/ɜːrθ/",
-            partOfSpeech: "noun",
-            meaning: "Our home planet, or the rich soil that nourishes plants, trees, and living ecosystems.",
-            sentence: "Caring for planet Earth is a collective responsibility for all humankind."
-        },
-        {
-            word: "EMBER",
-            phonetic: "/ˈɛmbər/",
-            partOfSpeech: "noun",
-            meaning: "A glowing, warm piece of wood or coal in a dying fire, retaining lasting warmth.",
-            sentence: "A solitary glowing ember kept the campfire warm throughout the frosty night."
-        },
-        {
-            word: "FAITH",
-            phonetic: "/feɪθ/",
-            partOfSpeech: "noun",
-            meaning: "Complete trust, confidence, or strong belief in someone, something, or a noble cause.",
-            sentence: "Her unwavering faith in her students inspired them to exceed every expectation."
-        },
-        {
-            word: "FEAST",
-            phonetic: "/fiːst/",
-            partOfSpeech: "noun",
-            meaning: "A large, bountiful meal, or a rich celebration that delights the senses.",
-            sentence: "The harvest festival concluded with a joyful feast of homemade delicacies."
-        },
-        {
-            word: "FLAME",
-            phonetic: "/fleɪm/",
-            partOfSpeech: "noun",
-            meaning: "A hot glowing body of ignited gas, or an intense, enduring passion for learning.",
-            sentence: "The flame of curiosity burned brightly in the young scientist's heart."
-        },
-        {
-            word: "FLEET",
-            phonetic: "/fliːt/",
-            partOfSpeech: "noun / adjective",
-            meaning: "A group of ships sailing together, or moving with remarkable swiftness.",
-            sentence: "The fleet gazelle bounded gracefully across the open savannah grassland."
-        },
-        {
-            word: "FLOCK",
-            phonetic: "/flɒk/",
-            partOfSpeech: "noun / verb",
-            meaning: "A group of birds or sheep, or to gather together in large enthusiastic numbers.",
-            sentence: "Art enthusiasts flock to the gallery opening to admire the new paintings."
-        },
-        {
-            word: "FLORA",
-            phonetic: "/ˈflɔːrə/",
-            partOfSpeech: "noun",
-            meaning: "The collective plant life occurring within a specific geographic region or habitat.",
-            sentence: "The alpine flora includes rare, resilient wildflowers that survive icy winds."
-        },
-        {
-            word: "FLUTE",
-            phonetic: "/fluːt/",
-            partOfSpeech: "noun",
-            meaning: "A slender wind instrument that produces pure, sweet, and melodic high tones.",
-            sentence: "The gentle notes of a silver flute echoed softly across the concert hall."
-        },
-        {
-            word: "FROST",
-            phonetic: "/frɒst/",
-            partOfSpeech: "noun",
-            meaning: "A delicate deposit of tiny white ice crystals formed on cold outdoor surfaces.",
-            sentence: "Intricate patterns of morning frost sparkled like diamonds on the windowpane."
-        },
-        {
-            word: "GLOBE",
-            phonetic: "/ɡloʊb/",
-            partOfSpeech: "noun",
-            meaning: "A spherical model of the Earth, or the entire terrestrial world and its people.",
-            sentence: "Students spun the colorful desktop globe to locate countries and continents."
-        },
-        {
-            word: "GLORY",
-            phonetic: "/ˈɡlɔːri/",
-            partOfSpeech: "noun",
-            meaning: "High renown, magnificent beauty, or praise earned by notable achievements.",
-            sentence: "The golden sunset illuminated the canyon walls in all their natural glory."
-        },
-        {
-            word: "GRACE",
-            phonetic: "/ɡreɪs/",
-            partOfSpeech: "noun",
-            meaning: "Simple elegance or refinement of movement, or courteous and kind goodwill.",
-            sentence: "She accepted the award with humility, gratitude, and poise and grace."
-        },
-        {
-            word: "GRAIN",
-            phonetic: "/ɡreɪn/",
-            partOfSpeech: "noun",
-            meaning: "A seed of a cereal grass, or the smallest microscopic speck or trace of something.",
-            sentence: "Every grain of truth helps in building an honest and reliable perspective."
-        },
-        {
-            word: "GRAND",
-            phonetic: "/ɡrænd/",
-            partOfSpeech: "adjective",
-            meaning: "Magnificent, imposing in size and scope, or splendidly impressive in design.",
-            sentence: "The national park features grand canyon vistas that take your breath away."
-        },
-        {
-            word: "GRASP",
-            phonetic: "/ɡrɑːsp/",
-            partOfSpeech: "verb / noun",
-            meaning: "To grip firmly, or to comprehend and fully understand an intricate concept.",
-            sentence: "He was quick to grasp the mathematical theory once it was explained visually."
-        },
-        {
-            word: "GREET",
-            phonetic: "/ɡriːt/",
-            partOfSpeech: "verb",
-            meaning: "To welcome someone with warm words, gestures, or joyful expressions of hospitality.",
-            sentence: "The cheerful teacher stood by the door to greet every arriving student by name."
-        },
-        {
-            word: "GROVE",
-            phonetic: "/ɡroʊv/",
-            partOfSpeech: "noun",
-            meaning: "A small group or orchard of trees without dense undergrowth, offering shade.",
-            sentence: "Families enjoyed picnics under the fragrant olive grove on sunny afternoons."
-        },
-        {
-            word: "GUIDE",
-            phonetic: "/ɡaɪd/",
-            partOfSpeech: "noun / verb",
-            meaning: "A person who leads others on a journey, or advice that points to the best path.",
-            sentence: "A knowledgeable guide helped the tourists discover historical hidden gems."
-        },
-        {
-            word: "HABIT",
-            phonetic: "/ˈhæbɪt/",
-            partOfSpeech: "noun",
-            meaning: "A settled, regular tendency or daily practice that is repeated automatically.",
-            sentence: "Reading for twenty minutes each evening is a wonderfully rewarding habit."
-        },
-        {
-            word: "HEART",
-            phonetic: "/hɑːrt/",
-            partOfSpeech: "noun",
-            meaning: "The muscular organ pumping life throughout the body, or the center of compassion.",
-            sentence: "She poured her entire heart and soul into creating the community mural."
-        },
-        {
-            word: "HONEY",
-            phonetic: "/ˈhʌni/",
-            partOfSpeech: "noun",
-            meaning: "A sweet, golden viscous fluid produced by bees from nectar; soothing and delicious.",
-            sentence: "A spoonful of wildflower honey added sweetness to the warm chamomile tea."
-        },
-        {
-            word: "JEWEL",
-            phonetic: "/ˈdʒuːəl/",
-            partOfSpeech: "noun",
-            meaning: "A precious cut stone or ornament, or something held in extraordinarily high regard.",
-            sentence: "The historic botanical conservatory is the architectural jewel of the city."
-        },
-        {
-            word: "KUDOS",
-            phonetic: "/ˈkuːdoʊz/",
-            partOfSpeech: "noun",
-            meaning: "Praise, acclaim, honor, and congratulations given for an outstanding achievement.",
-            sentence: "Kudos to the entire robotics squad for building an innovative rescue rover!"
-        },
-        {
-            word: "LIGHT",
-            phonetic: "/laɪt/",
-            partOfSpeech: "noun / adjective",
-            meaning: "Natural illumination that stimulates sight and brings clarity, warmth, and hope.",
-            sentence: "Morning light streamed through the library window, warming the study desks."
-        },
-        {
-            word: "LOYAL",
-            phonetic: "/ˈlɔɪəl/",
-            partOfSpeech: "adjective",
-            meaning: "Giving or showing firm, constant, and steadfast support and fidelity to friends.",
-            sentence: "A loyal friend stands by your side through both triumphs and challenging days."
-        },
-        {
-            word: "LUNAR",
-            phonetic: "/ˈluːnər/",
-            partOfSpeech: "adjective",
-            meaning: "Relating to or determined by the moon and its silvery glow or cycles.",
-            sentence: "Stargazers set up telescopes in the open field to observe the total lunar eclipse."
-        },
-        {
-            word: "MARCH",
-            phonetic: "/mɑːrtʃ/",
-            partOfSpeech: "verb / noun",
-            meaning: "To walk with steady, deliberate steps, or the third inspiring month of the year.",
-            sentence: "The persistent march toward equality and civil rights inspires people everywhere."
-        },
-        {
-            word: "MEDAL",
-            phonetic: "/ˈmɛdəl/",
-            partOfSpeech: "noun",
-            meaning: "A metal disc stamped with an emblem, awarded to honor exceptional service or victory.",
-            sentence: "She proudly received a gold medal for breaking the school swimming record."
-        },
-        {
-            word: "MERIT",
-            phonetic: "/ˈmɛrɪt/",
-            partOfSpeech: "noun / verb",
-            meaning: "The quality of being particularly good, worthy, or deserving of praise and reward.",
-            sentence: "Her proposal was chosen purely on merit and the feasibility of its design."
-        },
-        {
-            word: "MODEL",
-            phonetic: "/ˈmɒdəl/",
-            partOfSpeech: "noun / adjective",
-            meaning: "A standard or exemplary representation worthy of study, imitation, and praise.",
-            sentence: "He served as a model citizen by actively volunteering at the community shelter."
-        },
-        {
-            word: "MUSIC",
-            phonetic: "/ˈmjuːzɪk/",
-            partOfSpeech: "noun",
-            meaning: "Vocal or instrumental sounds combined to produce beauty of form and emotion.",
-            sentence: "Uplifting music has the universal power to bring diverse cultures together."
-        },
-        {
-            word: "NIFTY",
-            phonetic: "/ˈnɪfti/",
-            partOfSpeech: "adjective",
-            meaning: "Particularly good, skillful, clever, attractive, and stylish.",
-            sentence: "He devised a nifty shortcut that automated the entire grading process."
-        },
-        {
-            word: "NOVEL",
-            phonetic: "/ˈnɒvəl/",
-            partOfSpeech: "noun / adjective",
-            meaning: "A fictitious prose narrative, or something delightfully new, fresh, and original.",
-            sentence: "The engineer proposed a novel solution that cut energy consumption in half."
-        },
-        {
-            word: "OLIVE",
-            phonetic: "/ˈɒlɪv/",
-            partOfSpeech: "noun / adjective",
-            meaning: "A small oval fruit, or an ancient symbol of peace, healing, and reconciliation.",
-            sentence: "Extending an olive branch is a traditional gesture indicating an offer of peace."
-        },
-        {
-            word: "PANEL",
-            phonetic: "/ˈpænəl/",
-            partOfSpeech: "noun",
-            meaning: "A group of experts gathered to discuss a topic, or a flat rectangular section.",
-            sentence: "The panel of scientists answered insightful questions from eager young students."
-        },
-        {
-            word: "PEACH",
-            phonetic: "/piːtʃ/",
-            partOfSpeech: "noun",
-            meaning: "A sweet, juicy round fruit with velvety skin and sweet aromatic flesh.",
-            sentence: "Freshly sliced ripe peach made the summer dessert irresistible."
-        },
-        {
-            word: "PILOT",
-            phonetic: "/ˈpaɪlət/",
-            partOfSpeech: "noun / verb",
-            meaning: "A person who operates aircraft controls, or to guide a project through trial stages.",
-            sentence: "The skilled pilot navigated the passenger plane smoothly through the crosswinds."
-        },
-        {
-            word: "PRIZE",
-            phonetic: "/praɪz/",
-            partOfSpeech: "noun / verb",
-            meaning: "An award given in recognition of an accomplishment, or to value very highly.",
-            sentence: "She took home first prize in the national high school essay competition."
-        },
-        {
-            word: "PROUD",
-            phonetic: "/praʊd/",
-            partOfSpeech: "adjective",
-            meaning: "Feeling deep pleasure and satisfaction in one's achievements or those of loved ones.",
-            sentence: "Parents stood with proud smiles as graduates crossed the commencement stage."
-        },
-        {
-            word: "QUEEN",
-            phonetic: "/kwiːn/",
-            partOfSpeech: "noun",
-            meaning: "A female ruler of an independent state, or a woman regarded as preeminent in a field.",
-            sentence: "Aretha Franklin was celebrated worldwide as the undisputed Queen of Soul."
-        },
-        {
-            word: "QUEST",
-            phonetic: "/kwɛst/",
-            partOfSpeech: "noun",
-            meaning: "A long, adventurous search or pursuit in order to achieve a meaningful goal.",
-            sentence: "The research team dedicated years to their quest for clean, sustainable energy."
-        },
-        {
-            word: "RAPID",
-            phonetic: "/ˈræpɪd/",
-            partOfSpeech: "adjective",
-            meaning: "Happening in a brief period of time; fast, energetic, and accelerating.",
-            sentence: "The student showed rapid progress in English vocabulary after daily practice."
-        },
-        {
-            word: "RIVER",
-            phonetic: "/ˈrɪvər/",
-            partOfSpeech: "noun",
-            meaning: "A large, natural stream of flowing water running toward an ocean, lake, or sea.",
-            sentence: "The mighty river carved a spectacular canyon over millions of patient years."
-        },
-        {
-            word: "ROBOT",
-            phonetic: "/ˈroʊbɒt/",
-            partOfSpeech: "noun",
-            meaning: "An automated machine capable of carrying out a complex series of actions.",
-            sentence: "The student team programmed a helpful robot to sort recycling items quickly."
-        },
-        {
-            word: "ROYAL",
-            phonetic: "/ˈrɔɪəl/",
-            partOfSpeech: "adjective",
-            meaning: "Having the status of a king or queen; magnificent, dignified, and splendid.",
-            sentence: "The distinguished guests received a royal welcome at the international banquet."
-        },
-        {
-            word: "RULER",
-            phonetic: "/ˈruːlər/",
-            partOfSpeech: "noun",
-            meaning: "A person exercising government, or a straight measuring tool used in geometry.",
-            sentence: "She used a wooden ruler to draw precise straight lines across the diagram."
-        },
-        {
-            word: "SCALE",
-            phonetic: "/skeɪl/",
-            partOfSpeech: "noun / verb",
-            meaning: "To climb up to the summit of, or a graduated series of musical notes or measurements.",
-            sentence: "With grit and proper equipment, the mountaineers were ready to scale the cliff."
-        },
-        {
-            word: "SCENE",
-            phonetic: "/siːn/",
-            partOfSpeech: "noun",
-            meaning: "A picturesque view or landscape, or a sequence of continuous action in a play.",
-            sentence: "The sunset over the calm emerald lake was an unforgettable and serene scene."
-        },
-        {
-            word: "SHARE",
-            phonetic: "/ʃɛər/",
-            partOfSpeech: "verb",
-            meaning: "To distribute, give a portion to others, or participate collaboratively.",
-            sentence: "Generous leaders share credit and celebrate everyone's contributions."
-        },
-        {
-            word: "SOLAR",
-            phonetic: "/ˈsoʊlər/",
-            partOfSpeech: "adjective",
-            meaning: "Relating to, derived from, or powered by the radiant energy of the sun.",
-            sentence: "The school roof is fitted with solar panels that generate clean electrical power."
-        },
-        {
-            word: "SPACE",
-            phonetic: "/speɪs/",
-            partOfSpeech: "noun",
-            meaning: "The continuous physical expanse, or the vast cosmos beyond Earth's atmosphere.",
-            sentence: "Astronomers peer deep into outer space using powerful orbiting telescopes."
-        },
-        {
-            word: "STAND",
-            phonetic: "/stænd/",
-            partOfSpeech: "verb / noun",
-            meaning: "To remain upright, firm, and steadfast in defense of truth and integrity.",
-            sentence: "Kind citizens stand together to protect vulnerable members of their community."
-        },
-        {
-            word: "STORY",
-            phonetic: "/ˈstɔːri/",
-            partOfSpeech: "noun",
-            meaning: "An account of imaginary or real people and events told for entertainment or learning.",
-            sentence: "A captivating bedtime story transported the children into a magical wonderland."
-        },
-        {
-            word: "SWEET",
-            phonetic: "/swiːt/",
-            partOfSpeech: "adjective",
-            meaning: "Pleasing to the senses, having the taste of sugar, or delightfully kind in manner.",
-            sentence: "Her sweet encouragement gave the nervous speaker the courage to speak up."
-        },
-        {
-            word: "TEACH",
-            phonetic: "/tiːtʃ/",
-            partOfSpeech: "verb",
-            meaning: "To impart knowledge to or instruct someone in how to do or understand something.",
-            sentence: "Great mentors teach not only facts, but how to think critically and empathetically."
-        },
-        {
-            word: "THEME",
-            phonetic: "/θiːm/",
-            partOfSpeech: "noun",
-            meaning: "An underlying topic, central idea, or recurring motif in an artistic or literary work.",
-            sentence: "The central theme of the novel explores courage, friendship, and resilience."
-        },
-        {
-            word: "TIGER",
-            phonetic: "/ˈtaɪɡər/",
-            partOfSpeech: "noun",
-            meaning: "A magnificent striped Asian wild cat recognized for power, grace, and stealth.",
-            sentence: "The Bengal tiger paced silently through the lush greenery of the rainforest."
-        },
-        {
-            word: "TRUST",
-            phonetic: "/trʌst/",
-            partOfSpeech: "noun / verb",
-            meaning: "Firm belief in the reliability, truth, ability, and honest integrity of someone.",
-            sentence: "Mutual trust forms the cornerstone of every strong and successful partnership."
-        },
-        {
-            word: "VOICE",
-            phonetic: "/vɔɪs/",
-            partOfSpeech: "noun / verb",
-            meaning: "Sound produced by human vocal cords, or the expression of opinion and agency.",
-            sentence: "Every student's unique voice deserves to be heard, valued, and respected."
-        },
-        {
-            word: "WATER",
-            phonetic: "/ˈwɔːtər/",
-            partOfSpeech: "noun",
-            meaning: "The clear, colorless, odorless liquid essential for the survival of all living organisms.",
-            sentence: "A cool glass of clean spring water was wonderfully refreshing on a hot day."
-        },
-        {
-            word: "WORLD",
-            phonetic: "/wɜːrld/",
-            partOfSpeech: "noun",
-            meaning: "The earth, together with all of its countries, peoples, and natural wonders.",
-            sentence: "Traveling opens your eyes to the boundless diversity of our wonderful world."
-        },
-        {
-            word: "YOUTH",
-            phonetic: "/juːθ/",
-            partOfSpeech: "noun",
-            meaning: "The vibrant period of being young, full of energy, optimism, and fresh potential.",
-            sentence: "The youth of today are creating inspiring solutions for global sustainability."
-        }
-    ];
+    // ── Emergency Offline Fallback (Only used if user has 0 internet on first load) ──
+    const EMERGENCY_WORD = {
+        word: "SPARK",
+        phonetic: "/spɑːrk/",
+        partOfSpeech: "noun / verb",
+        meaning: "A small fiery particle, or a vital quality that ignites enthusiasm, passion, or creative action.",
+        sentence: "Her uplifting speech ignited a creative spark in all of the students."
+    };
 
-    // ── Comprehensive 5-Letter English Pool (2,319 Words - 6.35+ Years Non-Repeating) ──
-    const WORD_POOL = ["ABACK","ABASE","ABATE","ABBEY","ABBOT","ABHOR","ABIDE","ABLED","ABODE","ABORT","ABOUT","ABOVE","ABUSE","ABYSS","ACORN","ACRID","ACTOR","ACUTE","ADAGE","ADAPT","ADEPT","ADMIN","ADMIT","ADOBE","ADOPT","ADORE","ADORN","ADULT","AFFIX","AFIRE","AFOOT","AFOUL","AFTER","AGAIN","AGAPE","AGATE","AGENT","AGILE","AGING","AGLOW","AGONY","AGORA","AGREE","AHEAD","AIDER","AISLE","ALARM","ALBUM","ALERT","ALGAE","ALIBI","ALIEN","ALIGN","ALIKE","ALIVE","ALLAY","ALLEY","ALLOT","ALLOW","ALLOY","ALOFT","ALONE","ALONG","ALOOF","ALOUD","ALPHA","ALTAR","ALTER","AMASS","AMAZE","AMBER","AMBLE","AMEND","AMISS","AMITY","AMONG","AMPLE","AMPLY","AMUSE","ANGEL","ANGER","ANGLE","ANGRY","ANGST","ANIME","ANKLE","ANNEX","ANNOY","ANNUL","ANODE","ANTIC","ANVIL","AORTA","APART","APHID","APING","APNEA","APPLE","APPLY","APRON","APTLY","ARBOR","ARDOR","ARENA","ARGUE","ARISE","ARMOR","AROMA","AROSE","ARRAY","ARROW","ARSON","ARTSY","ASCOT","ASHEN","ASIDE","ASKEW","ASSAY","ASSET","ATOLL","ATONE","ATTIC","AUDIO","AUDIT","AUGUR","AUNTY","AVAIL","AVERT","AVIAN","AVOID","AWAIT","AWAKE","AWARD","AWARE","AWASH","AWFUL","AWOKE","AXIAL","AXIOM","AXION","AZURE","BACON","BADGE","BADLY","BAGEL","BAGGY","BAKER","BALER","BALMY","BANAL","BANJO","BARGE","BARON","BASAL","BASIC","BASIL","BASIN","BASIS","BASTE","BATCH","BATHE","BATON","BATTY","BAWDY","BAYOU","BEACH","BEADY","BEARD","BEAST","BEECH","BEEFY","BEFIT","BEGAN","BEGAT","BEGET","BEGIN","BEGUN","BEING","BELCH","BELIE","BELLE","BELLY","BELOW","BENCH","BERET","BERRY","BERTH","BESET","BETEL","BEVEL","BEZEL","BIBLE","BICEP","BIDDY","BIGOT","BILGE","BILLY","BINGE","BINGO","BIOME","BIRCH","BIRTH","BISON","BITTY","BLACK","BLADE","BLAME","BLAND","BLANK","BLARE","BLAST","BLAZE","BLEAK","BLEAT","BLEED","BLEEP","BLEND","BLESS","BLIMP","BLIND","BLINK","BLISS","BLITZ","BLOAT","BLOCK","BLOKE","BLOND","BLOOD","BLOOM","BLOWN","BLUER","BLUFF","BLUNT","BLURB","BLURT","BLUSH","BOARD","BOAST","BOBBY","BONEY","BONGO","BONUS","BOOBY","BOOST","BOOTH","BOOTY","BOOZE","BOOZY","BORAX","BORNE","BOSOM","BOSSY","BOTCH","BOUGH","BOULE","BOUND","BOWEL","BOXER","BRACE","BRAID","BRAIN","BRAKE","BRAND","BRASH","BRASS","BRAVE","BRAVO","BRAWL","BRAWN","BREAD","BREAK","BREED","BRIAR","BRIBE","BRICK","BRIDE","BRIEF","BRINE","BRING","BRINK","BRINY","BRISK","BROAD","BROIL","BROKE","BROOD","BROOK","BROOM","BROTH","BROWN","BRUNT","BRUSH","BRUTE","BUDDY","BUDGE","BUGGY","BUGLE","BUILD","BUILT","BULGE","BULKY","BULLY","BUNCH","BUNNY","BURLY","BURNT","BURST","BUSED","BUSHY","BUTCH","BUTTE","BUXOM","BUYER","BYLAW","CABAL","CABBY","CABIN","CABLE","CACAO","CACHE","CACTI","CADDY","CADET","CAGEY","CAIRN","CAMEL","CAMEO","CANAL","CANDY","CANNY","CANOE","CANON","CAPER","CAPUT","CARAT","CARGO","CAROL","CARRY","CARVE","CASTE","CATCH","CATER","CATTY","CAULK","CAUSE","CAVIL","CEASE","CEDAR","CELLO","CHAFE","CHAFF","CHAIN","CHAIR","CHALK","CHAMP","CHANT","CHAOS","CHARD","CHARM","CHART","CHASE","CHASM","CHEAP","CHEAT","CHECK","CHEEK","CHEER","CHESS","CHEST","CHICK","CHIDE","CHIEF","CHILD","CHILI","CHILL","CHIME","CHINA","CHIRP","CHOCK","CHOIR","CHOKE","CHORD","CHORE","CHOSE","CHUCK","CHUMP","CHUNK","CHURN","CHUTE","CIDER","CIGAR","CINCH","CIRCA","CIVIC","CIVIL","CLACK","CLAIM","CLAMP","CLANG","CLANK","CLASH","CLASP","CLASS","CLEAN","CLEAR","CLEAT","CLEFT","CLERK","CLICK","CLIFF","CLIMB","CLING","CLINK","CLOAK","CLOCK","CLONE","CLOSE","CLOTH","CLOUD","CLOUT","CLOVE","CLOWN","CLUCK","CLUED","CLUMP","CLUNG","COACH","COAST","COBRA","COCOA","COLON","COLOR","COMET","COMFY","COMIC","COMMA","CONCH","CONDO","CONIC","COPSE","CORAL","CORER","CORNY","COUCH","COUGH","COULD","COUNT","COUPE","COURT","COVEN","COVER","COVET","COVEY","COWER","COYLY","CRACK","CRAFT","CRAMP","CRANE","CRANK","CRASH","CRASS","CRATE","CRAVE","CRAWL","CRAZE","CRAZY","CREAK","CREAM","CREDO","CREED","CREEK","CREEP","CREME","CREPE","CREPT","CRESS","CREST","CRICK","CRIED","CRIER","CRIME","CRIMP","CRISP","CROAK","CROCK","CRONE","CRONY","CROOK","CROSS","CROUP","CROWD","CROWN","CRUDE","CRUEL","CRUMB","CRUMP","CRUSH","CRUST","CRYPT","CUBIC","CUMIN","CURIO","CURLY","CURRY","CURSE","CURVE","CURVY","CUTIE","CYBER","CYCLE","CYNIC","DADDY","DAILY","DAIRY","DAISY","DALLY","DANCE","DANDY","DATUM","DAUNT","DEALT","DEATH","DEBAR","DEBIT","DEBUG","DEBUT","DECAL","DECAY","DECOR","DECOY","DECRY","DEFER","DEIGN","DEITY","DELAY","DELTA","DELVE","DEMON","DEMUR","DENIM","DENSE","DEPOT","DEPTH","DERBY","DETER","DETOX","DEUCE","DEVIL","DIARY","DICEY","DIGIT","DILLY","DIMLY","DINER","DINGO","DINGY","DIODE","DIRGE","DIRTY","DISCO","DITCH","DITTO","DITTY","DIVER","DIZZY","DODGE","DODGY","DOGMA","DOING","DOLLY","DONOR","DONUT","DOPEY","DOUBT","DOUGH","DOWDY","DOWEL","DOWNY","DOWRY","DOZEN","DRAFT","DRAIN","DRAKE","DRAMA","DRANK","DRAPE","DRAWL","DRAWN","DREAD","DREAM","DRESS","DRIED","DRIER","DRIFT","DRILL","DRINK","DRIVE","DROIT","DROLL","DRONE","DROOL","DROOP","DROSS","DROVE","DROWN","DRUID","DRUNK","DRYER","DRYLY","DUCHY","DULLY","DUMMY","DUMPY","DUNCE","DUSKY","DUSTY","DUTCH","DUVET","DWARF","DWELL","DWELT","DYING","EAGER","EAGLE","EARLY","EARTH","EASEL","EATEN","EATER","EBONY","ECLAT","EDICT","EDIFY","EERIE","EGRET","EIGHT","EJECT","EKING","ELATE","ELBOW","ELDER","ELECT","ELEGY","ELFIN","ELIDE","ELITE","ELOPE","ELUDE","EMAIL","EMBED","EMBER","EMCEE","EMPTY","ENACT","ENDOW","ENEMA","ENEMY","ENJOY","ENNUI","ENSUE","ENTER","ENTRY","ENVOY","EPOCH","EPOXY","EQUAL","EQUIP","ERASE","ERECT","ERODE","ERROR","ERUPT","ESSAY","ESTER","ETHER","ETHIC","ETHOS","ETUDE","EVADE","EVENT","EVERY","EVICT","EVOKE","EXACT","EXALT","EXCEL","EXERT","EXILE","EXIST","EXPEL","EXTOL","EXTRA","EXULT","EYING","FABLE","FACET","FAINT","FAIRY","FAITH","FALSE","FANCY","FANNY","FARCE","FATAL","FATTY","FAULT","FAUNA","FAVOR","FEAST","FECAL","FEIGN","FELLA","FELON","FEMME","FEMUR","FENCE","FERAL","FERRY","FETAL","FETCH","FETID","FETUS","FEVER","FEWER","FIBER","FIBRE","FICUS","FIELD","FIEND","FIERY","FIFTH","FIFTY","FIGHT","FILER","FILET","FILLY","FILMY","FILTH","FINAL","FINCH","FINER","FIRST","FISHY","FIXER","FIZZY","FJORD","FLACK","FLAIL","FLAIR","FLAKE","FLAKY","FLAME","FLANK","FLARE","FLASH","FLASK","FLECK","FLEET","FLESH","FLICK","FLIER","FLING","FLINT","FLIRT","FLOAT","FLOCK","FLOOD","FLOOR","FLORA","FLOSS","FLOUR","FLOUT","FLOWN","FLUFF","FLUID","FLUKE","FLUME","FLUNG","FLUNK","FLUSH","FLUTE","FLYER","FOAMY","FOCAL","FOCUS","FOGGY","FOIST","FOLIO","FOLLY","FORAY","FORCE","FORGE","FORGO","FORTE","FORTH","FORTY","FORUM","FOUND","FOYER","FRAIL","FRAME","FRANK","FRAUD","FREAK","FREED","FREER","FRESH","FRIAR","FRIED","FRILL","FRISK","FRITZ","FROCK","FROND","FRONT","FROST","FROTH","FROWN","FROZE","FRUIT","FUDGE","FUGUE","FULLY","FUNGI","FUNKY","FUNNY","FUROR","FURRY","FUSSY","FUZZY","GAFFE","GAILY","GAMER","GAMMA","GAMUT","GASSY","GAUDY","GAUGE","GAUNT","GAUZE","GAVEL","GAWKY","GAYER","GAYLY","GAZER","GECKO","GEEKY","GEESE","GENIE","GENRE","GHOST","GHOUL","GIANT","GIDDY","GIPSY","GIRLY","GIRTH","GIVEN","GIVER","GLADE","GLAND","GLARE","GLASS","GLAZE","GLEAM","GLEAN","GLIDE","GLINT","GLOAT","GLOBE","GLOOM","GLORY","GLOSS","GLOVE","GLYPH","GNASH","GNOME","GODLY","GOING","GOLEM","GOLLY","GONAD","GONER","GOODY","GOOEY","GOOFY","GOOSE","GORGE","GOUGE","GOURD","GRACE","GRADE","GRAFT","GRAIL","GRAIN","GRAND","GRANT","GRAPE","GRAPH","GRASP","GRASS","GRATE","GRAVE","GRAVY","GRAZE","GREAT","GREED","GREEN","GREET","GRIEF","GRILL","GRIME","GRIMY","GRIND","GRIPE","GROAN","GROIN","GROOM","GROPE","GROSS","GROUP","GROUT","GROVE","GROWL","GROWN","GRUEL","GRUFF","GRUNT","GUARD","GUAVA","GUESS","GUEST","GUIDE","GUILD","GUILE","GUILT","GUISE","GULCH","GULLY","GUMBO","GUMMY","GUPPY","GUSTO","GUSTY","GYPSY","HABIT","HAIRY","HALVE","HANDY","HAPPY","HARDY","HAREM","HARPY","HARRY","HARSH","HASTE","HASTY","HATCH","HATER","HAUNT","HAUTE","HAVEN","HAVOC","HAZEL","HEADY","HEARD","HEART","HEATH","HEAVE","HEAVY","HEDGE","HEFTY","HEIST","HELIX","HELLO","HENCE","HERON","HILLY","HINGE","HIPPO","HIPPY","HITCH","HOARD","HOBBY","HOIST","HOLLY","HOMER","HONEY","HONOR","HORDE","HORNY","HORSE","HOTEL","HOTLY","HOUND","HOUSE","HOVEL","HOVER","HOWDY","HUMAN","HUMID","HUMOR","HUMPH","HUMUS","HUNCH","HUNKY","HURRY","HUSKY","HUSSY","HUTCH","HYDRO","HYENA","HYMEN","HYPER","ICILY","ICING","IDEAL","IDIOM","IDIOT","IDLER","IDYLL","IGLOO","ILIAC","IMAGE","IMBUE","IMPEL","IMPLY","INANE","INBOX","INCUR","INDEX","INEPT","INERT","INFER","INGOT","INLAY","INLET","INNER","INPUT","INTER","INTRO","IONIC","IRATE","IRONY","ISLET","ISSUE","ITCHY","IVORY","JAUNT","JAZZY","JELLY","JERKY","JETTY","JEWEL","JIFFY","JOINT","JOIST","JOKER","JOLLY","JOUST","JUDGE","JUICE","JUICY","JUMBO","JUMPY","JUNTA","JUNTO","JUROR","KAPPA","KARMA","KAYAK","KEBAB","KHAKI","KINKY","KIOSK","KITTY","KNACK","KNAVE","KNEAD","KNEED","KNEEL","KNELT","KNIFE","KNOCK","KNOLL","KNOWN","KOALA","KRILL","KUDOS","LABEL","LABOR","LADEN","LADLE","LAGER","LANCE","LANKY","LAPEL","LAPSE","LARGE","LARVA","LASSO","LATCH","LATER","LATHE","LATTE","LAUGH","LAYER","LEACH","LEAFY","LEAKY","LEANT","LEAPT","LEARN","LEASE","LEASH","LEAST","LEAVE","LEDGE","LEECH","LEERY","LEFTY","LEGAL","LEGGY","LEMON","LEMUR","LEPER","LEVEL","LEVER","LIBEL","LIEGE","LIGHT","LIKEN","LILAC","LIMBO","LIMIT","LINEN","LINER","LINGO","LIPID","LITHE","LIVER","LIVID","LLAMA","LOAMY","LOATH","LOBBY","LOCAL","LOCUS","LODGE","LOFTY","LOGIC","LOGIN","LOOPY","LOOSE","LORRY","LOSER","LOUSE","LOUSY","LOVER","LOWER","LOWLY","LOYAL","LUCID","LUCKY","LUMEN","LUMPY","LUNAR","LUNCH","LUNGE","LUPUS","LURCH","LURID","LUSTY","LYING","LYMPH","LYNCH","LYRIC","MACAW","MACHO","MACRO","MADAM","MADLY","MAFIA","MAGIC","MAGMA","MAIZE","MAJOR","MAKER","MAMBO","MAMMA","MAMMY","MANGA","MANGE","MANGO","MANGY","MANIA","MANIC","MANLY","MANOR","MAPLE","MARCH","MARRY","MARSH","MASON","MASSE","MATCH","MATEY","MAUVE","MAXIM","MAYBE","MAYOR","MEALY","MEANT","MEATY","MECCA","MEDAL","MEDIA","MEDIC","MELEE","MELON","MERCY","MERGE","MERIT","MERRY","METAL","METER","METRO","MICRO","MIDGE","MIDST","MIGHT","MILKY","MIMIC","MINCE","MINER","MINIM","MINOR","MINTY","MINUS","MIRTH","MISER","MISSY","MOCHA","MODAL","MODEL","MODEM","MOGUL","MOIST","MOLAR","MOLDY","MONEY","MONTH","MOODY","MOOSE","MORAL","MORON","MORPH","MOSSY","MOTEL","MOTIF","MOTOR","MOTTO","MOULT","MOUND","MOUNT","MOURN","MOUSE","MOUTH","MOVER","MOVIE","MOWER","MUCKY","MUCUS","MUDDY","MULCH","MUMMY","MUNCH","MURAL","MURKY","MUSHY","MUSIC","MUSKY","MUSTY","MYRRH","NADIR","NAIVE","NANNY","NASAL","NASTY","NATAL","NAVAL","NAVEL","NEEDY","NEIGH","NERDY","NERVE","NEVER","NEWER","NEWLY","NEXUS","NICER","NICHE","NIECE","NIFTY","NIGHT","NINJA","NINNY","NINTH","NOBLE","NOBLY","NOISE","NOISY","NOMAD","NOOSE","NORTH","NOSEY","NOTCH","NOVEL","NUDGE","NURSE","NUTTY","NYLON","NYMPH","OAKEN","OASIS","OBESE","OCCUR","OCEAN","OCTAL","OCTET","ODDER","ODDLY","OFFAL","OFFER","OFTEN","OLDEN","OLDER","OLIVE","OMBRE","OMEGA","ONION","ONSET","OPERA","OPINE","OPIUM","OPTIC","ORBIT","ORDER","ORGAN","OTHER","OTTER","OUGHT","OUNCE","OUTDO","OUTER","OUTGO","OVARY","OVATE","OVERT","OVINE","OVOID","OWING","OWNER","OXIDE","OZONE","PADDY","PAGAN","PAINT","PALER","PALSY","PANEL","PANIC","PANSY","PAPAL","PAPER","PARER","PARKA","PARRY","PARSE","PARTY","PASTA","PASTE","PASTY","PATCH","PATIO","PATSY","PATTY","PAUSE","PAYEE","PAYER","PEACE","PEACH","PEARL","PECAN","PEDAL","PENAL","PENCE","PENNE","PENNY","PERCH","PERIL","PERKY","PESKY","PESTO","PETAL","PETTY","PHASE","PHONE","PHONY","PHOTO","PIANO","PICKY","PIECE","PIETY","PIGGY","PILOT","PINCH","PINEY","PINKY","PINTO","PIPER","PIQUE","PITCH","PITHY","PIVOT","PIXEL","PIXIE","PIZZA","PLACE","PLAID","PLAIN","PLAIT","PLANE","PLANK","PLANT","PLATE","PLAZA","PLEAD","PLEAT","PLIED","PLIER","PLUCK","PLUMB","PLUME","PLUMP","PLUNK","PLUSH","POESY","POINT","POISE","POKER","POLAR","POLKA","POLYP","POOCH","POPPY","PORCH","POSER","POSIT","POSSE","POUCH","POUND","POUTY","POWER","PRANK","PRAWN","PREEN","PRESS","PRICE","PRICK","PRIDE","PRIED","PRIME","PRIMO","PRINT","PRIOR","PRISM","PRIVY","PRIZE","PROBE","PRONE","PRONG","PROOF","PROSE","PROUD","PROVE","PROWL","PROXY","PRUDE","PRUNE","PSALM","PUBIC","PUDGY","PUFFY","PULPY","PULSE","PUNCH","PUPAL","PUPIL","PUPPY","PUREE","PURER","PURGE","PURSE","PUSHY","PUTTY","PYGMY","QUACK","QUAIL","QUAKE","QUALM","QUARK","QUART","QUASH","QUASI","QUEEN","QUEER","QUELL","QUERY","QUEST","QUEUE","QUICK","QUIET","QUILL","QUILT","QUIRK","QUITE","QUOTA","QUOTE","QUOTH","RABBI","RABID","RACER","RADAR","RADII","RADIO","RAINY","RAISE","RAJAH","RALLY","RALPH","RAMEN","RANCH","RANDY","RANGE","RAPID","RARER","RASPY","RATIO","RATTY","RAVEN","RAYON","RAZOR","REACH","REACT","READY","REALM","REARM","REBAR","REBEL","REBUS","REBUT","RECAP","RECUR","RECUT","REEDY","REFER","REFIT","REGAL","REHAB","REIGN","RELAX","RELAY","RELIC","REMIT","RENAL","RENEW","REPAY","REPEL","REPLY","RERUN","RESET","RESIN","RETCH","RETRO","RETRY","REUSE","REVEL","REVUE","RHINO","RHYME","RIDER","RIDGE","RIFLE","RIGHT","RIGID","RIGOR","RINSE","RIPEN","RIPER","RISEN","RISER","RISKY","RIVAL","RIVER","RIVET","ROACH","ROAST","ROBIN","ROBOT","ROCKY","RODEO","ROGER","ROGUE","ROOMY","ROOST","ROTOR","ROUGE","ROUGH","ROUND","ROUSE","ROUTE","ROVER","ROWDY","ROWER","ROYAL","RUDDY","RUDER","RUGBY","RULER","RUMBA","RUMOR","RUPEE","RURAL","RUSTY","SADLY","SAFER","SAINT","SALAD","SALLY","SALON","SALSA","SALTY","SALVE","SALVO","SANDY","SANER","SAPPY","SASSY","SATIN","SATYR","SAUCE","SAUCY","SAUNA","SAUTE","SAVOR","SAVOY","SAVVY","SCALD","SCALE","SCALP","SCALY","SCAMP","SCANT","SCARE","SCARF","SCARY","SCENE","SCENT","SCION","SCOFF","SCOLD","SCONE","SCOOP","SCOPE","SCORE","SCORN","SCOUR","SCOUT","SCOWL","SCRAM","SCRAP","SCREE","SCREW","SCRUB","SCRUM","SCUBA","SEDAN","SEEDY","SEGUE","SEIZE","SEMEN","SENSE","SEPIA","SERIF","SERUM","SERVE","SETUP","SEVEN","SEVER","SEWER","SHACK","SHADE","SHADY","SHAFT","SHAKE","SHAKY","SHALE","SHALL","SHALT","SHAME","SHANK","SHAPE","SHARD","SHARE","SHARK","SHARP","SHAVE","SHAWL","SHEAR","SHEEN","SHEEP","SHEER","SHEET","SHEIK","SHELF","SHELL","SHIED","SHIFT","SHINE","SHINY","SHIRE","SHIRK","SHIRT","SHOAL","SHOCK","SHONE","SHOOK","SHOOT","SHORE","SHORN","SHORT","SHOUT","SHOVE","SHOWN","SHOWY","SHREW","SHRUB","SHRUG","SHUCK","SHUNT","SHUSH","SHYLY","SIEGE","SIEVE","SIGHT","SIGMA","SILKY","SILLY","SINCE","SINEW","SINGE","SIREN","SISSY","SIXTH","SIXTY","SKATE","SKIER","SKIFF","SKILL","SKIMP","SKIRT","SKULK","SKULL","SKUNK","SLACK","SLAIN","SLANG","SLANT","SLASH","SLATE","SLAVE","SLEEK","SLEEP","SLEET","SLEPT","SLICE","SLICK","SLIDE","SLIME","SLIMY","SLING","SLINK","SLOOP","SLOPE","SLOSH","SLOTH","SLUMP","SLUNG","SLUNK","SLURP","SLUSH","SLYLY","SMACK","SMALL","SMART","SMASH","SMEAR","SMELL","SMELT","SMILE","SMIRK","SMITE","SMITH","SMOCK","SMOKE","SMOKY","SMOTE","SNACK","SNAIL","SNAKE","SNAKY","SNARE","SNARL","SNEAK","SNEER","SNIDE","SNIFF","SNIPE","SNOOP","SNORE","SNORT","SNOUT","SNOWY","SNUCK","SNUFF","SOAPY","SOBER","SOGGY","SOLAR","SOLID","SOLVE","SONAR","SONIC","SOOTH","SOOTY","SORRY","SOUND","SOUTH","SOWER","SPACE","SPADE","SPANK","SPARE","SPARK","SPASM","SPAWN","SPEAK","SPEAR","SPECK","SPEED","SPELL","SPELT","SPEND","SPENT","SPERM","SPICE","SPICY","SPIED","SPIEL","SPIKE","SPIKY","SPILL","SPILT","SPINE","SPINY","SPIRE","SPITE","SPLAT","SPLIT","SPOIL","SPOKE","SPOOF","SPOOK","SPOOL","SPOON","SPORE","SPORT","SPOUT","SPRAY","SPREE","SPRIG","SPUNK","SPURN","SPURT","SQUAD","SQUAT","SQUIB","STACK","STAFF","STAGE","STAID","STAIN","STAIR","STAKE","STALE","STALK","STALL","STAMP","STAND","STANK","STARE","STARK","START","STASH","STATE","STAVE","STEAD","STEAK","STEAL","STEAM","STEED","STEEL","STEEP","STEER","STEIN","STERN","STICK","STIFF","STILL","STILT","STING","STINK","STINT","STOCK","STOIC","STOKE","STOLE","STOMP","STONE","STONY","STOOD","STOOL","STOOP","STORE","STORK","STORM","STORY","STOUT","STOVE","STRAP","STRAW","STRAY","STRIP","STRUT","STUCK","STUDY","STUFF","STUMP","STUNG","STUNK","STUNT","STYLE","SUAVE","SUGAR","SUING","SUITE","SULKY","SULLY","SUMAC","SUNNY","SUPER","SURER","SURGE","SURLY","SUSHI","SWAMI","SWAMP","SWARM","SWASH","SWATH","SWEAR","SWEAT","SWEEP","SWEET","SWELL","SWEPT","SWIFT","SWILL","SWINE","SWING","SWIRL","SWISH","SWOON","SWOOP","SWORD","SWORE","SWORN","SWUNG","SYNOD","SYRUP","TABBY","TABLE","TABOO","TACIT","TACKY","TAFFY","TAINT","TAKEN","TAKER","TALLY","TALON","TAMER","TANGO","TANGY","TAPER","TAPIR","TARDY","TAROT","TASTE","TASTY","TATTY","TAUNT","TAWNY","TEACH","TEARY","TEASE","TEDDY","TEETH","TEMPO","TENET","TENOR","TENSE","TENTH","TEPEE","TEPID","TERRA","TERSE","TESTY","THANK","THEFT","THEIR","THEME","THERE","THESE","THETA","THICK","THIEF","THIGH","THING","THINK","THIRD","THONG","THORN","THOSE","THREE","THREW","THROB","THROW","THRUM","THUMB","THUMP","THYME","TIARA","TIBIA","TIDAL","TIGER","TIGHT","TILDE","TIMER","TIMID","TIPSY","TITAN","TITHE","TITLE","TOAST","TODAY","TODDY","TOKEN","TONAL","TONGA","TONIC","TOOTH","TOPAZ","TOPIC","TORCH","TORSO","TORUS","TOTAL","TOTEM","TOUCH","TOUGH","TOWEL","TOWER","TOXIC","TOXIN","TRACE","TRACK","TRACT","TRADE","TRAIL","TRAIN","TRAIT","TRAMP","TRASH","TRAWL","TREAD","TREAT","TREND","TRIAD","TRIAL","TRIBE","TRICE","TRICK","TRIED","TRIPE","TRITE","TROLL","TROOP","TROPE","TROUT","TROVE","TRUCE","TRUCK","TRUER","TRULY","TRUMP","TRUNK","TRUSS","TRUST","TRUTH","TRYST","TUBAL","TUBER","TULIP","TULLE","TUMOR","TUNIC","TURBO","TUTOR","TWANG","TWEAK","TWEED","TWEET","TWICE","TWINE","TWIRL","TWIST","TWIXT","TYING","UDDER","ULCER","ULTRA","UMBRA","UNCLE","UNCUT","UNDER","UNDID","UNDUE","UNFED","UNFIT","UNIFY","UNION","UNITE","UNITY","UNLIT","UNMET","UNSET","UNTIE","UNTIL","UNWED","UNZIP","UPPER","UPSET","URBAN","URINE","USAGE","USHER","USING","USUAL","USURP","UTILE","UTTER","VAGUE","VALET","VALID","VALOR","VALUE","VALVE","VAPID","VAPOR","VAULT","VAUNT","VEGAN","VENOM","VENUE","VERGE","VERSE","VERSO","VERVE","VICAR","VIDEO","VIGIL","VIGOR","VILLA","VINYL","VIOLA","VIPER","VIRAL","VIRUS","VISIT","VISOR","VISTA","VITAL","VIVID","VIXEN","VOCAL","VODKA","VOGUE","VOICE","VOILA","VOMIT","VOTER","VOUCH","VOWEL","VYING","WACKY","WAFER","WAGER","WAGON","WAIST","WAIVE","WALTZ","WARTY","WASTE","WATCH","WATER","WAVER","WAXEN","WEARY","WEAVE","WEDGE","WEEDY","WEIGH","WEIRD","WELCH","WELSH","WENCH","WHACK","WHALE","WHARF","WHEAT","WHEEL","WHELP","WHERE","WHICH","WHIFF","WHILE","WHINE","WHINY","WHIRL","WHISK","WHITE","WHOLE","WHOOP","WHOSE","WIDEN","WIDER","WIDOW","WIDTH","WIELD","WIGHT","WILLY","WIMPY","WINCE","WINCH","WINDY","WISER","WISPY","WITCH","WITTY","WOKEN","WOMAN","WOMEN","WOODY","WOOER","WOOLY","WOOZY","WORDY","WORLD","WORRY","WORSE","WORST","WORTH","WOULD","WOUND","WOVEN","WRACK","WRATH","WREAK","WRECK","WREST","WRING","WRIST","WRITE","WRONG","WROTE","WRUNG","WRYLY","YACHT","YEARN","YEAST","YIELD","YOUNG","YOUTH","ZEBRA","ZESTY","ZONAL"];
-
-    // ── Wordle State ─────────────────────────────────────────────
+    // ── Wordle Constants & State ─────────────────────────────────
     const MAX_ROWS = 6;
     const WORD_LENGTH = 5;
 
     let currentTargetWordObj = null;
     let currentTargetWord = "";
-    let guesses = []; // array of strings (5 letters each)
-    let evaluations = []; // array of 5 status strings ('correct', 'present', 'absent')
+    let guesses = []; // array of 5-letter strings
+    let evaluations = []; // array of status arrays ('correct', 'present', 'absent')
     let currentRow = 0;
     let currentTileIndex = 0;
     let isGameOver = false;
     let isWon = false;
     let isRevealing = false;
+    let isValidating = false;
+    let isFetchingWord = false;
     let onProceedCallback = null;
     let onBackCallback = null;
     let activePlayerName = "Teacher Ash";
     let activePlayerImage = "ashhead.png";
 
-    // Elements
+    // In-memory caches for fast lookup
+    const validWordCache = new Map();
+    const wordDetailsCache = new Map();
+
+    // DOM Elements
     let screenWordleEl = null;
     let wordleGridEl = null;
     let wordleKeyboardEl = null;
@@ -1180,205 +55,24 @@
     let wordleWordTagEl = null;
     let wordleRevealedMeaningEl = null;
     let wordleRevealedSentenceEl = null;
+    let btnWordleProceedEl = null;
     let btnAudioWordEl = null;
     let btnAudioMeaningEl = null;
     let btnAudioSentenceEl = null;
-    let btnWordleProceedEl = null;
-    let wordleDatePillEl = null;
     let btnWordleRandomWordEl = null;
     let btnWordleBackEl = null;
     let btnWordleSkipEl = null;
+    let wordleDatePillEl = null;
 
-    // Key status tracking (letter -> 'correct' | 'present' | 'absent')
+    // Track on-screen keyboard key statuses ('correct', 'present', 'absent')
     const keyStatuses = {};
 
-    // ── Daily Deterministic Word Generator ───────────────────────
+    // ── Date Formatting & Daily Key ──────────────────────────────
     function getTodayDateKey(date = new Date()) {
         const y = date.getFullYear();
         const m = String(date.getMonth() + 1).padStart(2, "0");
         const d = String(date.getDate()).padStart(2, "0");
         return `${y}-${m}-${d}`;
-    }
-
-    // ── Dynamic Dictionary Cache & Online Resolver ──────────────
-    const definitionCache = new Map();
-
-    // Pre-populate cache with rich curated definitions
-    WORD_CATALOG.forEach((item) => {
-        definitionCache.set(item.word.toUpperCase(), item);
-    });
-
-    async function resolveWordDefinition(rawWord) {
-        if (!rawWord) return null;
-        const word = rawWord.toUpperCase();
-        if (definitionCache.has(word)) {
-            return definitionCache.get(word);
-        }
-
-        // 1. Try Free Dictionary API
-        try {
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 2200);
-
-            const resp = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${word.toLowerCase()}`, {
-                signal: controller.signal
-            });
-            clearTimeout(timeoutId);
-
-            if (resp.ok) {
-                const data = await resp.json();
-                if (Array.isArray(data) && data.length > 0) {
-                    const entry = data[0];
-                    let phonetic = entry.phonetic || (entry.phonetics && entry.phonetics.find(p => p.text)?.text) || `/${word.toLowerCase()}/`;
-                    let partOfSpeech = "word";
-                    let meaning = "";
-                    let sentence = "";
-
-                    if (entry.meanings && entry.meanings.length > 0) {
-                        for (const m of entry.meanings) {
-                            if (m.partOfSpeech && partOfSpeech === "word") {
-                                partOfSpeech = m.partOfSpeech;
-                            }
-                            for (const d of m.definitions) {
-                                if (!meaning && d.definition) meaning = d.definition;
-                                if (d.example) {
-                                    sentence = d.example;
-                                    break;
-                                }
-                            }
-                            if (sentence) break;
-                        }
-                    }
-
-                    if (!meaning) {
-                        meaning = `A recognized 5-letter English word expressing or referring to "${word.toLowerCase()}".`;
-                    }
-                    if (!sentence) {
-                        sentence = `The word "${word.toLowerCase()}" is widely used in everyday English speech and literature.`;
-                    }
-
-                    meaning = meaning.trim();
-                    if (!meaning.endsWith(".")) meaning += ".";
-                    sentence = sentence.trim();
-                    if (!sentence.endsWith(".")) sentence += ".";
-
-                    const resolvedObj = {
-                        word,
-                        phonetic,
-                        partOfSpeech,
-                        meaning,
-                        sentence
-                    };
-                    definitionCache.set(word, resolvedObj);
-                    return resolvedObj;
-                }
-            }
-        } catch (err) {
-            // API timeout or network offline
-        }
-
-        // 2. Try Wiktionary as secondary linguistic source
-        try {
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 1800);
-            const resp = await fetch(`https://en.wiktionary.org/api/rest_v1/page/definition/${word.toLowerCase()}`, {
-                signal: controller.signal,
-                headers: { "User-Agent": "MaoThink-Game/1.0" }
-            });
-            clearTimeout(timeoutId);
-
-            if (resp.ok) {
-                const data = await resp.json();
-                if (data.en && data.en.length > 0) {
-                    const pos = data.en[0].partOfSpeech || "noun";
-                    let rawDef = "";
-                    for (const sec of data.en) {
-                        for (const item of sec.definitions) {
-                            const clean = (item.definition || "").replace(/<[^>]+>/g, "").trim();
-                            if (clean && !clean.startsWith("(") && clean.length > 10) {
-                                rawDef = clean;
-                                break;
-                            }
-                        }
-                        if (rawDef) break;
-                    }
-                    if (!rawDef && data.en[0].definitions && data.en[0].definitions[0]) {
-                        rawDef = (data.en[0].definitions[0].definition || "").replace(/<[^>]+>/g, "").trim();
-                    }
-
-                    if (rawDef) {
-                        if (!rawDef.endsWith(".")) rawDef += ".";
-                        const resolvedObj = {
-                            word,
-                            phonetic: `/${word.toLowerCase()}/`,
-                            partOfSpeech: pos.toLowerCase(),
-                            meaning: rawDef,
-                            sentence: `Practice using "${word.toLowerCase()}" in your conversations and writing.`
-                        };
-                        definitionCache.set(word, resolvedObj);
-                        return resolvedObj;
-                    }
-                }
-            }
-        } catch (wErr) {
-            // Network offline or failed
-        }
-
-        // 3. Smart contextual fallback (guarantees the victory popup & audio always work smoothly)
-        const fallback = {
-            word,
-            phonetic: `/${word.toLowerCase()}/`,
-            partOfSpeech: "noun / verb",
-            meaning: `A recognized 5-letter English word used in everyday speech, reading, and literature.`,
-            sentence: `Practice using "${word.toLowerCase()}" regularly to broaden and enrich your English vocabulary.`
-        };
-        definitionCache.set(word, fallback);
-        return fallback;
-    }
-
-    // ── Non-Repeating Permutation Formula (>6.35 Years Unique Words) ──
-    const POOL_MULTIPLIER = 1381; // Prime coprime to 2319
-    const POOL_OFFSET = 397;
-
-    function getDailyWordIndex(date = new Date()) {
-        const epoch = new Date(2024, 0, 1).getTime();
-        const current = new Date(date.getFullYear(), date.getMonth(), date.getDate()).getTime();
-        const dayDiff = Math.max(0, Math.floor((current - epoch) / 86400000));
-        return (dayDiff * POOL_MULTIPLIER + POOL_OFFSET) % WORD_POOL.length;
-    }
-
-    function getDailyWord(date = new Date()) {
-        const index = getDailyWordIndex(date);
-        const word = WORD_POOL[index];
-        if (definitionCache.has(word)) {
-            return Object.assign({}, definitionCache.get(word));
-        }
-        const initial = {
-            word,
-            phonetic: `/${word.toLowerCase()}/`,
-            partOfSpeech: "5-letter word",
-            meaning: "Loading definition...",
-            sentence: `The word "${word.toLowerCase()}" is today's mystery word.`
-        };
-        resolveWordDefinition(word);
-        return initial;
-    }
-
-    function getRandomWord() {
-        const index = Math.floor(Math.random() * WORD_POOL.length);
-        const word = WORD_POOL[index];
-        if (definitionCache.has(word)) {
-            return Object.assign({}, definitionCache.get(word));
-        }
-        const initial = {
-            word,
-            phonetic: `/${word.toLowerCase()}/`,
-            partOfSpeech: "5-letter word",
-            meaning: "Loading definition...",
-            sentence: `The word "${word.toLowerCase()}" is the mystery word.`
-        };
-        resolveWordDefinition(word);
-        return initial;
     }
 
     function formatDateFriendly(date = new Date()) {
@@ -1391,6 +85,268 @@
         } catch (e) {
             return getTodayDateKey(date);
         }
+    }
+
+    // ── First-Time Visitor Check for Skip Button ──────────────────
+    function updateSkipButtonVisibility() {
+        if (!btnWordleSkipEl) return;
+        const hasVisited = localStorage.getItem("mao_wordle_visited");
+        if (!hasVisited) {
+            // First time visiting: strictly hide the Skip to Quiz button
+            btnWordleSkipEl.style.display = "none";
+            btnWordleSkipEl.classList.add("hidden");
+        } else {
+            // Returning player: show Skip button
+            btnWordleSkipEl.style.display = "";
+            btnWordleSkipEl.classList.remove("hidden");
+        }
+    }
+
+    function markVisitorCompleted() {
+        try {
+            localStorage.setItem("mao_wordle_visited", "true");
+        } catch (e) {}
+        updateSkipButtonVisibility();
+    }
+
+    // ── Online API Definition Enrichment ─────────────────────────
+    async function enrichWordDetails(rawWord) {
+        const word = rawWord.toLowerCase().trim();
+        if (wordDetailsCache.has(word)) {
+            return wordDetailsCache.get(word);
+        }
+
+        let phonetic = `/${word}/`;
+        let partOfSpeech = "word";
+        let meaning = "";
+        let sentence = "";
+
+        // 1. Try Wiktionary API
+        try {
+            const res = await fetch(`https://en.wiktionary.org/api/rest_v1/page/definition/${word}`, {
+                headers: { "User-Agent": "MaoThink-Game/1.0" },
+                signal: AbortSignal.timeout(2400)
+            });
+            if (res.ok) {
+                const data = await res.json();
+                if (data.en && data.en.length > 0) {
+                    partOfSpeech = data.en[0].partOfSpeech || "noun";
+                    for (const sec of data.en) {
+                        for (const item of sec.definitions) {
+                            const clean = (item.definition || "").replace(/<[^>]+>/g, "").trim();
+                            if (clean && !clean.startsWith("(") && clean.length > 8) {
+                                meaning = clean;
+                                break;
+                            }
+                        }
+                        if (meaning) break;
+                    }
+                }
+            }
+        } catch (e) {}
+
+        // 2. Try Datamuse md=d if definition still empty
+        if (!meaning) {
+            try {
+                const res = await fetch(`https://api.datamuse.com/words?sp=${word}&md=d&max=1`, {
+                    signal: AbortSignal.timeout(2000)
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data.length > 0 && Array.isArray(data[0].defs) && data[0].defs.length > 0) {
+                        const raw = data[0].defs[0];
+                        const parts = raw.split("\t");
+                        if (parts.length > 1) {
+                            partOfSpeech = parts[0] === "n" ? "noun" : parts[0] === "v" ? "verb" : parts[0] === "adj" ? "adjective" : parts[0];
+                            meaning = parts[1].trim();
+                        } else {
+                            meaning = raw.trim();
+                        }
+                    }
+                }
+            } catch (e) {}
+        }
+
+        // 3. Try Free Dictionary API
+        if (!meaning) {
+            try {
+                const res = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${word}`, {
+                    signal: AbortSignal.timeout(2000)
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    if (Array.isArray(data) && data[0]) {
+                        if (data[0].phonetic) phonetic = data[0].phonetic;
+                        if (data[0].meanings && data[0].meanings[0]) {
+                            partOfSpeech = data[0].meanings[0].partOfSpeech || partOfSpeech;
+                            const defObj = data[0].meanings[0].definitions[0];
+                            if (defObj) {
+                                meaning = defObj.definition || "";
+                                if (defObj.example) sentence = defObj.example;
+                            }
+                        }
+                    }
+                }
+            } catch (e) {}
+        }
+
+        // Clean punctuation and supply natural sentence if missing
+        if (!meaning) {
+            meaning = `A recognized 5-letter English word expressing or referring to "${word}".`;
+        }
+        meaning = meaning.trim();
+        if (!meaning.endsWith(".")) meaning += ".";
+
+        if (!sentence) {
+            sentence = `The word "${word}" is frequently used in everyday English speech, reading, and literature.`;
+        }
+        sentence = sentence.trim();
+        if (!sentence.endsWith(".")) sentence += ".";
+
+        const detailsObj = {
+            word: word.toUpperCase(),
+            phonetic,
+            partOfSpeech: partOfSpeech.toLowerCase(),
+            meaning,
+            sentence
+        };
+
+        wordDetailsCache.set(word, detailsObj);
+        validWordCache.set(word, true);
+        return detailsObj;
+    }
+
+    // ── Fetch Mystery Word Directly from API ─────────────────────
+    async function fetchFreshWordFromAPI() {
+        let pickedWord = "";
+
+        // 1. Try Random Word API
+        try {
+            const res = await fetch("https://random-word-api.herokuapp.com/word?length=5", {
+                signal: AbortSignal.timeout(2800)
+            });
+            if (res.ok) {
+                const data = await res.json();
+                if (Array.isArray(data) && data[0] && data[0].length === 5) {
+                    pickedWord = data[0].toLowerCase().trim();
+                }
+            }
+        } catch (e) {}
+
+        // 2. Fallback to Datamuse API (100 random 5-letter words pool)
+        if (!pickedWord) {
+            try {
+                const letters = "abcdefghijklmnopqrstuvwxyz";
+                const randomLetter = letters[Math.floor(Math.random() * letters.length)];
+                const res = await fetch(`https://api.datamuse.com/words?sp=${randomLetter}????&max=100`, {
+                    signal: AbortSignal.timeout(2400)
+                });
+                if (res.ok) {
+                    const list = await res.json();
+                    const filtered = list.filter((item) => item.word && item.word.length === 5 && /^[a-z]+$/i.test(item.word));
+                    if (filtered.length > 0) {
+                        pickedWord = filtered[Math.floor(Math.random() * filtered.length)].word.toLowerCase().trim();
+                    }
+                }
+            } catch (e) {}
+        }
+
+        // Emergency offline fallback if no network response
+        if (!pickedWord) {
+            pickedWord = EMERGENCY_WORD.word.toLowerCase();
+        }
+
+        // Enrich with definition and sample sentence from API
+        return await enrichWordDetails(pickedWord);
+    }
+
+    // ── Daily Mystery Word (Changes Daily, Cached Per Date) ───────
+    async function getDailyMysteryWord() {
+        const todayKey = getTodayDateKey();
+        const storageKey = `mao_wordle_daily_${todayKey}`;
+
+        // Check if today's word was already fetched and stored
+        try {
+            const stored = localStorage.getItem(storageKey);
+            if (stored) {
+                const parsed = JSON.parse(stored);
+                if (parsed && parsed.word && parsed.word.length === 5) {
+                    return parsed;
+                }
+            }
+        } catch (e) {}
+
+        // Fetch fresh word directly from API
+        const newDailyWord = await fetchFreshWordFromAPI();
+        try {
+            localStorage.setItem(storageKey, JSON.stringify(newDailyWord));
+        } catch (e) {}
+        return newDailyWord;
+    }
+
+    // ── Word Validity Checker (API-Backed) ────────────────────────
+    async function isValidEnglishWord(rawGuess) {
+        const guess = rawGuess.toLowerCase().trim();
+        if (guess.length !== WORD_LENGTH) return false;
+
+        // If it matches the mystery word, it is guaranteed valid
+        if (currentTargetWord && guess === currentTargetWord.toLowerCase()) {
+            return true;
+        }
+
+        // Check local cache
+        if (validWordCache.has(guess)) {
+            return validWordCache.get(guess);
+        }
+
+        // 1. Check Datamuse dictionary API (with defs)
+        try {
+            const res = await fetch(`https://api.datamuse.com/words?sp=${guess}&md=d&max=1`, {
+                signal: AbortSignal.timeout(1800)
+            });
+            if (res.ok) {
+                const data = await res.json();
+                if (data.length > 0 && data[0].word.toLowerCase() === guess && Array.isArray(data[0].defs) && data[0].defs.length > 0) {
+                    validWordCache.set(guess, true);
+                    return true;
+                }
+            }
+        } catch (e) {}
+
+        // 2. Check Wiktionary API status
+        try {
+            const res = await fetch(`https://en.wiktionary.org/api/rest_v1/page/definition/${guess}`, {
+                headers: { "User-Agent": "MaoThink-Game/1.0" },
+                signal: AbortSignal.timeout(1800)
+            });
+            if (res.status === 200) {
+                validWordCache.set(guess, true);
+                return true;
+            }
+            if (res.status === 404) {
+                validWordCache.set(guess, false);
+                return false;
+            }
+        } catch (e) {}
+
+        // 3. Check Free Dictionary API status
+        try {
+            const res = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${guess}`, {
+                signal: AbortSignal.timeout(1800)
+            });
+            if (res.status === 200) {
+                validWordCache.set(guess, true);
+                return true;
+            }
+            if (res.status === 404) {
+                validWordCache.set(guess, false);
+                return false;
+            }
+        } catch (e) {}
+
+        // If APIs cannot confirm word exists, reject
+        validWordCache.set(guess, false);
+        return false;
     }
 
     // ── Wordle Guess Evaluation Logic (Exact NYT Wordle Rules) ───
@@ -1433,7 +389,6 @@
             return;
         }
 
-        // If already speaking from this button, stop
         if (buttonElement && buttonElement.classList.contains("speaking")) {
             window.speechSynthesis.cancel();
             buttonElement.classList.remove("speaking");
@@ -1466,7 +421,7 @@
         window.speechSynthesis.speak(utterance);
     }
 
-    // ── DOM Construction ─────────────────────────────────────────
+    // ── DOM Construction & References ────────────────────────────
     function initDOMReferences() {
         screenWordleEl = document.getElementById("screenWordle");
         wordleGridEl = document.getElementById("wordleGrid");
@@ -1480,14 +435,16 @@
         wordleWordTagEl = document.getElementById("wordleWordTag");
         wordleRevealedMeaningEl = document.getElementById("wordleRevealedMeaning");
         wordleRevealedSentenceEl = document.getElementById("wordleRevealedSentence");
+        btnWordleProceedEl = document.getElementById("btnWordleProceed");
         btnAudioWordEl = document.getElementById("btnAudioWord");
         btnAudioMeaningEl = document.getElementById("btnAudioMeaning");
         btnAudioSentenceEl = document.getElementById("btnAudioSentence");
-        btnWordleProceedEl = document.getElementById("btnWordleProceed");
-        wordleDatePillEl = document.getElementById("wordleDatePill");
         btnWordleRandomWordEl = document.getElementById("btnWordleRandomWord");
         btnWordleBackEl = document.getElementById("btnWordleBack");
         btnWordleSkipEl = document.getElementById("btnWordleSkip");
+        wordleDatePillEl = document.getElementById("wordleDatePill");
+
+        updateSkipButtonVisibility();
     }
 
     function renderGrid() {
@@ -1497,18 +454,16 @@
         for (let r = 0; r < MAX_ROWS; r++) {
             const rowEl = document.createElement("div");
             rowEl.className = "wordle-row";
-            rowEl.dataset.row = String(r);
+            rowEl.dataset.row = r;
 
             for (let c = 0; c < WORD_LENGTH; c++) {
                 const tileEl = document.createElement("div");
                 tileEl.className = "wordle-tile";
-                tileEl.dataset.row = String(r);
-                tileEl.dataset.col = String(c);
-                tileEl.setAttribute("aria-label", `Row ${r + 1}, Letter ${c + 1}`);
+                tileEl.dataset.row = r;
+                tileEl.dataset.col = c;
 
-                // If row has already been guessed, restore its letter and status
-                if (guesses[r]) {
-                    const letter = guesses[r][c] || "";
+                if (guesses[r] && guesses[r][c]) {
+                    const letter = guesses[r][c];
                     tileEl.textContent = letter;
                     if (evaluations[r] && evaluations[r][c]) {
                         tileEl.classList.add(`tile-${evaluations[r][c]}`);
@@ -1553,7 +508,6 @@
                     keyBtn.textContent = key;
                 }
 
-                // Apply saved status if any
                 if (keyStatuses[key]) {
                     keyBtn.classList.add(`key-${keyStatuses[key]}`);
                 }
@@ -1566,7 +520,7 @@
         });
     }
 
-    function showToast(message, duration = 1600) {
+    function showToast(message, duration = 2200) {
         if (!wordleToastEl) return;
         wordleToastEl.textContent = message;
         wordleToastEl.classList.remove("hidden");
@@ -1580,22 +534,23 @@
 
     function shakeCurrentRow() {
         const rowEl = wordleGridEl.querySelector(`.wordle-row[data-row="${currentRow}"]`);
-        if (rowEl) {
-            rowEl.classList.add("row-shake");
-            setTimeout(() => rowEl.classList.remove("row-shake"), 500);
-        }
+        if (!rowEl) return;
+        rowEl.classList.remove("row-shake");
+        void rowEl.offsetWidth; // re-flow
+        rowEl.classList.add("row-shake");
+        setTimeout(() => rowEl.classList.remove("row-shake"), 500);
     }
 
-    // ── User Input Handling ──────────────────────────────────────
+    // ── Input Handling & Guess Submission ────────────────────────
     function handleKeyInput(key) {
-        if (isGameOver || isRevealing) return;
+        if (isGameOver || isRevealing || isValidating) return;
 
         if (key === "ENTER") {
             submitGuess();
-        } else if (key === "BACKSPACE" || key === "DELETE") {
+        } else if (key === "BACKSPACE") {
             deleteLetter();
-        } else if (/^[A-Z]$/i.test(key)) {
-            addLetter(key.toUpperCase());
+        } else if (/^[A-Z]$/.test(key)) {
+            addLetter(key);
         }
     }
 
@@ -1629,10 +584,11 @@
         }
     }
 
-    function submitGuess() {
+    async function submitGuess() {
+        // 1. Must have 5 letters
         if (currentTileIndex < WORD_LENGTH) {
             shakeCurrentRow();
-            showToast("Please enter 5 letters");
+            showToast("Please enter 5 letters", 1600);
             return;
         }
 
@@ -1646,7 +602,19 @@
         }
         guess = guess.toUpperCase();
 
-        // Evaluate the guess against the mystery word
+        // 2. Validate word against API
+        isValidating = true;
+        const isValid = await isValidEnglishWord(guess);
+        isValidating = false;
+
+        if (!isValid) {
+            shakeCurrentRow();
+            showToast("This is not a valid word, try another word in mind.", 2500);
+            // Crucial: do NOT advance row, do NOT consume try, let player edit letters!
+            return;
+        }
+
+        // 3. Word is valid -> evaluate against mystery word
         const statuses = evaluateGuess(guess, currentTargetWord);
         guesses.push(guess);
         evaluations.push(statuses);
@@ -1659,6 +627,7 @@
             if (allCorrect) {
                 isGameOver = true;
                 isWon = true;
+                markVisitorCompleted();
                 triggerWinCelebration(rowEl);
             } else {
                 currentRow++;
@@ -1667,6 +636,7 @@
                 if (currentRow >= MAX_ROWS) {
                     isGameOver = true;
                     isWon = false;
+                    markVisitorCompleted();
                     triggerLossReveal();
                 }
             }
@@ -1700,7 +670,6 @@
 
     function updateKeyStatus(letter, newStatus) {
         const current = keyStatuses[letter];
-        // Priority: correct > present > absent
         if (current === "correct") return;
         if (current === "present" && newStatus === "absent") return;
 
@@ -1721,7 +690,6 @@
             setTimeout(() => tile.classList.add("tile-win-dance"), i * 100);
         });
 
-        // Launch confetti if the main game canvas is available
         if (window.confettiCanvas) {
             launchWordleConfetti();
         }
@@ -1737,16 +705,8 @@
         }, 800);
     }
 
-    async function showWordleSuccessModal(isWinResult) {
+    function showWordleSuccessModal(isWinResult) {
         if (!wordleModalOverlayEl) return;
-
-        // Ensure definition has finished resolving (from cache or background fetch)
-        if (currentTargetWord) {
-            const resolved = await resolveWordDefinition(currentTargetWord);
-            if (resolved) {
-                currentTargetWordObj = resolved;
-            }
-        }
 
         if (isWinResult) {
             wordleModalTitleEl.textContent = "Congratulations!";
@@ -1839,7 +799,6 @@
         if (newWordObj) {
             currentTargetWordObj = newWordObj;
             currentTargetWord = newWordObj.word.toUpperCase();
-            resolveWordDefinition(currentTargetWord);
         }
         guesses = [];
         evaluations = [];
@@ -1848,6 +807,7 @@
         isGameOver = false;
         isWon = false;
         isRevealing = false;
+        isValidating = false;
 
         // Reset keyboard statuses
         Object.keys(keyStatuses).forEach((k) => delete keyStatuses[k]);
@@ -1855,6 +815,7 @@
         hideWordleModal();
         renderGrid();
         renderKeyboard();
+        updateSkipButtonVisibility();
 
         if (wordleDatePillEl) {
             wordleDatePillEl.textContent = `Today: ${formatDateFriendly()} • 5 Letters`;
@@ -1863,10 +824,8 @@
 
     function attachGlobalListeners() {
         window.addEventListener("keydown", (e) => {
-            // Only process keys if Wordle screen is currently active
             if (!screenWordleEl || !screenWordleEl.classList.contains("active")) return;
             if (wordleModalOverlayEl && !wordleModalOverlayEl.classList.contains("hidden")) {
-                // Modal is open, Enter can trigger proceed
                 if (e.key === "Enter") {
                     e.preventDefault();
                     handleProceed();
@@ -1909,12 +868,21 @@
             btnWordleProceedEl.addEventListener("click", handleProceed);
         }
 
-        // Random New Word Button
+        // Random New Word Button (Direct API Fetch)
         if (btnWordleRandomWordEl) {
-            btnWordleRandomWordEl.addEventListener("click", () => {
-                const nextWord = getRandomWord();
-                resetBoard(nextWord);
-                showToast("New mystery word generated!", 1400);
+            btnWordleRandomWordEl.addEventListener("click", async () => {
+                if (isFetchingWord) return;
+                isFetchingWord = true;
+                showToast("Fetching new word from API...", 1500);
+                try {
+                    const freshWord = await fetchFreshWordFromAPI();
+                    resetBoard(freshWord);
+                    showToast("New mystery word ready!", 1600);
+                } catch (e) {
+                    showToast("Could not fetch new word", 1600);
+                } finally {
+                    isFetchingWord = false;
+                }
             });
         }
 
@@ -1931,12 +899,14 @@
         // Skip to Quiz
         if (btnWordleSkipEl) {
             btnWordleSkipEl.addEventListener("click", () => {
+                markVisitorCompleted();
                 handleProceed();
             });
         }
     }
 
     function handleProceed() {
+        markVisitorCompleted();
         hideWordleModal();
         if (typeof onProceedCallback === "function") {
             onProceedCallback();
@@ -1944,22 +914,22 @@
     }
 
     // ── Public API ───────────────────────────────────────────────
-    function startWordle(options = {}) {
+    async function startWordle(options = {}) {
         initDOMReferences();
         onProceedCallback = options.onProceed || null;
         onBackCallback = options.onBack || null;
         activePlayerName = options.playerName || "Teacher Ash";
         activePlayerImage = options.playerImage || "ashhead.png";
 
-        // Update player preview pill if in markup
         const playerPillEl = document.getElementById("wordlePlayerPill");
         if (playerPillEl) {
             playerPillEl.innerHTML = `<img src="${activePlayerImage}" alt="" class="wordle-player-thumb" /><span>Playing as <strong>${activePlayerName}</strong></span>`;
         }
 
-        // Pick today's daily mystery word (or keep current if in-session)
+        updateSkipButtonVisibility();
+
         if (!currentTargetWordObj) {
-            const todayWord = getDailyWord();
+            const todayWord = await getDailyMysteryWord();
             resetBoard(todayWord);
         } else {
             renderGrid();
@@ -1967,11 +937,13 @@
         }
     }
 
-    function init() {
+    async function init() {
         initDOMReferences();
         attachGlobalListeners();
-        // Default to today's daily mystery word
-        currentTargetWordObj = getDailyWord();
+        updateSkipButtonVisibility();
+
+        // Fetch / load today's mystery word directly from API
+        currentTargetWordObj = await getDailyMysteryWord();
         currentTargetWord = currentTargetWordObj.word.toUpperCase();
     }
 
@@ -1979,12 +951,11 @@
     window.MaoWordle = {
         init,
         startWordle,
-        reset: () => resetBoard(getDailyWord()),
-        setRandomWord: () => resetBoard(getRandomWord()),
+        reset: async () => resetBoard(await getDailyMysteryWord()),
+        setRandomWord: async () => resetBoard(await fetchFreshWordFromAPI()),
         getCurrentWord: () => currentTargetWordObj,
-        resolveWordDefinition,
-        getWordPool: () => WORD_POOL,
-        catalog: WORD_CATALOG
+        isValidEnglishWord,
+        updateSkipButtonVisibility
     };
 
     // Auto-init on load

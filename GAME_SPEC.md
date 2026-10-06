@@ -51,11 +51,18 @@ The game has **three primary screens** managed via CSS classes (`.screen`, `.act
 - Wordle hint evaluation:
   - **Green** (`correct`): Letter is in the exact right place.
   - **Yellow** (`present`): Letter is in the word, but in a different position.
-- Hybrid Word Generation Engine:
-  - Backed by the complete official pool of 2,319 verified 5-letter English words.
-  - Non-repeating coprimes permutation formula guarantees **over 6.35 years** of daily words without a single repetition.
-  - Dynamically enriches word definitions, phonetic guides, and sample sentences on-the-fly via free dictionary APIs (Free Dictionary API & Wiktionary) with intelligent offline fallback so livestreams never hang.
-  - "🎲 New Word" button allows instant on-demand random word generation for replayability.
+- Direct API Word Generation Engine (No Word Pool):
+  - Fetches mystery words directly from online linguistic APIs (Random Word API & Datamuse).
+  - Automatically enriches definitions, phonetic guides, and sample sentences on-the-fly via Wiktionary, Datamuse, and Free Dictionary API.
+  - Mystery words change daily based on calendar date (cached per day in `localStorage`).
+  - "🎲 New Word" button allows instant on-demand random word generation directly from the API.
+- Word Validity Check (Invalid Guess Protection):
+  - If a user inputs an invalid or non-dictionary 5-letter word, the guess does **not** go through and does **not** consume an attempt.
+  - The row shakes and displays an alert/toast: `"This is not a valid word, try another word in mind."`
+  - The user can adjust letters until entering a valid English word.
+- Conditional "Skip to Quiz" Button:
+  - If it is the user's first time visiting the game (`localStorage.getItem("mao_wordle_visited")` is not set), the "Skip to Quiz →" button is hidden.
+  - The skip option is unlocked only after completing/visiting the Wordle icebreaker.
 - **Victory Pop-up Modal** (`#wordleModalOverlay`):
   - Headline: "Congratulations! You got the right word".
   - Displays the mystery word, phonetic guide, and part of speech tag.
