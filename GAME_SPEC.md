@@ -97,7 +97,7 @@ Screens fade out with a slight downward slide (`translateY(22px) scale(0.985)`) 
 
 ## 3. Question System
 
-> **Current implementation (October 2026):** New games select from questionnaire set `2026-10-19`, containing 500 regular and 500 C1 prompts. The previous sources are archived and unloaded.
+> **Current implementation (October 2026):** New games select from questionnaire set `2026-10-19-expanded-v2`, containing 1,640 regular and 720 C1 prompts. The previous sources are archived and unloaded.
 
 ### 3.0 Runtime Selector (`question-generator.js`)
 
@@ -120,9 +120,9 @@ Screens fade out with a slight downward slide (`translateY(22px) scale(0.985)`) 
 The following arrays are the source for newly started games.
 
 - **`GAME_QUESTION_COUNT`** = `50` (the number of levels per game session)
-- **`QUESTION_POOL`** = 500 regular questions: 125 each at A1, A2, B1, and B2.
-- **`HARD_QUESTION_POOL`** = 500 C1 questions.
-- **`QUESTION_SET_ID`** = `2026-10-19`.
+- **`QUESTION_POOL`** = 1,640 regular questions: 320 A1, 320 A2, 500 B1, and 500 B2.
+- **`HARD_QUESTION_POOL`** = 720 C1 questions.
+- **`QUESTION_SET_ID`** = `2026-10-19-expanded-v2`.
 
 **Each question object has:**
 ```js
