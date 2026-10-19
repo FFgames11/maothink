@@ -6,7 +6,9 @@
   "use strict";
 
   const TOTAL_STEPS = 5;
-  const SESSION_VERSION = 4;
+  // Version 5 invalidates sessions containing the questionnaire set archived
+  // on 2026-10-19, preventing an old tab from restoring retired questions.
+  const SESSION_VERSION = 5;
   const TOTAL_QS = GAME_QUESTION_COUNT;
   const FINAL_ROUND_COUNT = Math.min(10, TOTAL_QS, HARD_QUESTION_POOL.length);
   const REGULAR_LEVEL_COUNT = Math.max(0, TOTAL_QS - FINAL_ROUND_COUNT);

@@ -1,272 +1,210 @@
-// ============================================================
-// MaoThink - English question bank
-// Levels 1-40: a mixed selection of A1-B2 English language,
-//              grammar, and vocabulary questions
-// Levels 41-50: C1 English language, grammar, and vocabulary
-// ============================================================
+/* ============================================================
+   MaoThink - Questionnaire Set 2026-10-19
+
+   A completely new, self-validating English question bank.
+   The previous bank is preserved under:
+   archive/questionnaires-2026-10-19/
+   ============================================================ */
 
 const GAME_QUESTION_COUNT = 50;
+const QUESTION_SET_ID = "2026-10-19";
+const QUESTION_POOL = [];
+const HARD_QUESTION_POOL = [];
 
-const QUESTION_POOL = [
-  // A1 (Levels 1-10)
-  { level: "A1", category: "Grammar", question: "Which sentence uses the verb 'be' correctly?", choices: ["She are a teacher.", "She is a teacher.", "She am a teacher.", "She be a teacher."], answer: "She is a teacher.", points: 10 },
-  { level: "A1", category: "Vocabulary", question: "Which word is the opposite of 'big'?", choices: ["Tall", "Small", "Wide", "Heavy"], answer: "Small", points: 10 },
-  { level: "A1", category: "Grammar", question: "Complete the sentence: I ___ from Singapore.", choices: ["am", "is", "are", "be"], answer: "am", points: 10 },
-  { level: "A1", category: "Vocabulary", question: "Which word names a colour?", choices: ["Blue", "Chair", "Walk", "Happy"], answer: "Blue", points: 10 },
-  { level: "A1", category: "Grammar", question: "Choose the correct plural of 'book'.", choices: ["bookes", "books", "book's", "book"], answer: "books", points: 10 },
-  { level: "A1", category: "Vocabulary", question: "Which animal says 'meow'?", choices: ["Dog", "Bird", "Cat", "Horse"], answer: "Cat", points: 10 },
-  { level: "A1", category: "Grammar", question: "Complete the sentence: He ___ football every Sunday.", choices: ["play", "plays", "playing", "played"], answer: "plays", points: 10 },
-  { level: "A1", category: "English Language", question: "Which greeting is normally used in the morning?", choices: ["Good night", "Good morning", "Goodbye", "See you"], answer: "Good morning", points: 10 },
-  { level: "A1", category: "Grammar", question: "Complete the question: ___ is your name?", choices: ["Who", "What", "Where", "When"], answer: "What", points: 10 },
-  { level: "A1", category: "Vocabulary", question: "Which item do you use to write on paper?", choices: ["Spoon", "Shoe", "Pencil", "Plate"], answer: "Pencil", points: 10 },
-
-  // A2 (Levels 11-20)
-  { level: "A2", category: "Grammar", question: "Complete the sentence: We ___ to the cinema yesterday.", choices: ["go", "goes", "went", "going"], answer: "went", points: 10 },
-  { level: "A2", category: "Vocabulary", question: "Which word means 'very tired'?", choices: ["Excited", "Exhausted", "Surprised", "Interested"], answer: "Exhausted", points: 10 },
-  { level: "A2", category: "Grammar", question: "Which sentence correctly describes several apples?", choices: ["There is some apples.", "There are some apples.", "There are an apples.", "There is any apples."], answer: "There are some apples.", points: 10 },
-  { level: "A2", category: "Vocabulary", question: "A person who serves food in a restaurant is a ___.", choices: ["waiter", "pilot", "farmer", "mechanic"], answer: "waiter", points: 10 },
-  { level: "A2", category: "Grammar", question: "Complete the sentence: This bag is ___ than that one.", choices: ["cheap", "cheapest", "cheaper", "more cheap"], answer: "cheaper", points: 10 },
-  { level: "A2", category: "English Language", question: "Which phrase is a polite way to ask for help?", choices: ["Help me now.", "Could you help me, please?", "You help me.", "Helping me?"], answer: "Could you help me, please?", points: 10 },
-  { level: "A2", category: "Grammar", question: "Complete the sentence: I have lived here ___ 2022.", choices: ["for", "since", "during", "from"], answer: "since", points: 10 },
-  { level: "A2", category: "Vocabulary", question: "Which word is closest in meaning to 'begin'?", choices: ["Finish", "Stop", "Start", "Wait"], answer: "Start", points: 10 },
-  { level: "A2", category: "Grammar", question: "Complete the sentence: You ___ wear a seat belt in a car.", choices: ["must", "might", "would", "could"], answer: "must", points: 10 },
-  { level: "A2", category: "Vocabulary", question: "If the sky is full of clouds, the weather is ___.", choices: ["cloudy", "sunny", "dry", "windless"], answer: "cloudy", points: 10 },
-
-  // B1 (Levels 21-30)
-  { level: "B1", category: "Grammar", question: "Complete the sentence: If it rains, we ___ at home.", choices: ["stay", "stayed", "will stay", "would stay"], answer: "will stay", points: 10 },
-  { level: "B1", category: "Vocabulary", question: "Which word is closest in meaning to 'reliable'?", choices: ["Dependable", "Careless", "Unusual", "Temporary"], answer: "Dependable", points: 10 },
-  { level: "B1", category: "Grammar", question: "Choose the correct passive sentence.", choices: ["The bridge built in 1990.", "The bridge was built in 1990.", "The bridge was build in 1990.", "The bridge is built in 1990."], answer: "The bridge was built in 1990.", points: 10 },
-  { level: "B1", category: "English Language", question: "What does the phrase 'give up' mean in 'Don't give up'?", choices: ["Donate something", "Stop trying", "Stand up", "Return something"], answer: "Stop trying", points: 10 },
-  { level: "B1", category: "Grammar", question: "Complete the sentence: She asked me where I ___.", choices: ["live", "lived", "will live", "am living"], answer: "lived", points: 10 },
-  { level: "B1", category: "Vocabulary", question: "Choose the correct word: The instructions were clear and easy to ___.", choices: ["follow", "lead", "catch", "reach"], answer: "follow", points: 10 },
-  { level: "B1", category: "Grammar", question: "Complete the sentence: I ___ this book yet.", choices: ["didn't finish", "haven't finished", "don't finish", "wasn't finishing"], answer: "haven't finished", points: 10 },
-  { level: "B1", category: "English Language", question: "Which sentence expresses a suggestion?", choices: ["You must leave now.", "Why don't we take a break?", "I left yesterday.", "Are you leaving?"], answer: "Why don't we take a break?", points: 10 },
-  { level: "B1", category: "Vocabulary", question: "What does 'avoid' mean?", choices: ["To keep away from", "To look carefully at", "To agree with", "To prepare for"], answer: "To keep away from", points: 10 },
-  { level: "B1", category: "Grammar", question: "Complete the sentence: He is interested ___ learning Japanese.", choices: ["at", "on", "in", "for"], answer: "in", points: 10 },
-
-  // B2 (Levels 31-40)
-  { level: "B2", category: "Grammar", question: "Complete the sentence: If I ___ about the delay, I would have called you.", choices: ["knew", "had known", "would know", "have known"], answer: "had known", points: 10 },
-  { level: "B2", category: "Vocabulary", question: "Which word is closest in meaning to 'significant'?", choices: ["Minor", "Important", "Ordinary", "Uncertain"], answer: "Important", points: 10 },
-  { level: "B2", category: "Grammar", question: "Which sentence correctly expresses a present wish?", choices: ["I wish I can speak French.", "I wish I could speak French.", "I wish I will speak French.", "I wish I speak French."], answer: "I wish I could speak French.", points: 10 },
-  { level: "B2", category: "English Language", question: "What does 'to get the hang of something' mean?", choices: ["To become skilled at it", "To lose interest in it", "To postpone it", "To explain it badly"], answer: "To become skilled at it", points: 10 },
-  { level: "B2", category: "Grammar", question: "Complete the sentence: By next June, they ___ the project.", choices: ["complete", "completed", "will complete", "will have completed"], answer: "will have completed", points: 10 },
-  { level: "B2", category: "Vocabulary", question: "Choose the best word: The company plans to ___ its services into new markets.", choices: ["expand", "scatter", "stretch", "inflate"], answer: "expand", points: 10 },
-  { level: "B2", category: "Grammar", question: "Complete the sentence: She denied ___ the confidential document.", choices: ["to copy", "copy", "copying", "copied"], answer: "copying", points: 10 },
-  { level: "B2", category: "English Language", question: "Which sentence is the most formal?", choices: ["Send me the details soon.", "I want the details right now.", "Could you please provide the details at your earliest convenience?", "Can you shoot me the details?"], answer: "Could you please provide the details at your earliest convenience?", points: 10 },
-  { level: "B2", category: "Vocabulary", question: "What does 'inevitable' mean?", choices: ["Able to be prevented", "Certain to happen", "Difficult to explain", "Unlikely to matter"], answer: "Certain to happen", points: 10 },
-  { level: "B2", category: "Grammar", question: "Complete the sentence: Not only ___ late, but he also forgot the tickets.", choices: ["he arrived", "did he arrive", "he did arrive", "arrived he"], answer: "did he arrive", points: 10 }
-];
-
-const HARD_QUESTION_POOL = [
-  // C1 (Levels 41-50)
-  { level: "C1", category: "Grammar", question: "Complete the sentence: Seldom ___ such a compelling argument.", choices: ["I have heard", "have I heard", "I heard", "did I have heard"], answer: "have I heard", points: 20 },
-  { level: "C1", category: "Vocabulary", question: "Which word best completes the sentence? Her explanation was so ___ that it resolved every doubt.", choices: ["ambiguous", "cogent", "arbitrary", "tentative"], answer: "cogent", points: 20 },
-  { level: "C1", category: "Grammar", question: "Complete the sentence: Had the warning been issued earlier, the damage ___.", choices: ["might have been avoided", "might be avoided", "will have avoided", "would avoid"], answer: "might have been avoided", points: 20 },
-  { level: "C1", category: "English Language", question: "What does the idiom 'to play devil's advocate' mean?", choices: ["To support a dishonest person", "To argue an opposing view for discussion", "To avoid taking any position", "To deliberately offend someone"], answer: "To argue an opposing view for discussion", points: 20 },
-  { level: "C1", category: "Vocabulary", question: "Which word means 'to make a problem less severe'?", choices: ["Exacerbate", "Mitigate", "Invalidate", "Proliferate"], answer: "Mitigate", points: 20 },
-  { level: "C1", category: "Grammar", question: "Choose the sentence with the correct subjunctive form.", choices: ["The committee recommended that he resign immediately.", "The committee recommended that he resigns immediately.", "The committee recommended that he resigned immediately.", "The committee recommended him to resigns immediately."], answer: "The committee recommended that he resign immediately.", points: 20 },
-  { level: "C1", category: "Vocabulary", question: "Which word best describes a statement that appears self-contradictory but may be true?", choices: ["Paradoxical", "Superficial", "Redundant", "Unanimous"], answer: "Paradoxical", points: 20 },
-  { level: "C1", category: "Grammar", question: "Complete the sentence: No sooner ___ the announcement than the phones began ringing.", choices: ["they made", "had they made", "they had made", "did they made"], answer: "had they made", points: 20 },
-  { level: "C1", category: "English Language", question: "Which sentence uses 'disinterested' in its standard formal sense?", choices: ["She was disinterested because the lecture was dull.", "A disinterested judge considered both sides fairly.", "He felt disinterested in joining the club.", "The bored audience became increasingly disinterested."], answer: "A disinterested judge considered both sides fairly.", points: 20 },
-  { level: "C1", category: "Vocabulary", question: "Choose the best word: The report was criticised for being ___, as it mentioned only evidence supporting its conclusion.", choices: ["impartial", "selective", "comprehensive", "conclusive"], answer: "selective", points: 20 }
-];
-
-// Build a large, varied bank without storing hundreds of repetitive object
-// literals. Every generated entry is a complete question object used by the
-// same game logic as the hand-written questions above.
 function addQuestion(pool, level, category, question, choices, answer, points) {
-  pool.push({ level, category, question, choices, answer, points });
+  pool.push({ level, category, question, choices, answer, points, questionSet: QUESTION_SET_ID });
 }
 
-function otherValues(entries, field, index) {
-  return [1, 3, 5].map((offset) => entries[(index + offset) % entries.length][field]);
+function addGrid(pool, level, category, leftItems, rightItems, builder, points) {
+  leftItems.forEach((left) => rightItems.forEach((right) => {
+    const item = builder(left, right);
+    addQuestion(pool, level, category, item.question, item.choices, item.answer, points);
+  }));
 }
 
-function addVocabularySet(pool, level, points, entries) {
-  entries.forEach((entry, index) => {
-    addQuestion(pool, level, "Vocabulary", `${level} vocabulary: Which word is closest in meaning to '${entry.word}'?`, [entry.synonym, ...otherValues(entries, "synonym", index)], entry.synonym, points);
-    addQuestion(pool, level, "Vocabulary", `${level} vocabulary: Which word is the opposite of '${entry.word}'?`, [entry.antonym, ...otherValues(entries, "antonym", index)], entry.antonym, points);
-    addQuestion(pool, level, "Vocabulary", `${level} vocabulary: What is the best definition of '${entry.word}'?`, [entry.definition, ...otherValues(entries, "definition", index)], entry.definition, points);
-    addQuestion(pool, level, "English Language", entry.context, [entry.word, ...otherValues(entries, "word", index)], entry.word, points);
-    addQuestion(pool, level, "English Language", `Choose the word that means '${entry.definition}'.`, [entry.word, ...otherValues(entries, "word", index)], entry.word, points);
+// A1: possessives, present continuous, object pronouns, demonstratives, time prepositions.
+const A1_OWNERS = [["I", "my"], ["you", "your"], ["Lina", "her"], ["Omar", "his"], ["we", "our"]];
+const A1_OBJECTS = ["passport", "lunchbox", "notebook", "umbrella", "camera"];
+addGrid(QUESTION_POOL, "A1", "Grammar", A1_OWNERS, A1_OBJECTS, ([owner, answer], object) => ({
+  question: `Choose the possessive word: ${owner} packed ___ ${object}.`,
+  choices: [answer, ...["my", "your", "her", "his", "our"].filter((word) => word !== answer).slice(0, 3)], answer
+}), 10);
+
+const A1_CONTINUOUS_SUBJECTS = [["I", "am"], ["The baby", "is"], ["Our teacher", "is"], ["You", "are"], ["The neighbours", "are"]];
+const A1_ACTIONS = [["read", "reading"], ["dance", "dancing"], ["swim", "swimming"], ["write", "writing"], ["run", "running"]];
+addGrid(QUESTION_POOL, "A1", "Grammar", A1_CONTINUOUS_SUBJECTS, A1_ACTIONS, ([subject, auxiliary], [base, ing]) => {
+  const answer = `${auxiliary} ${ing}`;
+  return { question: `Use “${base}” for an action happening now: ${subject} ___ at the moment.`, choices: [answer, `${auxiliary} ${base}`, `does ${base}`, `${base}s`], answer };
+}, 10);
+
+const A1_PRONOUN_TARGETS = [["the speaker", "me"], ["the listener", "you"], ["a boy named Ben", "him"], ["a girl named Mei", "her"], ["the speaker and a friend", "us"]];
+const A1_PRONOUN_LEADS = ["Please call", "The coach thanked", "Maya invited", "Could you help", "The guide showed the map to"];
+addGrid(QUESTION_POOL, "A1", "Grammar", A1_PRONOUN_TARGETS, A1_PRONOUN_LEADS, ([target, answer], lead) => ({
+  question: `Which object pronoun replaces ${target}? ${lead} ___.`,
+  choices: [answer, ...["me", "you", "him", "her", "us"].filter((word) => word !== answer).slice(0, 3)], answer
+}), 10);
+
+const A1_DEMONSTRATIVES = [["one cup beside me", "This", "is"], ["one kite far away", "That", "is"], ["two keys beside me", "These", "are"], ["three boats far away", "Those", "are"], ["several photos in my hand", "These", "are"]];
+const A1_DEMO_SETTINGS = ["at the market", "during the lesson", "in the garden", "on our trip", "inside the museum"];
+addGrid(QUESTION_POOL, "A1", "Grammar", A1_DEMONSTRATIVES, A1_DEMO_SETTINGS, ([description, answer, verb], setting) => ({
+  question: `${setting}, point to ${description}: “___ ${verb} what I mean.”`, choices: [answer, ...["This", "That", "These", "Those"].filter((word) => word !== answer)], answer
+}), 10);
+
+const A1_TIMES = [["7:30", "at"], ["Tuesday", "on"], ["December", "in"], ["noon", "at"], ["the weekend", "on"]];
+const A1_TIME_LEADS = ["The shop opens", "Our class begins", "The bus arrives", "I practise piano", "They meet us"];
+addGrid(QUESTION_POOL, "A1", "Grammar", A1_TIMES, A1_TIME_LEADS, ([time, answer], lead) => ({
+  question: `Add the correct time preposition: ${lead} ___ ${time}.`, choices: [answer, ...["at", "on", "in", "for"].filter((word) => word !== answer)], answer
+}), 10);
+
+// A2: quantity, interrupted actions, verb patterns, superlatives, and planned actions.
+const A2_NOUNS = [["rice", "much"], ["emails", "many"], ["traffic", "much"], ["chairs", "many"], ["information", "much"]];
+const A2_QUANTITY_LEADS = ["How ___ did you find?", "We do not have ___ left.", "Was there ___ available?", "I wonder how ___ they need.", "There is not ___ here."];
+addGrid(QUESTION_POOL, "A2", "Grammar", A2_NOUNS, A2_QUANTITY_LEADS, ([noun, answer], lead) => ({
+  question: `Choose the quantity word for “${noun}”: ${lead.replace("___", "___")} (${noun})`, choices: [answer, answer === "many" ? "much" : "many", "a few", "several"], answer
+}), 10);
+
+const A2_INTERRUPTED = [["I", "was"], ["Eva", "was"], ["The driver", "was"], ["We", "were"], ["The children", "were"]];
+const A2_ING_ACTIONS = [["cook", "cooking"], ["cycle", "cycling"], ["shop", "shopping"], ["study", "studying"], ["travel", "travelling"]];
+addGrid(QUESTION_POOL, "A2", "Grammar", A2_INTERRUPTED, A2_ING_ACTIONS, ([subject, auxiliary], [base, ing]) => {
+  const answer = `${auxiliary} ${ing}`;
+  return { question: `Use “${base}” for the interrupted action: ${subject} ___ when the phone rang.`, choices: [answer, `${auxiliary} ${base}`, `has ${ing}`, `did ${ing}`], answer };
+}, 10);
+
+const A2_PATTERNS = [["enjoys", "-ing"], ["finished", "-ing"], ["wants", "to"], ["decided", "to"], ["hopes", "to"]];
+const A2_VERBS = [["paint", "painting"], ["visit", "visiting"], ["learn", "learning"], ["cook", "cooking"], ["travel", "travelling"]];
+addGrid(QUESTION_POOL, "A2", "Grammar", A2_PATTERNS, A2_VERBS, ([lead, pattern], [base, ing]) => {
+  const answer = pattern === "to" ? `to ${base}` : ing;
+  return { question: `Select the form of “${base}”: Nadi ${lead} ___ during the holiday.`, choices: [answer, base, `to ${ing}`, `${base}s`], answer };
+}, 10);
+
+const A2_SUPERLATIVES = [["bright", "the brightest"], ["busy", "the busiest"], ["comfortable", "the most comfortable"], ["good", "the best"], ["far", "the farthest"]];
+const A2_GROUPS = ["in the whole shop", "among the five routes", "of all the rooms", "in our class", "on the entire island"];
+addGrid(QUESTION_POOL, "A2", "Grammar", A2_SUPERLATIVES, A2_GROUPS, ([base, answer], group) => ({
+  question: `Use the superlative of “${base}”: This option is ___ ${group}.`, choices: [answer, base, answer.replace("the ", ""), `more ${base}`], answer
+}), 10);
+
+const A2_PLANNERS = ["I am", "She is", "Ravi is", "We are", "They are"];
+const A2_PLANS = [["bake a cake", "bake"], ["clean the beach", "clean"], ["join the club", "join"], ["watch the parade", "watch"], ["plant a tree", "plant"]];
+addGrid(QUESTION_POOL, "A2", "Grammar", A2_PLANNERS, A2_PLANS, (subject, [plan, base]) => {
+  const answer = `going to ${plan}`;
+  return { question: `Express this prior plan—“${plan}”: ${subject} ___ tomorrow.`, choices: [answer, `go to ${plan}`, `going ${base}`, `will going to ${base}`], answer };
+}, 10);
+
+// B1: relative clauses, reported speech, experience, hypothetical results, and modal meaning.
+const B1_RELATIVES = [["chef", "who"], ["musician", "who"], ["neighbour", "who"], ["device", "which"], ["website", "which"]];
+const B1_RELATIVE_ENDINGS = ["appeared in the report", "was mentioned by our guide", "became the subject of a documentary", "received a design award", "attracted attention online"];
+addGrid(QUESTION_POOL, "B1", "Grammar", B1_RELATIVES, B1_RELATIVE_ENDINGS, ([noun, answer], ending) => ({
+  question: `Supply the relative word: The ${noun} ___ ${ending} is easy to identify.`, choices: [answer, ...["who", "which", "where", "whose"].filter((word) => word !== answer)], answer
+}), 10);
+
+const B1_SPEAKERS = ["Amir", "Chloe", "My aunt", "The captain", "Our tutor"];
+const B1_QUOTES = [["I am tired", "was tired"], ["I need a map", "needed a map"], ["I know the answer", "knew the answer"], ["I feel better", "felt better"], ["I have a ticket", "had a ticket"]];
+addGrid(QUESTION_POOL, "B1", "Grammar", B1_SPEAKERS, B1_QUOTES, (speaker, [quote, reported]) => {
+  const answer = `${speaker} said that ${speaker} ${reported}.`;
+  return { question: `Report this statement: ${speaker} said, “${quote}.”`, choices: [answer, `${speaker} said that ${speaker} ${quote.slice(2)}.`, `${speaker} says that I ${reported}.`, `${speaker} told that ${speaker} ${reported}.`], answer };
+}, 10);
+
+const B1_EXPERIENCE_SUBJECTS = [["I", "have"], ["You", "have"], ["Marta", "has"], ["The pilot", "has"], ["We", "have"]];
+const B1_PARTICIPLES = [["ride", "ridden a horse"], ["see", "seen snow"], ["eat", "eaten seaweed"], ["write", "written a poem"], ["fly", "flown in a helicopter"]];
+addGrid(QUESTION_POOL, "B1", "Grammar", B1_EXPERIENCE_SUBJECTS, B1_PARTICIPLES, ([subject, auxiliary], [base, phrase]) => {
+  const answer = `${auxiliary} ${phrase}`;
+  return { question: `Use “${base}” to describe life experience: ${subject} ___ before.`, choices: [answer, `did ${base}`, `${auxiliary} ${base}`, `was ${phrase}`], answer };
+}, 10);
+
+const B1_HYPOTHETICALS = ["found a wallet", "spoke four languages", "owned a boat", "met an astronaut", "lived near the office"];
+const B1_RESULTS = ["I would tell my closest friend", "I would need time to adjust", "I would change my daily routine", "I would make a careful plan", "I would consider my options"];
+addGrid(QUESTION_POOL, "B1", "Grammar", B1_HYPOTHETICALS, B1_RESULTS, (condition, answer) => ({
+  question: `Complete this unreal situation with the intended result “${answer.replace("I would ", "I ")}”: If I ${condition}, ___.`, choices: [answer, answer.replace("would", "will"), answer.replace("would", "did"), answer.replace("would", "have")], answer
+}), 10);
+
+const B1_MODAL_CASES = [["a strong recommendation", "should"], ["a rule or obligation", "must"], ["a lack of necessity", "do not have to"], ["a present possibility", "might"], ["a past ability", "could"]];
+const B1_MODAL_ACTIONS = ["wear a helmet", "save a copy", "bring an umbrella", "speak to the manager", "use the side entrance"];
+addGrid(QUESTION_POOL, "B1", "Grammar", B1_MODAL_CASES, B1_MODAL_ACTIONS, ([meaning, answer], action) => ({
+  question: `Which modal phrase expresses ${meaning}? You ___ ${action}.`, choices: [answer, ...["should", "must", "do not have to", "might", "could"].filter((word) => word !== answer).slice(0, 3)], answer
+}), 10);
+
+// B2: passive voice, concession, causatives, regrets, and modal-perfect meanings.
+const B2_PASSIVE_SUBJECTS = ["The mural", "The software", "The bridge", "The invitations", "The final schedule"];
+const B2_PASSIVE_VERBS = [["paint", "was painted"], ["update", "was updated"], ["inspect", "was inspected"], ["deliver", "was delivered"], ["approve", "was approved"]];
+addGrid(QUESTION_POOL, "B2", "Grammar", B2_PASSIVE_SUBJECTS, B2_PASSIVE_VERBS, (subject, [base, answer]) => ({
+  question: `Put “${base}” in the past passive: ${subject} ___ before noon.`, choices: [answer, `did ${base}`, `has ${base}`, `was ${base}`], answer
+}), 10);
+
+const B2_CONCESSIONS = ["the heavy rain", "her limited experience", "the high price", "their late arrival", "the narrow space"];
+const B2_MAIN_CLAUSES = ["the concert continued", "she handled the task well", "every ticket was sold", "they were admitted", "the furniture fitted"];
+addGrid(QUESTION_POOL, "B2", "Grammar", B2_CONCESSIONS, B2_MAIN_CLAUSES, (nounPhrase, mainClause) => {
+  const answer = `Despite ${nounPhrase}, ${mainClause}.`;
+  return { question: `Join these ideas with “despite”: ${nounPhrase}; ${mainClause}.`, choices: [answer, `Despite of ${nounPhrase}, ${mainClause}.`, `Although ${nounPhrase}, but ${mainClause}.`, `Despite ${nounPhrase}, but ${mainClause}.`], answer };
+}, 10);
+
+const B2_CAUSATIVE_SUBJECTS = ["I", "Nora", "The director", "We", "Our neighbours"];
+const B2_SERVICES = [["repair the laptop", "the laptop repaired"], ["clean the windows", "the windows cleaned"], ["print the banners", "the banners printed"], ["test the alarm", "the alarm tested"], ["deliver the sofa", "the sofa delivered"]];
+addGrid(QUESTION_POOL, "B2", "Grammar", B2_CAUSATIVE_SUBJECTS, B2_SERVICES, (subject, [service, objectPhrase]) => {
+  const answer = `had ${objectPhrase}`;
+  return { question: `Show that a professional did the service “${service}”: ${subject} ___ yesterday.`, choices: [answer, `had repaired ${objectPhrase}`, `made ${objectPhrase}`, `did ${objectPhrase}`], answer };
+}, 10);
+
+const B2_REGRETS = [["leaving the phone uncharged", "had charged the phone"], ["missing the rehearsal", "had attended the rehearsal"], ["selling the bicycle", "had not sold the bicycle"], ["forgetting the appointment", "had remembered the appointment"], ["taking the wrong train", "had taken the right train"]];
+const B2_REGRET_SPEAKERS = ["I wish I", "He wishes he", "Maya wishes she", "We wish we", "They wish they"];
+addGrid(QUESTION_POOL, "B2", "Grammar", B2_REGRETS, B2_REGRET_SPEAKERS, ([reality, answerEnding], lead) => {
+  const answer = `${lead} ${answerEnding}.`;
+  return { question: `Begin with “${lead}” to express regret about this past fact—${reality}:`, choices: [answer, `${lead} ${answerEnding.replace("had ", "")}.`, `${lead} would ${answerEnding.replace("had ", "")}.`, `${lead} have ${answerEnding.replace("had ", "")}.`], answer };
+}, 10);
+
+const B2_MODAL_PERFECTS = [["a missed obligation", "should have"], ["a certain past deduction", "must have"], ["an impossible past deduction", "cannot have"], ["an unrealized possibility", "could have"], ["an unnecessary completed action", "need not have"]];
+const B2_PAST_ACTIONS = ["checked the lock", "taken the earlier bus", "read the instructions", "kept the receipt", "called the office"];
+addGrid(QUESTION_POOL, "B2", "Grammar", B2_MODAL_PERFECTS, B2_PAST_ACTIONS, ([meaning, answer], action) => ({
+  question: `Choose the modal-perfect phrase for ${meaning}: Sam ___ ${action}.`, choices: [answer, ...["should have", "must have", "cannot have", "could have", "need not have"].filter((word) => word !== answer).slice(0, 3)], answer
+}), 10);
+
+// C1: five advanced transformation families, 100 unique questions each.
+const C1_EVENTS = ["reading the appendix", "checking the timestamps", "interviewing the witness", "reviewing the budget", "testing the backup", "consulting the archive", "mapping the route", "comparing the samples", "hearing both accounts", "examining the contract"];
+const C1_DISCOVERIES = [["the analyst", "notice", "the discrepancy"], ["the editors", "find", "the missing citation"], ["the engineer", "identify", "the fault"], ["the panel", "understand", "the objection"], ["the auditors", "detect", "the duplicate payment"], ["the doctor", "recognize", "the pattern"], ["the crew", "locate", "the leak"], ["the curator", "confirm", "the painting's origin"], ["the lawyer", "spot", "the contradiction"], ["the researchers", "question", "the initial assumption"]];
+addGrid(HARD_QUESTION_POOL, "C1", "Advanced Grammar", C1_EVENTS, C1_DISCOVERIES, (event, [subject, base, object]) => {
+  const answer = `did ${subject} ${base} ${object}`;
+  return { question: `Invert a clause with subject “${subject}”, verb “${base}”, and object “${object}”: Only after ${event} ___ .`, choices: [answer, `${subject} did ${base} ${object}`, `had ${subject} ${base} ${object}`, `${subject} ${base} ${object}`], answer };
+}, 20);
+
+const C1_DEADLINES = ["the vote was counted", "the doors had closed", "the data were released", "the final bell rang", "the fog had lifted", "the permit arrived", "the repairs were complete", "the chair intervened", "the last guest departed", "the embargo ended"];
+const C1_DELAYED_ACTIONS = [["the result", "become public", "did the result become public"], ["the train", "leave", "did the train leave"], ["the team", "respond", "did the team respond"], ["the audience", "relax", "did the audience relax"], ["the aircraft", "take off", "did the aircraft take off"], ["construction", "begin", "did construction begin"], ["the network", "return online", "did the network return online"], ["the debate", "resume", "did the debate resume"], ["the staff", "lock up", "did the staff lock up"], ["trade", "restart", "did trade restart"]];
+addGrid(HARD_QUESTION_POOL, "C1", "Advanced Grammar", C1_DEADLINES, C1_DELAYED_ACTIONS, (deadline, [subject, base, answer]) => ({
+  question: `Invert the action “${subject} ${base}”: Not until ${deadline} ___ .`, choices: [answer, `${subject} did ${base}`, `${subject} ${base}`, `had ${subject} ${base}`], answer
+}), 20);
+
+const C1_REPORTS = [["People believe", "is believed"], ["Experts consider", "is considered"], ["Officials expect", "is expected"], ["Historians understand", "is understood"], ["Witnesses report", "is reported"], ["Analysts estimate", "is estimated"], ["Scientists know", "is known"], ["Reviewers claim", "is claimed"], ["Observers assume", "is assumed"], ["Investigators allege", "is alleged"]];
+const C1_REPORTED_SUBJECTS = [["the manuscript", "is authentic", "to be authentic"], ["the species", "is endangered", "to be endangered"], ["the merger", "will happen soon", "to happen soon"], ["the settlement", "dates from antiquity", "to date from antiquity"], ["the vessel", "sank offshore", "to have sunk offshore"], ["the collection", "is worth millions", "to be worth millions"], ["the compound", "reacts with water", "to react with water"], ["the sequel", "is in production", "to be in production"], ["the signal", "comes from the north", "to come from the north"], ["the suspect", "left early", "to have left early"]];
+addGrid(HARD_QUESTION_POOL, "C1", "Advanced Grammar", C1_REPORTS, C1_REPORTED_SUBJECTS, ([activeLead, passive], [subject, finitePredicate, infinitive]) => {
+  const answer = `${subject} ${passive} ${infinitive}.`;
+  return { question: `Rewrite impersonally: “${activeLead} that ${subject} ${finitePredicate}.”`, choices: [answer, `${subject} believes ${infinitive}.`, `It ${passive} ${subject} ${infinitive}.`, `${subject} ${passive} that ${infinitive}.`], answer };
+}, 20);
+
+const C1_PRESENT_STATES = ["the streets are flooded", "the team is exhausted", "the files are missing", "the hall is overcrowded", "the engine is damaged", "the account is inaccessible", "the crops are failing", "the schedule is chaotic", "the shoreline is polluted", "the evidence is incomplete"];
+const C1_PAST_CAUSES = ["the preventive work had succeeded", "the warning had been followed", "the earlier plan had worked", "the specialists had intervened", "the proper checks had been made", "the backup measure had held", "the risk had been addressed", "the recommended action had been taken", "the initial response had been effective", "the contingency plan had been used"];
+addGrid(HARD_QUESTION_POOL, "C1", "Advanced Grammar", C1_PRESENT_STATES, C1_PAST_CAUSES, (state, condition) => {
+  const answer = state.replace(/\b(?:is|are)\b/, "would not be");
+  return {
+  question: `Link the past cause to the present state “${state}”: If ${condition}, ___.`, choices: [answer, answer.replace("would not be", "will not be"), answer.replace("would not be", "would not have been"), answer.replace("would not be", "is not")], answer
+  };
+}, 20);
+
+const C1_FOCUSES = ["the handwritten note", "her calm response", "the second prototype", "their shared history", "the smallest detail", "his willingness to listen", "the unexpected detour", "the local volunteers", "the final rehearsal", "the independent audit"];
+const C1_IMPACTS = ["resolved the mystery", "prevented an argument", "passed every stress test", "made cooperation possible", "exposed the forgery", "restored the team's trust", "led them to the viewpoint", "kept the shelter open", "revealed the timing problem", "uncovered the accounting error"];
+addGrid(HARD_QUESTION_POOL, "C1", "Advanced Grammar", C1_FOCUSES, C1_IMPACTS, (focus, impact) => {
+  const answer = `What ${impact} was ${focus}.`;
+  return { question: `Create a what-cleft emphasizing “${focus}”: ${focus} ${impact}.`, choices: [answer, `What was ${focus} ${impact}.`, `It ${impact} what ${focus}.`, `${focus} was what ${impact}.`], answer };
+}, 20);
+
+(function validateQuestionBank() {
+  const expected = [[QUESTION_POOL, 500, "regular"], [HARD_QUESTION_POOL, 500, "hard"]];
+  const prompts = new Set();
+
+  expected.forEach(([pool, size, label]) => {
+    if (pool.length !== size) throw new Error(`New ${label} question bank has ${pool.length} entries; expected ${size}.`);
+    pool.forEach((item) => {
+      if (prompts.has(item.question)) throw new Error(`Duplicate new question: ${item.question}`);
+      prompts.add(item.question);
+      if (item.choices.length !== 4 || new Set(item.choices).size !== 4) throw new Error(`Choices must be four unique values: ${item.question}`);
+      if (!item.choices.includes(item.answer)) throw new Error(`Answer is missing from choices: ${item.question}`);
+    });
   });
-}
-
-const REGULAR_VOCABULARY = {
-  A1: [
-    { word: "quick", synonym: "fast", antonym: "slow", definition: "moving with speed", context: "The rabbit is very ___ and wins the race." },
-    { word: "happy", synonym: "glad", antonym: "sad", definition: "feeling pleased", context: "Mina feels ___ because today is her birthday." },
-    { word: "begin", synonym: "start", antonym: "finish", definition: "to do the first part of something", context: "The lesson will ___ at nine o'clock." },
-    { word: "quiet", synonym: "silent", antonym: "noisy", definition: "making little or no sound", context: "Please be ___ while the baby is sleeping." },
-    { word: "easy", synonym: "simple", antonym: "difficult", definition: "not hard to do", context: "This puzzle is ___, so I can solve it quickly." },
-    { word: "near", synonym: "close", antonym: "far", definition: "a short distance away", context: "The shop is ___ my house, so I walk there." },
-    { word: "clean", synonym: "tidy", antonym: "dirty", definition: "free from dirt", context: "Wash the table so that it is ___." },
-    { word: "strong", synonym: "powerful", antonym: "weak", definition: "having a lot of physical power", context: "The ___ athlete can lift the heavy box." }
-  ],
-  A2: [
-    { word: "ancient", synonym: "old", antonym: "modern", definition: "belonging to a very distant past", context: "We visited an ___ castle built centuries ago." },
-    { word: "repair", synonym: "fix", antonym: "damage", definition: "to make something work again", context: "A mechanic will ___ my broken bicycle." },
-    { word: "choose", synonym: "select", antonym: "reject", definition: "to decide which one you want", context: "You may ___ one dessert from the menu." },
-    { word: "crowded", synonym: "packed", antonym: "empty", definition: "full of people", context: "The train was very ___ during the morning rush." },
-    { word: "polite", synonym: "courteous", antonym: "rude", definition: "showing good manners", context: "It is ___ to say please and thank you." },
-    { word: "borrow", synonym: "take temporarily", antonym: "lend", definition: "to use something and return it later", context: "May I ___ your pen for a minute?" },
-    { word: "arrive", synonym: "reach", antonym: "depart", definition: "to get to a place", context: "Our flight will ___ at six in the evening." },
-    { word: "healthy", synonym: "well", antonym: "ill", definition: "in good physical condition", context: "Regular exercise helps you stay ___." }
-  ],
-  B1: [
-    { word: "accurate", synonym: "correct", antonym: "incorrect", definition: "free from mistakes", context: "The map is ___ and shows every street clearly." },
-    { word: "benefit", synonym: "advantage", antonym: "drawback", definition: "a helpful or positive effect", context: "One ___ of cycling is improved fitness." },
-    { word: "decline", synonym: "decrease", antonym: "increase", definition: "to become smaller or less", context: "Sales began to ___ after the price rose." },
-    { word: "essential", synonym: "necessary", antonym: "optional", definition: "completely needed", context: "Clean water is ___ for human life." },
-    { word: "flexible", synonym: "adaptable", antonym: "rigid", definition: "able to change easily", context: "Our schedule is ___, so we can meet tomorrow instead." },
-    { word: "maintain", synonym: "preserve", antonym: "neglect", definition: "to keep in good condition", context: "You should ___ your car by checking it regularly." },
-    { word: "persuade", synonym: "convince", antonym: "discourage", definition: "to make someone agree to do something", context: "She tried to ___ her friends to join the club." },
-    { word: "require", synonym: "need", antonym: "waive", definition: "to make something necessary", context: "Most jobs ___ applicants to submit a résumé." }
-  ],
-  B2: [
-    { word: "ambiguous", synonym: "unclear", antonym: "explicit", definition: "open to more than one interpretation", context: "The instruction was ___, so nobody knew exactly what to do." },
-    { word: "compelling", synonym: "convincing", antonym: "unpersuasive", definition: "able to attract attention or belief", context: "The lawyer presented a ___ argument supported by evidence." },
-    { word: "diminish", synonym: "lessen", antonym: "intensify", definition: "to make or become smaller", context: "The pain should ___ after you take the medicine." },
-    { word: "feasible", synonym: "practical", antonym: "impossible", definition: "possible and realistic to achieve", context: "The team must decide whether the plan is financially ___." },
-    { word: "impartial", synonym: "unbiased", antonym: "prejudiced", definition: "treating all sides fairly", context: "A judge must remain ___ throughout a trial." },
-    { word: "prevalent", synonym: "widespread", antonym: "rare", definition: "common in a particular place or time", context: "Remote work has become increasingly ___ in the industry." },
-    { word: "reluctant", synonym: "unwilling", antonym: "eager", definition: "hesitant about doing something", context: "He was ___ to speak before such a large audience." },
-    { word: "subsequent", synonym: "following", antonym: "previous", definition: "coming after something else", context: "The first experiment failed, but ___ attempts succeeded." }
-  ]
-};
-
-Object.entries(REGULAR_VOCABULARY).forEach(([level, entries]) => addVocabularySet(QUESTION_POOL, level, 10, entries));
-
-// Each function below contributes 25 distinct grammar questions to its CEFR
-// band. Together with the vocabulary sets and the ten original questions,
-// each band contains exactly 125 questions.
-const A1_SUBJECTS = [["I", "am"], ["You", "are"], ["He", "is"], ["She", "is"], ["We", "are"]];
-const A1_COMPLEMENTS = ["ready for class", "at the library", "very hungry", "from Malaysia", "happy today"];
-A1_SUBJECTS.forEach(([subject, answer]) => A1_COMPLEMENTS.forEach((ending) =>
-  addQuestion(QUESTION_POOL, "A1", "Grammar", `Complete the sentence: ${subject} ___ ${ending}.`, ["am", "is", "are", "be"], answer, 10)
-));
-
-const A1_VERBS = [["work", "works", "working", "worked"], ["play", "plays", "playing", "played"], ["cook", "cooks", "cooking", "cooked"], ["help", "helps", "helping", "helped"], ["walk", "walks", "walking", "walked"]];
-const A1_PEOPLE = [["My brother", true], ["Sara", true], ["They", false], ["My friends", false], ["The teacher", true]];
-A1_PEOPLE.forEach(([subject, singular]) => A1_VERBS.forEach(([base, third, ing, past]) =>
-  addQuestion(QUESTION_POOL, "A1", "Grammar", `Use the verb '${base}' in the present simple: ${subject} ___ every day.`, [base, third, ing, past], singular ? third : base, 10)
-));
-
-const A1_ARTICLES = [["apple", "an"], ["banana", "a"], ["umbrella", "an"], ["book", "a"], ["orange", "an"]];
-const A1_BUYERS = ["I bought", "She wants", "He found", "We need", "They shared"];
-A1_BUYERS.forEach((lead) => A1_ARTICLES.forEach(([noun, answer]) =>
-  addQuestion(QUESTION_POOL, "A1", "Grammar", `Complete the sentence: ${lead} ___ ${noun}.`, ["a", "an", "the", "some"], answer, 10)
-));
-
-const A2_PAST = [["go", "went", "gone", "going"], ["see", "saw", "seen", "seeing"], ["buy", "bought", "boughten", "buying"], ["write", "wrote", "written", "writing"], ["take", "took", "taken", "taking"]];
-const A2_TIME_LEADS = ["Yesterday I", "Last week we", "On Monday they", "This morning she", "Two days ago he"];
-A2_TIME_LEADS.forEach((lead) => A2_PAST.forEach(([base, past, participle, ing]) =>
-  addQuestion(QUESTION_POOL, "A2", "Grammar", `Use the verb '${base}' in the past simple: ${lead} ___ it.`, [base, past, participle, ing], past, 10)
-));
-
-const A2_ADJECTIVES = [["tall", "taller", "tallest", "more tall"], ["fast", "faster", "fastest", "more fast"], ["cheap", "cheaper", "cheapest", "more cheap"], ["small", "smaller", "smallest", "more small"], ["young", "younger", "youngest", "more young"]];
-const A2_COMPARE = ["This one", "My bicycle", "The blue building", "Her dog", "Their new model"];
-A2_COMPARE.forEach((subject) => A2_ADJECTIVES.forEach(([base, comparative, superlative, wrong]) =>
-  addQuestion(QUESTION_POOL, "A2", "Grammar", `Use the comparative form of '${base}': ${subject} is ___ than the old one.`, [base, comparative, superlative, wrong], comparative, 10)
-));
-
-const A2_DURATIONS = [["Monday", "since"], ["2019", "since"], ["three hours", "for"], ["a long time", "for"], ["last summer", "since"]];
-const A2_RESIDENTS = ["I have lived here", "She has worked there", "We have known him", "They have studied English", "He has owned the shop"];
-A2_RESIDENTS.forEach((lead) => A2_DURATIONS.forEach(([time, answer]) =>
-  addQuestion(QUESTION_POOL, "A2", "Grammar", `Complete the sentence: ${lead} ___ ${time}.`, ["since", "for", "during", "from"], answer, 10)
-));
-
-const B1_CONDITIONS = ["it rains tomorrow", "you study regularly", "we leave now", "she calls tonight", "they miss the bus"];
-const B1_RESULTS = ["we will stay inside", "you will improve", "we will arrive early", "I will tell her", "they will be late"];
-B1_CONDITIONS.forEach((condition) => B1_RESULTS.forEach((result) =>
-  addQuestion(QUESTION_POOL, "B1", "Grammar", `Complete the first conditional to express this result: '${result}'. If ${condition}, ___.`, [result, result.replace("will", "would"), result.replace("will", "had"), result.replace("will", "have")], result, 10)
-));
-
-const B1_OBJECTS = ["The report", "The meal", "The road", "The invitations", "The room"];
-const B1_ACTIONS = [["complete", "completed"], ["prepare", "prepared"], ["close", "closed"], ["send", "sent"], ["clean", "cleaned"]];
-B1_OBJECTS.forEach((subject) => B1_ACTIONS.forEach(([base, participle]) =>
-  addQuestion(QUESTION_POOL, "B1", "Grammar", `Use the verb '${base}' to complete the passive sentence: ${subject} was ___ yesterday.`, [base, participle, `${base}s`, `${base}ing`], participle, 10)
-));
-
-const B1_PREPOSITIONS = [["interested", "in"], ["afraid", "of"], ["good", "at"], ["responsible", "for"], ["familiar", "with"]];
-const B1_TOPICS = ["learning languages", "large spiders", "solving puzzles", "organising the event", "this software"];
-B1_PREPOSITIONS.forEach(([adjective, answer]) => B1_TOPICS.forEach((topic) =>
-  addQuestion(QUESTION_POOL, "B1", "Grammar", `Complete the sentence: She is ${adjective} ___ ${topic}.`, ["in", "of", "at", "for", "with"].filter((value, index, array) => array.indexOf(value) === index).slice(0, 4).includes(answer) ? [answer, ...["in", "of", "at", "for", "with"].filter((value) => value !== answer).slice(0, 3)] : [answer, "in", "of", "at"], answer, 10)
-));
-
-const B2_IF_CLAUSES = ["I had known about the traffic", "she had checked the address", "we had booked earlier", "they had followed the advice", "he had saved the document"];
-const B2_OUTCOMES = ["I would have left sooner", "she would have arrived", "we would have found seats", "they would have avoided the problem", "he would not have lost his work"];
-B2_IF_CLAUSES.forEach((condition) => B2_OUTCOMES.forEach((result) =>
-  addQuestion(QUESTION_POOL, "B2", "Grammar", `Complete the third conditional to express this outcome: '${result}'. If ${condition}, ___.`, [result, result.replace("would", "will"), result.replace("would", "might"), result.replace("would", "had")], result, 10)
-));
-
-const B2_TASKS = ["finish the project", "write the report", "complete the course", "review every application", "deliver all the orders"];
-const B2_DEADLINES = ["by Friday", "by next June", "before the meeting", "by the end of the day", "before you arrive"];
-B2_TASKS.forEach((task) => B2_DEADLINES.forEach((deadline) => {
-  const answer = `will have ${task.replace(/^\w+/, (verb) => ({ finish: "finished", write: "written", complete: "completed", review: "reviewed", deliver: "delivered" }[verb]))}`;
-  addQuestion(QUESTION_POOL, "B2", "Grammar", `Use the future perfect for the task '${task}': They ___ ${deadline}.`, [answer, `will ${task}`, `have ${task}`, `would ${task}`], answer, 10);
-}));
-
-const B2_PATTERNS = [["denied", "taking", "take", "took"], ["admitted", "making", "make", "made"], ["considered", "moving", "move", "moved"], ["suggested", "waiting", "wait", "waited"], ["avoided", "answering", "answer", "answered"]];
-const B2_ENDINGS = ["the file", "a mistake", "to another city", "until Monday", "the difficult question"];
-B2_PATTERNS.forEach(([verb, answer, base, past]) => B2_ENDINGS.forEach((ending) =>
-  addQuestion(QUESTION_POOL, "B2", "Grammar", `Complete the sentence: She ${verb} ___ ${ending}.`, [answer, `to ${base}`, past, base], answer, 10)
-));
-
-const C1_VOCABULARY = [
-  { word: "abate", synonym: "subside", antonym: "intensify", definition: "to become less severe", context: "The storm began to ___ shortly before dawn." },
-  { word: "austere", synonym: "severe", antonym: "luxurious", definition: "plain and without comfort", context: "The monastery's rooms were deliberately ___." },
-  { word: "candid", synonym: "frank", antonym: "evasive", definition: "truthful and straightforward", context: "The director gave a ___ account of the company's failures." },
-  { word: "dearth", synonym: "scarcity", antonym: "abundance", definition: "a serious lack of something", context: "A ___ of reliable evidence weakened the claim." },
-  { word: "eclectic", synonym: "diverse", antonym: "uniform", definition: "drawn from many different sources", context: "Her ___ taste ranges from opera to electronic music." },
-  { word: "fastidious", synonym: "meticulous", antonym: "careless", definition: "very attentive to detail", context: "The editor is ___ about punctuation and formatting." },
-  { word: "gregarious", synonym: "sociable", antonym: "reclusive", definition: "fond of being with other people", context: "His ___ nature makes him comfortable at large events." },
-  { word: "hackneyed", synonym: "overused", antonym: "original", definition: "lacking impact because of repeated use", context: "The speech relied on ___ phrases and tired clichés." }
-];
-addVocabularySet(HARD_QUESTION_POOL, "C1", 20, C1_VOCABULARY);
-
-// Five advanced grammar families add 450 C1 questions (90 per family).
-const C1_OPENERS = ["Rarely", "Seldom", "Never before", "At no time", "Under no circumstances", "On no account", "Not once", "Hardly ever", "Only rarely", "In no way"];
-const C1_CLAUSES = [
-  ["the committee", "has", "encountered such resistance"], ["the researchers", "have", "observed this phenomenon"], ["the company", "has", "faced a greater challenge"],
-  ["the delegates", "have", "reached agreement so quickly"], ["the court", "has", "considered such evidence"], ["the editors", "have", "received so many complaints"],
-  ["the system", "has", "failed without warning"], ["the participants", "have", "questioned the underlying assumption"], ["the policy", "has", "attracted widespread support"]
-];
-C1_OPENERS.forEach((opener) => C1_CLAUSES.forEach(([subject, auxiliary, ending]) => {
-  const answer = `${auxiliary} ${subject} ${ending}`;
-  addQuestion(HARD_QUESTION_POOL, "C1", "Grammar", `Invert the clause '${subject} ${auxiliary} ${ending}' after '${opener}': ${opener} ___ .`, [answer, `${subject} ${auxiliary} ${ending}`, `did ${subject} ${ending}`, `${auxiliary} ${ending} ${subject}`], answer, 20);
-}));
-
-const C1_RECOMMENDATIONS = ["The board recommended", "The doctor insisted", "The chairperson proposed", "The report suggested", "The judge ordered", "The adviser requested", "The committee demanded", "The policy requires", "The director urged", "The regulation stipulates"];
-const C1_ACTIONS = [
-  ["he", "resign immediately"], ["she", "submit a revised draft"], ["the company", "disclose the figures"], ["each member", "attend the hearing"], ["the applicant", "provide identification"],
-  ["the team", "reconsider its approach"], ["the tenant", "vacate the property"], ["the minister", "address the issue"], ["every report", "be independently reviewed"]
-];
-C1_RECOMMENDATIONS.forEach((lead) => C1_ACTIONS.forEach(([subject, base]) => {
-  const answer = `${subject} ${base}`;
-  addQuestion(HARD_QUESTION_POOL, "C1", "Grammar", `Use the formal subjunctive for '${subject} ${base}': ${lead} that ___ .`, [answer, `${subject} to ${base}`, `${subject} would ${base}`, `${subject} should to ${base}`], answer, 20);
-}));
-
-const C1_IF_CLAUSES = ["the data been verified", "the warning arrived sooner", "the talks not collapsed", "the funds been allocated", "the witness come forward", "the flaw been detected", "the rules been clarified", "the market remained stable", "the evidence been disclosed", "the system been tested"];
-const C1_MODAL_RESULTS = ["the error might have been avoided", "the outcome could have been different", "the project would have continued", "the damage might have been limited", "the inquiry could have concluded sooner", "the decision would have been reconsidered", "the dispute might have been resolved", "the investment could have succeeded", "the verdict might have changed"];
-C1_IF_CLAUSES.forEach((condition) => C1_MODAL_RESULTS.forEach((result) =>
-  addQuestion(HARD_QUESTION_POOL, "C1", "Grammar", `Complete the advanced conditional with the outcome '${result}': Had ${condition}, ___.`, [result, result.replace(/(might|could|would) have/, "$1"), result.replace(/^(the \w+ )?(might|could|would)/, "$1will"), result.replace(/^(the \w+ )?(might|could|would)/, "$1can")], result, 20)
-));
-
-const C1_FOCUS = ["the lack of evidence", "her persistence", "the revised timetable", "their shared objective", "the final interview", "his detailed notes", "the unexpected delay", "the public response", "the second proposal", "the independent review"];
-const C1_EFFECTS = ["changed the committee's mind", "enabled the team to succeed", "caused the greatest concern", "ultimately resolved the dispute", "revealed the central problem", "made the difference", "prompted further investigation", "secured widespread support", "led to the policy change"];
-C1_FOCUS.forEach((focus) => C1_EFFECTS.forEach((effect) => {
-  const answer = `It was ${focus} that ${effect}`;
-  addQuestion(HARD_QUESTION_POOL, "C1", "Grammar", `Form a cleft sentence emphasising '${focus}' in the statement '${focus} ${effect}'.`, [answer, `It ${focus} was that ${effect}`, `What was ${focus} that ${effect}`, `There was ${focus} who ${effect}`], answer, 20);
-}));
-
-const C1_CONCESSIONS = ["Difficult though the task was", "Compelling though the argument seemed", "Carefully though the plan was devised", "Experienced though the team was", "Limited though the evidence remained", "Unlikely though the outcome appeared", "Complex though the procedure became", "Strong though the opposition was", "Persuasive though her case sounded", "Costly though the solution proved"];
-const C1_MAIN_CLAUSES = ["they completed it on schedule", "the panel remained unconvinced", "several flaws eventually emerged", "it still required outside support", "the inquiry reached a firm conclusion", "the possibility could not be dismissed", "the staff followed every step", "the measure was ultimately approved", "the jury rejected it"];
-C1_CONCESSIONS.forEach((concession) => C1_MAIN_CLAUSES.forEach((mainClause) => {
-  const answer = `${concession}, ${mainClause}`;
-  addQuestion(HARD_QUESTION_POOL, "C1", "English Language", `Combine '${concession}' with '${mainClause}' using a correct inverted concessive clause.`, [answer, `${concession.replace(" though", " despite")}, ${mainClause}`, `Although ${concession}, but ${mainClause}`, `${concession} however ${mainClause}`], answer, 20);
-}));
-
-if (QUESTION_POOL.length !== 500 || HARD_QUESTION_POOL.length !== 500) {
-  throw new Error(`Question bank size mismatch: ${QUESTION_POOL.length} regular, ${HARD_QUESTION_POOL.length} C1.`);
-}
+})();

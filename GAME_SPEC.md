@@ -10,11 +10,11 @@
 **Type:** Browser-based interactive quiz game, designed for use as an overlay or screen during a livestream.  
 **Tagline:** "How smart are you today?"  
 **Tech Stack:** Vanilla HTML, CSS, JavaScript — no frameworks, no build step needed.  
-**Entry Point:** `index.html` (loads `style.css`, `questions.js`, `questions-extra.js`, `question-facts.js`, `question-generator.js`, and `game.js` in that order)
+**Entry Point:** `index.html` (loads `style.css`, `questions.js`, `question-generator.js`, `wordle.js`, and `game.js`)
 
 ### File Structure
 
-Question logic is split across `questions.js` and `questions-extra.js` (legacy/configuration and shared base facts), `question-facts.js` (new verified raw facts), and `question-generator.js` (weighted persistent generation).
+`questions.js` builds and validates the active questionnaire set. `question-generator.js` selects unseen questions from those banks when a level must be refreshed. Superseded questionnaire sources are kept under `archive/` and are never loaded by the game.
 
 ```
 livestream game/
@@ -97,9 +97,9 @@ Screens fade out with a slight downward slide (`translateY(22px) scale(0.985)`) 
 
 ## 3. Question System
 
-> **Current implementation (September 2026):** The runtime question system is fully generated rather than selected from `QUESTION_POOL` or `HARD_QUESTION_POOL`. `question-generator.js` constructs questions on demand using procedural rules and verified local fact tables. The legacy question objects remain loaded for backward-compatible saved sessions, but new games never select from them.
+> **Current implementation (October 2026):** New games select from questionnaire set `2026-10-19`, containing 500 regular and 500 C1 prompts. The previous sources are archived and unloaded.
 
-### 3.0 Runtime Generator (`question-generator.js`)
+### 3.0 Runtime Selector (`question-generator.js`)
 
 - A new random seed is created at the start of every normal or challenge game.
 - Regular questions use a weighted mix: approximately 10% basic arithmetic and 90% knowledge/pop-culture generators.
@@ -115,12 +115,14 @@ Screens fade out with a slight downward slide (`translateY(22px) scale(0.985)`) 
 - Challenge mode generates seven regular and three hard questions, then shuffles their order.
 - Wrong-answer fallback levels receive a newly generated unseen question at the appropriate difficulty.
 
-### 3.1 Legacy Question Pool (`questions.js`)
+### 3.1 Active Question Pool (`questions.js`)
 
-The following arrays are retained for backward compatibility with sessions created before the generator migration. They are not a source for newly started games.
+The following arrays are the source for newly started games.
 
 - **`GAME_QUESTION_COUNT`** = `50` (the number of levels per game session)
-- **`QUESTION_POOL`** = a large array of question objects. Currently contains **~216 questions** across three "games" worth of content (GAME 1, GAME 2, GAME 3 + hard final round).
+- **`QUESTION_POOL`** = 500 regular questions: 125 each at A1, A2, B1, and B2.
+- **`HARD_QUESTION_POOL`** = 500 C1 questions.
+- **`QUESTION_SET_ID`** = `2026-10-19`.
 
 **Each question object has:**
 ```js
@@ -133,7 +135,7 @@ The following arrays are retained for backward compatibility with sessions creat
 }
 ```
 
-### 3.2 Generated Question Difficulty Tiers
+### 3.2 Question Difficulty Tiers
 
 Generated sessions are split into two tiers by level:
 
@@ -142,7 +144,7 @@ Generated sessions are split into two tiers by level:
 | Regular | Regular generator categories | 10 pts | Levels 1–40 |
 | Hard (Final Round) | Hard generator categories | 20 pts | Levels 41–50 |
 
-- `FINAL_ROUND_COUNT` = `Math.min(10, TOTAL_QS, QUESTION_POOL.length)` = **10**
+- `FINAL_ROUND_COUNT` = `Math.min(10, TOTAL_QS, HARD_QUESTION_POOL.length)` = **10**
 - `REGULAR_LEVEL_COUNT` = `TOTAL_QS - FINAL_ROUND_COUNT` = **40**
 
 ### 3.3 Question List Construction (`buildQuestionList`)
@@ -432,15 +434,13 @@ The confetti runs on `#confettiCanvas` (full-screen, `z-index: 180`, pointer-eve
 
 ## 13. Adding New Questions (Instructions for AI)
 
-To add a generated question family:
-1. Open `question-generator.js`.
-2. Add a definition to `regularGenerators` or `hardGenerators` with a stable, unique `kind`, the exact number of possible combinations in `size`, and an index-driven `build()` function.
-3. Decode the supplied combination index deterministically. Do not choose the question's core operands or fact randomly inside `build()`; otherwise the cycle cannot guarantee uniqueness.
-4. Random answer-choice ordering and distractor construction are allowed because they do not change the question identity.
-5. Pass the definition, cycle, and combination index to `makeQuestion()` so `generatorKey` remains compact and stable.
-6. Ensure every result has exactly four unique choices and that `answer` matches one choice exactly.
-
-To add verified fact content, extend the relevant fact table in `question-facts.js` (or the shared legacy base tables in `questions-extra.js`). Changing a category's calculated `size` automatically starts a fresh compatible cycle record for that category.
+To add or replace a question family:
+1. Open `questions.js` and add entries through `addQuestion()` or `addGrid()`.
+2. Keep regular questions at 10 points and C1 questions at 20 points.
+3. Ensure every displayed prompt is unique, including all visible text supplied by a template.
+4. Ensure every result has exactly four unique choices and that `answer` matches one choice exactly.
+5. Update the expected sizes in `validateQuestionBank()` only when intentionally changing the pools.
+6. Bump `SESSION_VERSION` in `game.js` when replacing a set so saved sessions cannot restore retired prompts.
 
 ---
 
