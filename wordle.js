@@ -32,11 +32,8 @@
     let isWon = false;
     let isRevealing = false;
     let isValidating = false;
-    let isFetchingWord = false;
     let onProceedCallback = null;
     let onBackCallback = null;
-    let activePlayerName = "Teacher Ash";
-    let activePlayerImage = "ashhead.png";
 
     // In-memory caches for fast lookup
     const validWordCache = new Map();
@@ -59,10 +56,8 @@
     let btnAudioWordEl = null;
     let btnAudioMeaningEl = null;
     let btnAudioSentenceEl = null;
-    let btnWordleRandomWordEl = null;
     let btnWordleBackEl = null;
     let btnWordleSkipEl = null;
-    let wordleDatePillEl = null;
 
     // Track on-screen keyboard key statuses ('correct', 'present', 'absent')
     const keyStatuses = {};
@@ -73,18 +68,6 @@
         const m = String(date.getMonth() + 1).padStart(2, "0");
         const d = String(date.getDate()).padStart(2, "0");
         return `${y}-${m}-${d}`;
-    }
-
-    function formatDateFriendly(date = new Date()) {
-        try {
-            return date.toLocaleDateString(undefined, {
-                weekday: "short",
-                month: "short",
-                day: "numeric"
-            });
-        } catch (e) {
-            return getTodayDateKey(date);
-        }
     }
 
     // ── First-Time Visitor Check for Skip Button ──────────────────
@@ -439,10 +422,8 @@
         btnAudioWordEl = document.getElementById("btnAudioWord");
         btnAudioMeaningEl = document.getElementById("btnAudioMeaning");
         btnAudioSentenceEl = document.getElementById("btnAudioSentence");
-        btnWordleRandomWordEl = document.getElementById("btnWordleRandomWord");
         btnWordleBackEl = document.getElementById("btnWordleBack");
         btnWordleSkipEl = document.getElementById("btnWordleSkip");
-        wordleDatePillEl = document.getElementById("wordleDatePill");
 
         updateSkipButtonVisibility();
     }
@@ -817,9 +798,6 @@
         renderKeyboard();
         updateSkipButtonVisibility();
 
-        if (wordleDatePillEl) {
-            wordleDatePillEl.textContent = `Today: ${formatDateFriendly()} • 5 Letters`;
-        }
     }
 
     function attachGlobalListeners() {
@@ -868,24 +846,6 @@
             btnWordleProceedEl.addEventListener("click", handleProceed);
         }
 
-        // Random New Word Button (Direct API Fetch)
-        if (btnWordleRandomWordEl) {
-            btnWordleRandomWordEl.addEventListener("click", async () => {
-                if (isFetchingWord) return;
-                isFetchingWord = true;
-                showToast("Fetching new word from API...", 1500);
-                try {
-                    const freshWord = await fetchFreshWordFromAPI();
-                    resetBoard(freshWord);
-                    showToast("New mystery word ready!", 1600);
-                } catch (e) {
-                    showToast("Could not fetch new word", 1600);
-                } finally {
-                    isFetchingWord = false;
-                }
-            });
-        }
-
         // Back to Menu
         if (btnWordleBackEl) {
             btnWordleBackEl.addEventListener("click", () => {
@@ -918,14 +878,6 @@
         initDOMReferences();
         onProceedCallback = options.onProceed || null;
         onBackCallback = options.onBack || null;
-        activePlayerName = options.playerName || "Teacher Ash";
-        activePlayerImage = options.playerImage || "ashhead.png";
-
-        const playerPillEl = document.getElementById("wordlePlayerPill");
-        if (playerPillEl) {
-            playerPillEl.innerHTML = `<img src="${activePlayerImage}" alt="" class="wordle-player-thumb" /><span>Playing as <strong>${activePlayerName}</strong></span>`;
-        }
-
         updateSkipButtonVisibility();
 
         if (!currentTargetWordObj) {

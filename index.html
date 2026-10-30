@@ -126,45 +126,47 @@
               <h2 class="wordle-title">Wordle of the Day</h2>
             </div>
           </div>
-          <div class="wordle-meta">
-            <div class="wordle-player-pill" id="wordlePlayerPill">
-              <img src="ashhead.png" alt="" class="wordle-player-thumb" />
-              <span>Playing as <strong>Teacher Ash</strong></span>
+        </div>
+
+        <div class="wordle-game-layout">
+          <section class="wordle-section wordle-input-section" aria-label="Answer keyboard and game controls">
+            <div class="wordle-input-heading">
+              <span class="wordle-input-kicker">YOUR ANSWER</span>
+              <h3>Type your guess</h3>
+              <p>Use the keyboard below or type on your device.</p>
             </div>
-            <span class="wordle-date-pill" id="wordleDatePill">Today • 5 Letters</span>
-            <button class="wordle-btn-random" id="btnWordleRandomWord" type="button" title="Generate a new random mystery word">
-              &#127922; New Word
-            </button>
-          </div>
-        </div>
 
-        <div class="wordle-hint-bar">
-          <div class="hint-pill hint-green">
-            <span class="hint-box hint-box-green">A</span>
-            <span>Correct place</span>
-          </div>
-          <div class="hint-pill hint-yellow">
-            <span class="hint-box hint-box-yellow">B</span>
-            <span>Wrong placement</span>
-          </div>
-          <div class="hint-pill hint-black">
-            <span class="hint-box hint-box-black">C</span>
-            <span>Not in word</span>
-          </div>
-        </div>
+            <!-- Virtual Keyboard -->
+            <div class="wordle-keyboard" id="wordleKeyboard" role="group" aria-label="Wordle Keyboard"></div>
 
-        <!-- 5x6 Wordle Board -->
-        <div class="wordle-board-wrap">
-          <div class="wordle-grid" id="wordleGrid" role="grid" aria-label="Wordle 6 attempts grid"></div>
-          <div class="wordle-toast hidden" id="wordleToast">Not enough letters</div>
-        </div>
+            <div class="wordle-bottom-bar">
+              <button class="btn btn-back" id="btnWordleBack" type="button">&#8592; Back to Menu</button>
+              <button class="wordle-btn-skip" id="btnWordleSkip" type="button">Skip to Quiz &#8594;</button>
+            </div>
+          </section>
 
-        <!-- Virtual Keyboard -->
-        <div class="wordle-keyboard" id="wordleKeyboard" role="group" aria-label="Wordle Keyboard"></div>
+          <section class="wordle-section wordle-board-section" aria-label="Wordle attempts">
+            <div class="wordle-hint-bar" aria-label="Tile color guide">
+              <div class="hint-pill hint-green">
+                <span class="hint-box hint-box-green">A</span>
+                <span>Correct place</span>
+              </div>
+              <div class="hint-pill hint-yellow">
+                <span class="hint-box hint-box-yellow">B</span>
+                <span>Wrong placement</span>
+              </div>
+              <div class="hint-pill hint-black">
+                <span class="hint-box hint-box-black">C</span>
+                <span>Not in word</span>
+              </div>
+            </div>
 
-        <div class="wordle-bottom-bar">
-          <button class="btn btn-back" id="btnWordleBack" type="button">&#8592; Back to Menu</button>
-          <button class="wordle-btn-skip" id="btnWordleSkip" type="button">Skip to Quiz &#8594;</button>
+            <!-- 5x6 Wordle Board -->
+            <div class="wordle-board-wrap">
+              <div class="wordle-grid" id="wordleGrid" role="grid" aria-label="Wordle 6 attempts grid"></div>
+              <div class="wordle-toast hidden" id="wordleToast">Not enough letters</div>
+            </div>
+          </section>
         </div>
       </div>
     </div>
